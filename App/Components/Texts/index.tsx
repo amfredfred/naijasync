@@ -5,7 +5,7 @@ import { View, Text } from 'react-native'
 export type ISpanText = Text['props'] & IThemedComponent
 
 export const SpanText = (props: ISpanText) => {
-    const { isVisible = true, style, ...otherProps } = props
+    const { hidden, style, ...otherProps } = props
     const { textColor } = useColorSchemes()
 
     const styles: ISpanText['style'] = {
@@ -14,5 +14,18 @@ export const SpanText = (props: ISpanText) => {
         fontSize: 18
     }
 
-    return <Text style={[styles, style]} {...otherProps} />
+    return hidden || <Text style={[styles, style]} {...otherProps} />
+}
+
+export const HeadLine = (props: ISpanText) => {
+    const { hidden, style, ...otherProps } = props
+
+    const styles: ISpanText['style'] = {
+        fontSize: 16,
+        textTransform: 'capitalize',
+        fontWeight: '400',
+        paddingHorizontal: 5
+    }
+
+    return hidden || <SpanText hidden={hidden} style={[styles, style]} {...otherProps} />
 }

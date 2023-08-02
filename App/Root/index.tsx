@@ -6,25 +6,28 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Landing from "../Screens/Guest/Landing";
+import Home from "../Screens/User/Home";
 
 
 export default function Root() {
-    const [isAuthenticated, setisAuthenticated] = useState(false)
+    const [isAuthenticated, setisAuthenticated] = useState(true)
 
     const Stack = createNativeStackNavigator();
 
     return (
         <SafeAreaProvider>
-            <NavigationContainer>
+            <NavigationContainer >
                 {isAuthenticated ?
                     <UserLayout>
-                        <Text>USer</Text>
+                        <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }} >
+                            <Stack.Screen name='Home' component={Home} options={{ title: 'Home' }} />
+                        </Stack.Navigator>
                     </UserLayout>
                     :
                     <GuestLayout>
                         <Text>Guest</Text>
-                        <Stack.Navigator initialRouteName="Landing">
-                            <Stack.Screen name='Landing' component={Landing} options={{ title: 'Welcome' }} />
+                        <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+                            <Stack.Screen name='Landing' component={Landing} />
                         </Stack.Navigator>
                         <Text>Guest</Text>
                     </GuestLayout>

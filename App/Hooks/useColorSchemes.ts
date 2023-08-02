@@ -1,6 +1,5 @@
-import { useColorScheme, Appearance } from "react-native";
+import { useColorScheme } from "react-native";
 import { IApp } from "../Interfaces";
-import { useEffect, useState } from 'react'
 
 export default function useColorSchemes(): IApp['themeColors']['dark' | 'light'] {
 
@@ -8,7 +7,8 @@ export default function useColorSchemes(): IApp['themeColors']['dark' | 'light']
 
     const schemes: IApp['themeColors'] = {
         dark: {
-            background: '#091314',
+            background: '#050807',
+            headerBackgorund:'#bf0442',
             textColor: '#EAEAEA',
             headlineColor: '',
             primaryColor: '#FF925A',
@@ -23,7 +23,8 @@ export default function useColorSchemes(): IApp['themeColors']['dark' | 'light']
             opacity: 1,
         },
         light: {
-            background: '#F0F0F',
+            background: '#F0F0FF',
+            headerBackgorund:'honeydew',
             textColor: '#333333',
             headlineColor: '',
             primaryColor: '#FF925A',

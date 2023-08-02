@@ -1,12 +1,13 @@
 import { TouchableOpacity } from 'react-native'
 
 export interface IThemedComponent {
-    isVisible?: boolean
+    hidden?: null | boolean
 }
 
 export interface ITheme {
     light: {
         background: string
+        headerBackgorund: string
         textColor: string
         headlineColor: string
         primaryColor: string
@@ -22,6 +23,7 @@ export interface ITheme {
     }
     dark: {
         background: string
+        headerBackgorund: string
         textColor: string
         headlineColor: string
         primaryColor: string
@@ -35,6 +37,23 @@ export interface ITheme {
         background2: string
         opacity: number
     }
+}
+
+export type IPostItem = {
+    caption: string
+    thumb: string
+    src: string
+    index?: number
+} & ({
+    type: 'video'
+} | {
+    type: 'audio'
+})
+
+export interface IListSlider {
+    children?: React.ReactNode
+    items: IPostItem[]
+    headline?: React.ReactNode
 }
 
 export interface IApp {
