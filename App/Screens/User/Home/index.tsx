@@ -22,7 +22,15 @@ export default function Home() {
                 headline='Hollywood'
                 items={Videos} />
             <ListSlider
-                headline='NollyWood movies'
+                headline='NollyWood'
+                items={Videos}
+            />
+            <ListSlider
+                headline='Skits'
+                items={Videos}
+            />
+            <ListSlider
+                headline='2023'
                 items={Videos}
             />
             <ListSlider

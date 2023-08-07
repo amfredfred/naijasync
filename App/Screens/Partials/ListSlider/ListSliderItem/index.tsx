@@ -11,7 +11,7 @@ export const VideoListItem = (props: IPostItem) => {
     const { navigate } = useNavigation()
     return (
         <Button
-            // onPress={() => navigate?.({ name: '' })}
+            onPress={() => navigate?.('View', props)}
             title={null}
             style={{
                 height: 140,

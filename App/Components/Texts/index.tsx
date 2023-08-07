@@ -21,10 +21,9 @@ export const HeadLine = (props: ISpanText) => {
     const { hidden, style, ...otherProps } = props
 
     const styles: ISpanText['style'] = {
-        fontSize: 16,
         textTransform: 'capitalize',
-        fontWeight: '400',
-        paddingHorizontal: 5
+        fontWeight: '900',
+        paddingHorizontal: 5,
     }
 
     return hidden || <SpanText hidden={hidden} style={[styles, style]} {...otherProps} />

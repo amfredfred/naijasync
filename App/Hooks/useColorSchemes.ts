@@ -8,7 +8,7 @@ export default function useColorSchemes(): IApp['themeColors']['dark' | 'light']
     const schemes: IApp['themeColors'] = {
         dark: {
             background: '#050807',
-            headerBackgorund:'#bf0442',
+            headerBackgorund:'#bf0202',
             textColor: '#EAEAEA',
             headlineColor: '',
             primaryColor: '#FF925A',

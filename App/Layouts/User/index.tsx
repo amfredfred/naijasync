@@ -22,7 +22,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <ContainerFlex>
-            <Header />
+            <Header  />
             {children}
             <Navigation />
         </ContainerFlex>

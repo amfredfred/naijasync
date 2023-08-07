@@ -46,7 +46,7 @@ export const IconButton = (props: IButton) => {
         style={[styled, style]}
         {...otherProps} >
         <ContainerSpaceBetween justify="center">
-            <SpanText style={{ color }} children={children} />
+            <SpanText style={{ color  }} children={children} />
         </ContainerSpaceBetween>
     </TouchableOpacity>
 }

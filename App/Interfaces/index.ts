@@ -4,6 +4,11 @@ export interface IThemedComponent {
     hidden?: null | boolean
 }
 
+export interface IHeader {
+    hidden?: boolean,
+    headerToggle?(p: ((s: boolean) => void)): void
+}
+
 export interface ITheme {
     light: {
         background: string
