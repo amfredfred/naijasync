@@ -1,4 +1,4 @@
-import useColorSchemes from "../../Hooks/useColorSchemes";
+import useThemeColors from "../../Hooks/useThemeColors";
 import { IApp, IThemedComponent } from "../../Interfaces";
 import { View, ScrollView, ActivityIndicator, useWindowDimensions, Image } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
@@ -12,7 +12,7 @@ export type ContainerSpaceBetween = IContainer & {
 
 export const ContainerFlex = (props: IContainer) => {
     const { style, hidden, ...otherProps } = props
-    const { background } = useColorSchemes()
+    const { background } = useThemeColors()
     const styles: IContainer['style'] = {
         backgroundColor: background,
         flex: 1
@@ -22,7 +22,7 @@ export const ContainerFlex = (props: IContainer) => {
 
 export const ContainerBlock = (props: IContainer) => {
     const { style, hidden, ...otherProps } = props
-    const { background2 } = useColorSchemes()
+    const { background2 } = useThemeColors()
     const styles: IContainer['style'] = {
         backgroundColor: background2,
         padding: 10,
@@ -32,13 +32,15 @@ export const ContainerBlock = (props: IContainer) => {
 
 export const ContainerSpaceBetween = (props: ContainerSpaceBetween) => {
     const { style, hidden, justify = 'space-between', align = 'center', ...otherProps } = props
-    const { background2 } = useColorSchemes()
+    const { background2 } = useThemeColors()
     const styles: IContainer['style'] = {
         backgroundColor: background2,
         padding: 10,
         justifyContent: justify,
         alignItems: align,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        maxWidth: '100%',
+        overflow: 'hidden'
     }
     return hidden || <View style={[styles, style]} {...otherProps} />
 }

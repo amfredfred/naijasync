@@ -1,4 +1,4 @@
-import useColorSchemes from "../../Hooks/useColorSchemes";
+import useThemeColors from "../../Hooks/useThemeColors";
 import { IApp, IThemedComponent } from "../../Interfaces";
 import { View, Text } from 'react-native'
 
@@ -6,10 +6,10 @@ export type ISpanText = Text['props'] & IThemedComponent
 
 export const SpanText = (props: ISpanText) => {
     const { hidden, style, ...otherProps } = props
-    const { textColor } = useColorSchemes()
+    const { text } = useThemeColors()
 
     const styles: ISpanText['style'] = {
-        color: textColor,
+        color: text,
         fontWeight: '500',
         fontSize: 18
     }

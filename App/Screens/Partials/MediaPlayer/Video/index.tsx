@@ -2,16 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Video, ResizeMode } from 'expo-av'
 import { IPostItem } from "../../../../Interfaces";
 import { ContainerBlock, Overlay } from "../../../../Components/Containers";
-import useColorSchemes from "../../../../Hooks/useColorSchemes";
+import useThemeColors from "../../../../Hooks/useThemeColors";
 import { Image } from "react-native";
-import useHeader from "../../../../Hooks/useHeader";
 import { Button } from "../../../../Components/Buttons";
 import { SpanText } from "../../../../Components/Texts";
 
 
 export default function VideoPlayer(props: IPostItem) {
-    const { background2 } = useColorSchemes()
-    const { setisUSerHeaderHidden, isUSerHeaderHidden } = useHeader()
+    const { background2 } = useThemeColors()
     const { src, thumb } = props
     const video = useRef<Video>();
     const [status, setStatus] = useState({});
@@ -26,7 +24,6 @@ export default function VideoPlayer(props: IPostItem) {
         })
     }, [])
 
-    console.log(isUSerHeaderHidden)
 
     const PlayerControls = (
         <ContainerBlock>
@@ -41,7 +38,7 @@ export default function VideoPlayer(props: IPostItem) {
                 imageSource={thumb}
             />
             {!isShwoingControls || PlayerControls}
-            <Button title="HEY" children={<SpanText>Hidee</SpanText>} onPress={()=>setisUSerHeaderHidden(s=>!s)} />
+            <Button title="HEY" children={<SpanText>Hidee</SpanText>} onPress={() => { }} />
             <Video
                 posterSource={{ uri: thumb }}
                 style={{ width: '100%', aspectRatio: '16/9' }}

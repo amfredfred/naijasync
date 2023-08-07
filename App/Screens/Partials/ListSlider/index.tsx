@@ -20,7 +20,6 @@ export default function ListSlider(props: IListSlider) {
                 data={items}
                 bouncesZoom={false}
                 bounces={false}
-                inverted
                 contentContainerStyle={{ paddingHorizontal: 10, gap: 10 }}
                 renderItem={({ item, index }: { item: IPostItem, index: number }) => <ListSlideItem key={index} index={index} {...item} />}
                 horizontal

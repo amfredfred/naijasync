@@ -1,15 +1,24 @@
-import useColorSchemes from "../../Hooks/useColorSchemes";
+import useThemeColors from "../../Hooks/useThemeColors";
 import { IApp, IThemedComponent } from "../../Interfaces";
-import { TouchableOpacity, Vibration } from 'react-native'
+import { Image, TouchableOpacity, Vibration } from 'react-native'
 import { ContainerBlock, ContainerSpaceBetween, IContainer } from "../Containers";
-import { SpanText } from "../Texts";
+import { ISpanText, SpanText } from "../Texts";
 
 export type IBUttonContainer = IContainer
-export type IButton = TouchableOpacity['props'] & IThemedComponent & { containerStyle?: ContainerSpaceBetween['style'] }
+export type IButton = TouchableOpacity['props'] & IThemedComponent & {
+    containerStyle?: ContainerSpaceBetween['style']
+    textStyle?: ISpanText['style']
+    title?: React.ReactNode
+    color?: "primary" | "secondary"
+    variant?: "outlined" | "contained"
+    severity?: "error" | "success" | "warning" | "info"
+}
+
+export type IIconButton = IButton & ({ image: Image['props'], size?: number } | { icon: React.ReactNode })
 
 export const Button = (props: IButton & { title: string }) => {
     const { style, title, children, hidden, onLongPress, containerStyle, ...otherProps } = props
-    const { accentColor: color, background } = useColorSchemes()
+    const { accent: color, background } = useThemeColors()
     const styled: IButton['style'] = {
         flexGrow: 1,
         borderRadius: 10,
@@ -31,22 +40,41 @@ export const Button = (props: IButton & { title: string }) => {
 }
 
 
-export const IconButton = (props: IButton) => {
-    const { style, children, hidden, ...otherProps } = props
-    const { accentColor: color, background } = useColorSchemes()
+export const IconButton = (props: IIconButton) => {
+    const { style, title, children, hidden, ...otherProps } = props
+    const { accent: color, background, primary } = useThemeColors()
 
     const styled: IButton['style'] = {
-        aspectRatio: 1 / 1,
         borderRadius: 50,
-        width: 35,
-        backgroundColor: background
+        overflow: 'hidden',
     }
 
-    return hidden || <TouchableOpacity
+    const styledContainer: IButton['style'] = {
+        minHeight: (props as any)?.size ?? 35,
+        borderRadius: 50,
+        aspectRatio: 1,
+        padding: 2,
+        ...(otherProps.variant === 'contained' ? {
+            backgroundColor: primary,
+        } : otherProps.variant === 'outlined' ? {
+            borderWidth: 1,
+            borderColor: primary,
+        } : { backgroundColor: 'transparent' }),
+    };
+
+    return !hidden ? <TouchableOpacity
         style={[styled, style]}
         {...otherProps} >
-        <ContainerSpaceBetween justify="center">
-            <SpanText style={{ color  }} children={children} />
+        <ContainerSpaceBetween justify="center" style={[styledContainer]}>
+            <SpanText hidden={!(props as any)?.icon} style={{ color }} children={(props as any)?.icon} />
+            {
+                (otherProps as any)?.image?.source && (
+                    <Image
+                        style={[{ width: (props as any)?.size ?? 40, aspectRatio: 1 }]}
+                        {...(otherProps as any).image}
+                    />
+                )
+            }
         </ContainerSpaceBetween>
-    </TouchableOpacity>
+    </TouchableOpacity> : null
 }
