@@ -1,4 +1,4 @@
-import { IStorageItems, IStorageMethods } from './iStorage'
+import { IStorageItems, IStorageMethods } from './iUseStorage'
 
 export interface IThemedComponent {
     hidden?: null | boolean

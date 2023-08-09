@@ -9,6 +9,7 @@ import Home from "../Screens/User/Home";
 import View from "../Screens/User/View";
 import { useCallback, useEffect, useState } from 'react';
 import DataContextProvider from "../Contexts/DataContext";
+import Downloads from "../Screens/User/Downloads";
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
@@ -20,6 +21,7 @@ export default function Root() {
             <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }} >
                 <Stack.Screen name='Home' component={Home} />
                 <Stack.Screen name='View' component={View} />
+                <Stack.Screen name='Downloads' component={Downloads} />
             </Stack.Navigator>
         </UserLayout>
     )

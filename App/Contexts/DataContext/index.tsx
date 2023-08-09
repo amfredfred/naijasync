@@ -3,7 +3,6 @@ import { IAppDataContext, IAppDataContextMethods } from '../../Interfaces'
 import useStorage from '../../Hooks/useStorage'
 
 const initialState: IAppDataContext = {
-
 }
 
 const DataContext = createContext<{

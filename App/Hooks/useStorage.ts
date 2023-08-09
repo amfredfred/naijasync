@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState, useEffect } from 'react'
-import { IStorageItems, IStorageMethods } from '../Interfaces/iStorage'
+import { IStorageItems, IStorageMethods } from '../Interfaces/iUseStorage'
 export type IUseStorage = {
     method: IStorageMethods,
     NaijaSync: IStorageItems

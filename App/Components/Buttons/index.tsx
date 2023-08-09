@@ -23,7 +23,7 @@ export type IButtonGradient = IIconButton & {
 
 
 export const Button = (props: IButton & { title: string }) => {
-    const { style, title, children, hidden, onLongPress, containerStyle, ...otherProps } = props
+    const { style, title, children, hidden, textStyle, onLongPress, containerStyle, ...otherProps } = props
     const { accent: color, background } = useThemeColors()
     const styled: IButton['style'] = {
         flexGrow: 1,
@@ -41,13 +41,14 @@ export const Button = (props: IButton & { title: string }) => {
         {...otherProps} >
         <ContainerBlock style={[containerStyle]}>
             {children}
+            <SpanText numberOfLines={1} hidden={!title} children={title} style={[{ textTransform: 'uppercase' }, textStyle]} />
         </ContainerBlock>
     </TouchableOpacity>
 }
 
 export const IconButton = (props: IIconButton) => {
-    const { style, title, children, hidden, ...otherProps } = props
-    const { accent: color, background, primary } = useThemeColors()
+    const { style, title, children, hidden, containerStyle, ...otherProps } = props
+    const { accent: color, background2, primary } = useThemeColors()
 
     const styled: IButton['style'] = {
         borderRadius: 50,
@@ -55,22 +56,28 @@ export const IconButton = (props: IIconButton) => {
     }
 
     const styledContainer: IButton['style'] = {
-        minHeight: (props as any)?.size ?? 35,
-        borderRadius: 50,
-        aspectRatio: 1,
+        minHeight: (props as any)?.size ?? 30,
+        borderRadius: 10,
         padding: 2,
         ...(otherProps.variant === 'contained' ? {
             backgroundColor: primary,
+            aspectRatio: 1
         } : otherProps.variant === 'outlined' ? {
             borderWidth: 1,
             borderColor: primary,
-        } : { backgroundColor: 'transparent' }),
+            aspectRatio: 1
+        } : {
+            backgroundColor: title ? background2 : 'transparent',
+            borderWidth: title ? 1 : 0,
+            borderColor: color,
+            paddingHorizontal: 5
+        }),
     };
 
     return !hidden ? <TouchableOpacity
         style={[styled, style]}
         {...otherProps} >
-        <ContainerSpaceBetween justify="center" style={[styledContainer]}>
+        <ContainerSpaceBetween justify="center" style={[styledContainer, containerStyle]}>
             <SpanText hidden={!(props as any)?.icon} style={{ color }} children={(props as any)?.icon} />
             {
                 (otherProps as any)?.image?.source && (
@@ -80,6 +87,7 @@ export const IconButton = (props: IIconButton) => {
                     />
                 )
             }
+            <SpanText hidden={!title} children={title} style={{ textTransform: 'capitalize', paddingRight: 5, fontSize:13 }} />
         </ContainerSpaceBetween>
     </TouchableOpacity> : null
 }

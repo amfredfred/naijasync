@@ -6,6 +6,8 @@ import { View, Text, StyleSheet, RefreshControl, Dimensions } from 'react-native
 import useThemeColors from "../../../Hooks/useThemeColors";
 import ContentTables from "../../Partials/ContentTables";
 import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
+import { useDataContext } from "../../../Contexts/DataContext";
+import { useEffect } from 'react'
 
 
 const ComingSoon = () => (
@@ -20,12 +22,14 @@ export default function Home() {
 
     const colors = useThemeColors()
     const [index, setIndex] = useState(0);
+    const { setData, states: NJS } = useDataContext()
     const [routes] = useState([
         { key: 'movies', title: 'movies 🎞️' },
         { key: 'music', title: 'music 🎶' },
         { key: 'betting', title: 'betting 🎲' },
         { key: 'more', title: 'more... 📃' },
     ]);
+
 
     const renderScene = SceneMap({
         movies: ContentTables,
@@ -57,7 +61,7 @@ export default function Home() {
                 onIndexChange={setIndex}
                 initialLayout={initialLayout}
                 renderTabBar={(props) => <TabBar
-                    style={{ backgroundColor: colors.headerBackgorund, }}
+                    style={{ backgroundColor: 'transparent', }}
                     inactiveColor={colors.text}
                     activeColor={colors.accent}
                     {...props}
@@ -70,10 +74,6 @@ export default function Home() {
 
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'blue'
-    },
     pagerView: {
         flex: 1,
     },
@@ -83,8 +83,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
 });
