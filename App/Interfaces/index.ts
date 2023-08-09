@@ -1,4 +1,4 @@
-import { TouchableOpacity } from 'react-native'
+import { IStorageItems, IStorageMethods } from './iStorage'
 
 export interface IThemedComponent {
     hidden?: null | boolean
@@ -17,7 +17,6 @@ export interface IColors {
     warning: string
     background2: string
 }
-
 export interface ITheme {
     light: IColors
     dark: IColors
@@ -43,3 +42,6 @@ export interface IListSlider {
 export interface IApp {
     themeColors: ITheme
 }
+
+export type IAppDataContext = IStorageItems
+export type IAppDataContextMethods = IStorageMethods

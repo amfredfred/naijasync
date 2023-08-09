@@ -6,6 +6,8 @@ import useThemeColors from "../../../../Hooks/useThemeColors";
 import { Image } from "react-native";
 import { Button } from "../../../../Components/Buttons";
 import { SpanText } from "../../../../Components/Texts";
+import useStorage from "../../../../Hooks/useStorage";
+import { useDataContext } from "../../../../Contexts/DataContext";
 
 
 export default function VideoPlayer(props: IPostItem) {
@@ -17,12 +19,20 @@ export default function VideoPlayer(props: IPostItem) {
     const [onVideoLoading, setonVideoLoading] = useState(true)
     //
     const [isShwoingControls, setisShwoingControls] = useState<boolean>()
+    // const { NaijaSync: NJS, method } = useStorage("@NaijaSync")
+    const { setData, states: NJS } = useDataContext()
 
     useEffect(() => {
         video.current?.setState({
             showPoster: true,
         })
     }, [])
+
+    const handleToggleHeader = () => {
+        setData('states', 'isHeaderHidden', !NJS?.states?.isHeaderHidden)
+        // method?.setItem('states', 'isHeaderHidden', !NJS?.states?.isHeaderHidden)
+        // console.log("HEY FRE FRED::: ", NJS?.states?.isHeaderHidden)
+    }
 
 
     const PlayerControls = (
@@ -38,7 +48,7 @@ export default function VideoPlayer(props: IPostItem) {
                 imageSource={thumb}
             />
             {!isShwoingControls || PlayerControls}
-            <Button title="HEY" children={<SpanText>Hidee</SpanText>} onPress={() => { }} />
+            <Button title="HEY" children={<SpanText>Hidee</SpanText>} onPress={handleToggleHeader} />
             <Video
                 posterSource={{ uri: thumb }}
                 style={{ width: '100%', aspectRatio: '16/9' }}

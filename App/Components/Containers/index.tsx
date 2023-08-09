@@ -22,9 +22,9 @@ export const ContainerFlex = (props: IContainer) => {
 
 export const ContainerBlock = (props: IContainer) => {
     const { style, hidden, ...otherProps } = props
-    const { background2 } = useThemeColors()
+    const { background } = useThemeColors()
     const styles: IContainer['style'] = {
-        backgroundColor: background2,
+        backgroundColor: background,
         padding: 10,
     }
     return hidden || <View style={[styles, style]} {...otherProps} />
@@ -32,9 +32,9 @@ export const ContainerBlock = (props: IContainer) => {
 
 export const ContainerSpaceBetween = (props: ContainerSpaceBetween) => {
     const { style, hidden, justify = 'space-between', align = 'center', ...otherProps } = props
-    const { background2 } = useThemeColors()
+    const { } = useThemeColors()
     const styles: IContainer['style'] = {
-        backgroundColor: background2,
+        backgroundColor: 'transparent',
         padding: 10,
         justifyContent: justify,
         alignItems: align,
@@ -46,7 +46,7 @@ export const ContainerSpaceBetween = (props: ContainerSpaceBetween) => {
 }
 
 export const ScrollContainer = (props: IScrollContainer) => {
-    const { children, hidden, style, ...otherProps } = props
+    const { hidden, style, ...otherProps } = props
     const styled: IScrollContainer['style'] = {
 
     }
@@ -56,13 +56,6 @@ export const ScrollContainer = (props: IScrollContainer) => {
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             style={[styled, style]}
-            children={
-                <ContainerBlock
-                    hidden={hidden}
-                    style={{ padding: 0 }}
-                    children={children}
-                />
-            }
             {...otherProps}
         />
     )

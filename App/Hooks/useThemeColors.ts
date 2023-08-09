@@ -16,12 +16,12 @@ export default function useThemeColors(): IApp['themeColors']['dark' | 'light'] 
             sucess: '',
             error: '',
             warning: '',
-            background2: '',
+            background2: '#1f1e1e',
             headline: ''
         },
-        ligdht: {
-            background: '#F0F0FF',
-            headerBackgorund: 'honeydew',
+        light: {
+            background: 'white',
+            headerBackgorund: 'white',
             text: '#333333',
             primary: '#FF925A',
             secondary: '#FFBE96',
@@ -29,7 +29,7 @@ export default function useThemeColors(): IApp['themeColors']['dark' | 'light'] 
             sucess: '',
             error: '',
             warning: '',
-            background2: '',
+            background2: '#f2f0f0',
             headline: ''
         }
     }

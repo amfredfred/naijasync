@@ -8,9 +8,8 @@ import { Ionicons } from "@expo/vector-icons";
 export type ITextInput = TextInput['props'] & IThemedComponent & {
     containerStyle?: IContainer['style']
     title?: React.ReactNode
-    color?: "primary" | "secondary"
-    variant?: "search" | "password"
-    severity?: "error" | "success" | "warning" | "info"
+    variant?: "search" | "password",
+    isFocused?: boolean
 }
 
 export const InputText = (props: ITextInput) => {
@@ -20,8 +19,8 @@ export const InputText = (props: ITextInput) => {
 
     const inputStyle: ITextInput['style'] = {
         flexGrow: 1,
-        backgroundColor: 'pink',
         maxWidth: '80%',
+        color: colors?.text,
         flex: 1
     }
 
@@ -46,6 +45,7 @@ export const InputText = (props: ITextInput) => {
                 icon={<Ionicons size={25} name="search" />} />
             <TextInput
                 style={[inputStyle, style]}
+                placeholderTextColor={colors.text}
                 {...otherProps}
             />
         </ContainerSpaceBetween>

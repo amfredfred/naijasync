@@ -1,8 +1,9 @@
 import useThemeColors from "../../Hooks/useThemeColors";
 import { IApp, IThemedComponent } from "../../Interfaces";
-import { Image, TouchableOpacity, Vibration } from 'react-native'
+import { Image, TouchableOpacity, Vibration, Dimensions } from 'react-native'
 import { ContainerBlock, ContainerSpaceBetween, IContainer } from "../Containers";
 import { ISpanText, SpanText } from "../Texts";
+import { LinearGradient } from 'expo-linear-gradient';
 
 export type IBUttonContainer = IContainer
 export type IButton = TouchableOpacity['props'] & IThemedComponent & {
@@ -15,6 +16,11 @@ export type IButton = TouchableOpacity['props'] & IThemedComponent & {
 }
 
 export type IIconButton = IButton & ({ image: Image['props'], size?: number } | { icon: React.ReactNode })
+export type IButtonGradient = IIconButton & {
+    gradient: LinearGradient['props']['colors'],
+    title: string
+}
+
 
 export const Button = (props: IButton & { title: string }) => {
     const { style, title, children, hidden, onLongPress, containerStyle, ...otherProps } = props
@@ -38,7 +44,6 @@ export const Button = (props: IButton & { title: string }) => {
         </ContainerBlock>
     </TouchableOpacity>
 }
-
 
 export const IconButton = (props: IIconButton) => {
     const { style, title, children, hidden, ...otherProps } = props
@@ -77,4 +82,42 @@ export const IconButton = (props: IIconButton) => {
             }
         </ContainerSpaceBetween>
     </TouchableOpacity> : null
+}
+
+export const ButtonGradient = (props: IButtonGradient) => {
+    const { background2: color } = useThemeColors()
+    const { gradient, children, title, ...otherProps } = props
+    const { width, height } = Dimensions.get('window')
+
+    const containerStyle: LinearGradient['props']['style'] = {
+        borderRadius: 5,
+        padding: 10,
+        minWidth: width / 3.36,
+        maxHeight: width / 5
+    }
+
+
+    return (
+        <LinearGradient colors={gradient} style={[containerStyle]}>
+            <TouchableOpacity {...otherProps}>
+                <SpanText
+                    hidden={!(props as any)?.icon}
+                    style={{ color }}
+                    children={(props as any)?.icon} />
+                {
+                    (otherProps as any)?.image?.source && (
+                        <Image
+                            style={[{ width: (props as any)?.size ?? 30, aspectRatio: 1 }]}
+                            {...(otherProps as any).image}
+                        />
+                    )
+                }
+                <SpanText
+                    style={{ textTransform: 'capitalize', color }}
+                    hidden={!title}
+                    children={title} />
+            </TouchableOpacity>
+        </LinearGradient>
+    )
+
 }
