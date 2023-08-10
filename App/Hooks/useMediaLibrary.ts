@@ -18,82 +18,81 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         setData
     } = useDataContext()
 
-    const dirname = `${FS.documentDirectory}naijasync/downloads/`
+    const dirname = `${FS.documentDirectory}naijasync/items/`
     const albumName = 'naijaSync';
 
+    const requestAndSetStorageFolderDirectoryUri = async (dirname: string) => {
+        try {
+            if (libPermision?.status === 'undetermined' && !libPermision.canAskAgain) {
+                const FOLDER_PERMIT = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync(dirname);
+                if (FOLDER_PERMIT.granted) {
+                    setData('storage', 'storageFolderDirectoryUri', FOLDER_PERMIT.directoryUri);
+                }
+            }
+        } catch (error) {
+            console.log("Error while requesting and setting storage folder directory URI: ", error);
+        }
+    };
+
+    const handleAlbumCreationAndAssetAddition = async (dirname: string, albumName: 'naijaSync') => {
+        try {
+            let itemsToMove = await FS.readDirectoryAsync(dirname);
+            const existingAlbum = await Library.getAlbumAsync(albumName);
+            let initialAsset = `${dirname}${itemsToMove[0]}`;
+
+            const moveItemsToAlbum = async () => {
+                const movedItems = await Promise.all(itemsToMove.map(async (fileName) => {
+                    const sourceFilePath = `${dirname}${fileName}`;
+                    // const asset = await Library.createAssetAsync(sourceFilePath);
+                    console.log(sourceFilePath);
+                    // await Library.addAssetsToAlbumAsync(asset, albumName, Platform.OS === 'android');
+                }));
+                console.log(movedItems.length, ' ITEMS_MOVED_TO_ALBUM: ', albumName);
+            };
+
+            if (!existingAlbum) {
+                if (!initialAsset) {
+                    if (Platform.OS !== 'ios') {
+                        setData('downloads', 'noDownloads', true);
+                    } else {
+                        const album = await Library.createAlbumAsync(albumName);
+                        console.log("ALBUM_CREATED_IOS: ", album);
+                    }
+                } else {
+                    const asset = await Library.createAssetAsync(initialAsset);
+                    const album = await Library.createAlbumAsync(albumName, asset, false);
+                    itemsToMove = await FS.readDirectoryAsync(dirname);
+                    console.log("ALBUM_CREATED: ", album);
+                }
+            }
+
+            moveItemsToAlbum();
+        } catch (error) {
+            console.error('ERROR_OCCURED: ', error);
+        }
+    };
+
+    const ensureDownloadsDirectoryExists = async (dirname: string) => {
+        try {
+            const downloadsDirectory = await FS.readDirectoryAsync(dirname);
+            if (!downloadsDirectory) {
+                const createdDirectory = await FS.makeDirectoryAsync(dirname, { intermediates: true });
+                setData('storage', 'storageFolderDirectoryUri', dirname);
+                console.log(`DOWNLOADS_DIRECTORY: ${createdDirectory} : CREATED`);
+            }
+        } catch (error) {
+            requestAndSetStorageFolderDirectoryUri(dirname)
+            console.log("Error while ensuring downloads directory exists: ", error);
+        }
+
+        handleAlbumCreationAndAssetAddition(dirname, 'naijaSync')
+    };
 
     useEffect(() => {
+        ensureDownloadsDirectoryExists(dirname)
+    }, [libPermision, states.storage])
 
-        if (libPermision?.status === 'undetermined' && !libPermision.canAskAgain) {
-            Alert.alert("Go to setings and allow Naijasync to access medias on your device.")
-        }
-
-        if (dirname) {
-            try {
-                ; (async () => {
-                    await FS.makeDirectoryAsync(dirname.concat('videos'), { intermediates: true })
-                    await FS.makeDirectoryAsync(dirname.concat('audios'), { intermediates: true })
-                    await FS.makeDirectoryAsync(dirname, { intermediates: true })
-                    console.log("::: ALL PATH CREATED?!")
-                })();
-            } catch (error) {
-                console.log("ERORR_CREATING_DIRECTORIES: ", error)
-            }
-        }
-
-        const createAlbumAndAddAssets = async () => {
-            try {
-                // Read the contents of the source directory
-                const videosToMove = await FS.readDirectoryAsync(dirname.concat('videos'));
-                const audiosToMove = await FS.readDirectoryAsync(dirname.concat('audios'));
-                const existingAlbum = await Library.getAlbumAsync(albumName);
-                let initialAsset = null
-
-                const MoveItemsToAlbum = async () => {
-                    // Move each file to the album
-                    const items = [
-                        ...videosToMove,
-                        ...audiosToMove
-                    ]
-                    await Promise.all(items.map(async (fileName) => {
-                        const sourceFilePath = `${dirname}${fileName}`;
-                        const asset = await Library.createAssetAsync(sourceFilePath);
-                        await Library.addAssetsToAlbumAsync([asset], albumName, Platform.OS === 'android')
-                    }));
-                }
-
-                if (existingAlbum) {
-                    //do stuff
-                    MoveItemsToAlbum()
-                    console.log('ITEMS_MOVED_TO_ALBUM: ')
-                } else {
-                    if (videosToMove[0])
-                        initialAsset = `${dirname.concat('videos')}/${videosToMove[0]}`
-                    else if (audiosToMove[0])
-                        initialAsset = `${dirname.concat('audios')}/${audiosToMove[0]}`
-                    if (!initialAsset)
-                        if (Platform.OS !== 'ios')
-                            setData('downloads', 'noDownloads', true)
-                        else {
-                            const album = await Library.createAlbumAsync(albumName);
-                            console.log("ALBUM_CREATED_IOS: ", album)
-                        }
-                    else {
-                        const asset = await Library.createAssetAsync(initialAsset);
-                        const album = await Library.createAlbumAsync(albumName, asset, false);
-                        MoveItemsToAlbum()
-                        console.log("ALBUM_CREATED: ", album)
-                    }
-                }
-            } catch (error) {
-                console.error('ERROR_OCCURED: ', error);
-            }
-        };
-
-        if (libPermision?.granted) {
-            createAlbumAndAddAssets();
-        }
-    }, [libPermision])
+    console.log(states.storage)
 
     useEffect(() => {
         return () => {
@@ -123,10 +122,10 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         return Ddata?.downloadAsync?.()
     }
 
-    const createDownload: IUseMediaLibrary['createDownload'] = async (url, filename, fileType, directory) => {
+    const createDownload: IUseMediaLibrary['createDownload'] = async (url, filename) => {
         if (!libPermision.granted) await handleLibPermision()
         let link = url,
-            path = `${dirname}${fileType}/${filename}`,
+            path = `${dirname}${filename}`,
             dData = downloadResumable
         try {
             dData = FS.createDownloadResumable(link, path, {}, onDownloading)

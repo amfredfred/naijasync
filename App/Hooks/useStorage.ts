@@ -9,7 +9,7 @@ export type IUseStorage = {
 
 export default function useStorage(watch?: "@NaijaSync", deps?: any): IUseStorage {
 
-    const [NaijaSync, setItems] = useState<IStorageItems>({})
+    const [NaijaSync, setItems] = useState<IStorageItems>()
     const [isFetching, setIsFteching] = useState<boolean>(false)
 
     const delItem: IStorageMethods['delItem'] = async (key) => {
