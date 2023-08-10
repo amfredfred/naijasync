@@ -10,9 +10,11 @@ import View from "../Screens/User/View";
 import { useCallback, useEffect, useState } from 'react';
 import DataContextProvider from "../Contexts/DataContext";
 import Downloads from "../Screens/User/Downloads";
+import useAppStatus from "../Hooks/useAppStatus";
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
+    const { status } = useAppStatus()
 
     const Stack = createNativeStackNavigator();
 

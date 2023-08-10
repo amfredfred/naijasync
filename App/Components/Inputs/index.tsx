@@ -21,14 +21,15 @@ export const InputText = (props: ITextInput) => {
         flexGrow: 1,
         maxWidth: '80%',
         color: colors?.text,
-        flex: 1
+        flex: 1,
+        fontFamily: 'Montserrat_500Medium'
     }
 
     const containerStyles: ITextInput['containerStyle'] = {
         backgroundColor: colors.background2,
         marginRight: 10,
         padding: 0,
-        flexGrow: 1,
+        flexGrow: 1, 
         ...(
             variant == 'search' ? {
                 borderRadius: 50,

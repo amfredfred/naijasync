@@ -11,9 +11,8 @@ export interface IUseMediaLibrary {
         isErorr?: boolean,
         message?: string
     }
-    isDownloading: boolean
-    isPaused: boolean
     libPermision: PermissionResponse,
+    downloadStataus: "paused" | "finished" | "canceled" | "erorred" | "idle" |"downloading"
     requestLibPermisions(): Promise<PermissionResponse>,
     pauseDownload(): void
     cancelDownload(): void

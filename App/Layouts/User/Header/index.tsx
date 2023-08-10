@@ -22,7 +22,7 @@ export default function Heade() {
             style={{
                 paddingTop: StatusBar.currentHeight + (NS?.states?.isHeaderHidden ? 0 : 10),
                 paddingBottom: NS?.states?.isHeaderHidden ? 0 : 10,
-                backgroundColor: NS?.states?.isHeaderHidden ? background: HBG
+                // backgroundColor: NS?.states?.isHeaderHidden ? background: HBG
             }}   >
             <ContainerSpaceBetween hidden={NS?.states?.isHeaderHidden} style={{ padding: 0, gap: 10 }}>
                 <IconButton

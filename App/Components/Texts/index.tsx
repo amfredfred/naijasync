@@ -11,7 +11,8 @@ export const SpanText = (props: ISpanText) => {
     const styles: ISpanText['style'] = {
         color: text,
         fontWeight: '500',
-        fontSize: 18
+        fontSize: 18,
+        fontFamily:'Montserrat_500Medium'
     }
 
     return hidden || <Text style={[styles, style]} {...otherProps} />

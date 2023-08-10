@@ -41,7 +41,12 @@ export const Button = (props: IButton & { title: string }) => {
         {...otherProps} >
         <ContainerBlock style={[containerStyle]}>
             {children}
-            <SpanText numberOfLines={1} hidden={!title} children={title} style={[{ textTransform: 'uppercase' }, textStyle]} />
+            <SpanText
+                numberOfLines={2}
+                hidden={!title}
+                children={title}
+                style={[{ textTransform: 'uppercase', lineHeight: 25, fontWeight: '400' }, textStyle]}
+            />
         </ContainerBlock>
     </TouchableOpacity>
 }
@@ -87,7 +92,7 @@ export const IconButton = (props: IIconButton) => {
                     />
                 )
             }
-            <SpanText hidden={!title} children={title} style={{ textTransform: 'capitalize', paddingRight: 5, fontSize:13 }} />
+            <SpanText hidden={!title} children={title} style={{ textTransform: 'capitalize', paddingRight: 5, fontSize: 13 }} />
         </ContainerSpaceBetween>
     </TouchableOpacity> : null
 }
