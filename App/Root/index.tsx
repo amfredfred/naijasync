@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import DataContextProvider from "../Contexts/DataContext";
 import Downloads from "../Screens/User/Downloads";
 import useAppStatus from "../Hooks/useAppStatus";
-import { AppOpenAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
+// import { AppOpenAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
 
 
 
@@ -22,22 +22,22 @@ export default function Root() {
     const Stack = createNativeStackNavigator();
     //
 
-    const adUnitId = __DEV__ ? TestIds.APP_OPEN : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+    // const adUnitId = __DEV__ ? TestIds.APP_OPEN : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
 
-    const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
-        requestNonPersonalizedAdsOnly: true,
-        keywords: ['fashion', 'clothing'],
-    });
+    // const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
+    //     requestNonPersonalizedAdsOnly: true,
+    //     keywords: ['fashion', 'clothing'],
+    // });
 
-    useEffect(() => {
-        // // Preload an app open ad
-        // appOpenAd.load();
+    // useEffect(() => {
+    //     // // Preload an app open ad
+    //     // appOpenAd.load();
 
-        // // Show the app open ad when user brings the app to the foreground.
-        // appOpenAd.show();
+    //     // // Show the app open ad when user brings the app to the foreground.
+    //     // appOpenAd.show();
 
-        console.log(status, TestIds, ":: APP STATUS")
-    }, [status])
+    //     console.log(status, TestIds, ":: APP STATUS")
+    // }, [status])
 
 
     const UserRoutes = (
