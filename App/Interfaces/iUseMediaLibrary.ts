@@ -13,7 +13,7 @@ export interface IUseMediaLibrary {
     }
     libPermision: PermissionResponse,
     downloadStataus: "paused" | "finished" | "canceled" | "erorred" | "idle" |"downloading"
-    requestLibPermisions(): Promise<PermissionResponse>,
+    handleLibPermisionsRequest(): void,
     pauseDownload(): void
     cancelDownload(): void
     resumeDownload(): void

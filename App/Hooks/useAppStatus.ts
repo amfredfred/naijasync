@@ -7,7 +7,7 @@ import {
     Montserrat_700Bold,
     Montserrat_500Medium,
     Montserrat_900Black,
-    Montserrat_800ExtraBold
+    Montserrat_800ExtraBold,
 } from '@expo-google-fonts/montserrat'
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -52,6 +52,7 @@ const useAppStatus = (): IAppStatus => {
 
         return () => {
             appStateSubscription.remove()
+
         }
     }, [fontsLoaded, error])
 

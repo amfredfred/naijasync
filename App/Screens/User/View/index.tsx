@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RefreshControl, StyleSheet } from "react-native";
 import { FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
@@ -17,8 +17,10 @@ export default function View() {
     const {
         createDownload,
         downloadProgreess,
-        isDownloading,
+        downloadStataus,
         pauseDownload,
+        libPermision,
+        handleLibPermisionsRequest
     } = useMediaLibrary();
 
     const colors = useThemeColors();
@@ -31,7 +33,7 @@ export default function View() {
 
     const beginDownload = () => {
         console.log("SHOULD DOWNLOAD");
-        createDownload((params as any)?.src, "new-movies-2023.mp4", 'video');
+        createDownload((params as any)?.src, "new-movies-2023.mp4");
     };
 
     const suspendDownload = () => {
@@ -44,16 +46,28 @@ export default function View() {
         // Toggle header logic
     };
 
+    useEffect(() => {
+        if (!libPermision?.granted) {
+            console.log("CALLED")
+        }
+        return () => {
+
+        }
+    }, [libPermision])
+
+
+    console.log(downloadStataus)
+
     return (
         <ContainerFlex>
             <VideoPlayer {...params as IPostItem} />
             <ScrollContainer
                 refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={isRefreshing} />}
             >
-                <ContainerBlock style={{   padding: 5, paddingHorizontal:10 }}>
+                <ContainerBlock style={{ padding: 5, paddingHorizontal: 10 }}>
                     <Button
                         containerStyle={{ padding: 0, backgroundColor: "transparent", paddingVertical: 10 }}
-                        textStyle={{ textTransform: "none", width:'90%' }}
+                        textStyle={{ textTransform: "none", width: '90%' }}
                         title="Ronaldo Goal - Al Nassr vs Al Shorta 1-0 Highlights & All Goals - 2023"
                     />
                 </ContainerBlock>
@@ -62,8 +76,8 @@ export default function View() {
                     contentContainerStyle={{ paddingVertical: 10, gap: 10 }}
                 >
                     <IconButton
-                        onPress={isDownloading ? suspendDownload : beginDownload}
-                        title={isDownloading ? `${downloadProgreess?.expected ?? 0}/${downloadProgreess?.written ?? 0}` : "download"}
+                        onPress={downloadStataus == 'paused' ? suspendDownload : beginDownload}
+                        title={downloadStataus == 'downloading' ? `${downloadProgreess?.expected ?? 0}/${downloadProgreess?.written ?? 0}` : "download"}
                         containerStyle={[styles.iconsButton, { marginLeft: 10 }]}
                         icon={<MaterialCommunityIcons size={25} name="download" />}
                     />

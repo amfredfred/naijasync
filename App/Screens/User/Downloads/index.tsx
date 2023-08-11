@@ -15,7 +15,7 @@ export default function Downloads() {
     const [isRefreshing, setIsRefreshing] = useState<boolean>()
     const {
         libPermision,
-        requestLibPermisions
+        handleLibPermisionsRequest
     } = useMediaLibrary()
 
     const onRefresh = async () => {
@@ -29,7 +29,7 @@ export default function Downloads() {
 
     const accessButton = (
         <Button
-            onPress={requestLibPermisions}
+            onPress={handleLibPermisionsRequest}
             containerStyle={{ borderRadius: 50, backgroundColor: colors.accent, top: '47%' }}
             textStyle={{ textAlign: "center" }}
             title={"Grant Media Access"} />
@@ -37,10 +37,10 @@ export default function Downloads() {
 
     const medias = (
         <FlatList
-            data={states?.downloads?.videos}
+            data={states?.downloads?.video}
             renderItem={({ index, item }) => {
                 return <Video
-                    source={{ uri: item.uri }}
+                    source={{ uri: (item as any)?.uri }}
                     style={{ width: 200, height: 100, backgroundColor: 'red', marginTop:10 }}
 
                 />
@@ -55,7 +55,7 @@ export default function Downloads() {
         <ContainerFlex>
             <ContainerSpaceBetween>
                 <SpanText style={{ padding: 10 }}>
-                    {add(states?.downloads?.audios?.length ?? 0, states?.downloads?.videos?.length ?? 0)} Downloads
+                    {add(states?.downloads?.audio?.length ?? 0, states?.downloads?.video?.length ?? 0)} Downloads
                 </SpanText>
             </ContainerSpaceBetween>
             <ContainerBlock style={{ backgroundColor: colors.background2, borderTopEndRadius: 20, flex: 1, borderTopStartRadius: 20, padding: 10 }}>

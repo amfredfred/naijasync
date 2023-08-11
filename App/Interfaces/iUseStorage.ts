@@ -17,8 +17,8 @@ export interface IUser {
 }
   
 export interface IUserDownloads {
-    audios: []
-    videos: []
+    audio: string[]
+    video: string[]
     noDownloads: boolean
 }
 

@@ -2,9 +2,10 @@ import * as Library from 'expo-media-library'
 import { IUseMediaLibrary } from '../Interfaces/iUseMediaLibrary'
 import * as FS from 'expo-file-system'
 import { useEffect, useState } from 'react'
-import { Alert, Permission, PermissionsAndroid, Platform } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import { formatFileSize } from '../Helpers'
 import { useDataContext } from '../Contexts/DataContext'
+import * as Permissions from 'expo-permissions'
 
 export default function useMediaLibrary(): IUseMediaLibrary {
     const [libPermision, requestLibPermisions] = Library.usePermissions()
@@ -18,21 +19,18 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         setData
     } = useDataContext()
 
-    const dirname = `${FS.documentDirectory}naijasync/items/`
+    const dirname = states?.storage?.storageFolderDirectoryUri ?? `${FS.documentDirectory}naijasync`
     const albumName = 'naijaSync';
 
-    const requestAndSetStorageFolderDirectoryUri = async (dirname: string) => {
-        try {
-            if (libPermision?.status === 'undetermined' && !libPermision.canAskAgain) {
-                const FOLDER_PERMIT = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync(dirname);
-                if (FOLDER_PERMIT.granted) {
-                    setData('storage', 'storageFolderDirectoryUri', FOLDER_PERMIT.directoryUri);
-                }
-            }
-        } catch (error) {
-            console.log("Error while requesting and setting storage folder directory URI: ", error);
+    const OpenSettingsToEnablePermissions = async () => {
+        if (Platform.OS === 'android') {
+            // For Android, open the app's settings page
+            await Linking.openSettings();
+        } else if (Platform.OS === 'ios') {
+            // For iOS, open the app's settings specifically for permission
+            await Linking.openURL('app-settings:' + Permissions.getAsync('mediaLibrary'));
         }
-    };
+    }
 
     const handleAlbumCreationAndAssetAddition = async (dirname: string, albumName: 'naijaSync') => {
         try {
@@ -40,12 +38,16 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             const existingAlbum = await Library.getAlbumAsync(albumName);
             let initialAsset = `${dirname}${itemsToMove[0]}`;
 
+            console.log("AOLBUN_NAIJA_SYNCIS", existingAlbum)
+
             const moveItemsToAlbum = async () => {
                 const movedItems = await Promise.all(itemsToMove.map(async (fileName) => {
                     const sourceFilePath = `${dirname}${fileName}`;
-                    // const asset = await Library.createAssetAsync(sourceFilePath);
-                    console.log(sourceFilePath);
-                    // await Library.addAssetsToAlbumAsync(asset, albumName, Platform.OS === 'android');
+                    console.log("FILE_PATH_IT_IS", sourceFilePath);
+                    const asset = await Library.createAssetAsync(sourceFilePath);
+                    console.log("FILE_PATH_IT_IS", asset);
+                    await Library.addAssetsToAlbumAsync(asset, existingAlbum.title);
+                    // setData('downloads', asset?.mediaType as "video" | "audio", [...states.downloads?.[asset.mediaType as string], asset.uri])
                 }));
                 console.log(movedItems.length, ' ITEMS_MOVED_TO_ALBUM: ', albumName);
             };
@@ -74,25 +76,23 @@ export default function useMediaLibrary(): IUseMediaLibrary {
 
     const ensureDownloadsDirectoryExists = async (dirname: string) => {
         try {
-            const downloadsDirectory = await FS.readDirectoryAsync(dirname);
-            if (!downloadsDirectory) {
-                const createdDirectory = await FS.makeDirectoryAsync(dirname, { intermediates: true });
+            if (libPermision?.granted) {
+                await FS.makeDirectoryAsync(dirname, { intermediates: true });
                 setData('storage', 'storageFolderDirectoryUri', dirname);
-                console.log(`DOWNLOADS_DIRECTORY: ${createdDirectory} : CREATED`);
+            } else if (libPermision.status === 'denied' && !libPermision.canAskAgain) {
+                // requestAndSetStorageFolderDirectoryUri(dirname)
             }
         } catch (error) {
-            requestAndSetStorageFolderDirectoryUri(dirname)
-            console.log("Error while ensuring downloads directory exists: ", error);
+            console.log("FATAL_ERROR_IN_NEXTED: ", error)
         }
-
-        handleAlbumCreationAndAssetAddition(dirname, 'naijaSync')
+        if (libPermision?.granted)
+            handleAlbumCreationAndAssetAddition(dirname, 'naijaSync')
     };
 
     useEffect(() => {
+        console.log(" ENSURE_DOWNLOAD_DIRECTORY_EXISTS")
         ensureDownloadsDirectoryExists(dirname)
-    }, [libPermision, states.storage])
-
-    console.log(states.storage)
+    }, [libPermision, states?.storage?.storageFolderDirectoryUri === dirname])
 
     useEffect(() => {
         return () => {
@@ -103,9 +103,11 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         };
     }, [downloadStataus]);
 
-    const handleLibPermision = async () => {
-        if (!libPermision.granted) {
+    const handleLibPermisionsRequest = async () => {
+        if (!libPermision?.granted && libPermision?.canAskAgain) {
             await requestLibPermisions()
+        } else if (libPermision?.status === 'denied' && !libPermision?.canAskAgain) {
+            OpenSettingsToEnablePermissions()
         }
     }
 
@@ -123,7 +125,7 @@ export default function useMediaLibrary(): IUseMediaLibrary {
     }
 
     const createDownload: IUseMediaLibrary['createDownload'] = async (url, filename) => {
-        if (!libPermision.granted) await handleLibPermision()
+        if (!libPermision?.granted) await handleLibPermisionsRequest()
         let link = url,
             path = `${dirname}${filename}`,
             dData = downloadResumable
@@ -182,7 +184,7 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         createDownload,
         downloadProgreess,
         libPermision,
-        requestLibPermisions,
+        handleLibPermisionsRequest,
         pauseDownload,
         cancelDownload,
         resumeDownload,
