@@ -13,9 +13,10 @@ export type IButton = TouchableOpacity['props'] & IThemedComponent & {
     color?: "primary" | "secondary"
     variant?: "outlined" | "contained"
     severity?: "error" | "success" | "warning" | "info"
+    active?: boolean
 }
 
-export type IIconButton = IButton & ({ image: Image['props'], size?: number } | { icon: React.ReactNode })
+export type IIconButton = IButton & ({ image?: Image['props'], size?: number } | { icon?: React.ReactNode })
 export type IButtonGradient = IIconButton & {
     gradient: LinearGradient['props']['colors'],
     title: string
@@ -26,8 +27,7 @@ export const Button = (props: IButton & { title: string }) => {
     const { style, title, children, hidden, textStyle, onLongPress, containerStyle, ...otherProps } = props
     const { accent: color, background } = useThemeColors()
     const styled: IButton['style'] = {
-        flexGrow: 1,
-        borderRadius: 10,
+        alignItems:'flex-start'
     }
 
     const onlongpress = (e: any) => {
@@ -35,24 +35,25 @@ export const Button = (props: IButton & { title: string }) => {
         onLongPress?.(e)
     }
 
-    return hidden || <TouchableOpacity
-        onLongPress={onlongpress}
-        style={[styled, style]}
-        {...otherProps} >
+    return hidden ||
         <ContainerBlock style={[containerStyle]}>
-            {children}
-            <SpanText
-                numberOfLines={2}
-                hidden={!title}
-                children={title}
-                style={[{ textTransform: 'uppercase', lineHeight: 25, fontWeight: '400' }, textStyle]}
-            />
+            <TouchableOpacity
+                onLongPress={onlongpress}
+                style={[styled, style]}
+                {...otherProps} >
+                {children}
+                <SpanText
+                    numberOfLines={2}
+                    hidden={!title}
+                    children={title}
+                    style={[{ textTransform: 'uppercase', lineHeight: 25, fontWeight: '400' }, textStyle]}
+                />
+            </TouchableOpacity>
         </ContainerBlock>
-    </TouchableOpacity>
 }
 
 export const IconButton = (props: IIconButton) => {
-    const { style, title, children, hidden, containerStyle, ...otherProps } = props
+    const { style, title, children, hidden, textStyle, active, containerStyle, ...otherProps } = props
     const { accent: color, background2, primary } = useThemeColors()
 
     const styled: IButton['style'] = {
@@ -64,6 +65,7 @@ export const IconButton = (props: IIconButton) => {
         minHeight: (props as any)?.size ?? 30,
         borderRadius: 10,
         padding: 2,
+        backgroundColor: active ? color : background2,
         ...(otherProps.variant === 'contained' ? {
             backgroundColor: primary,
             aspectRatio: 1
@@ -72,10 +74,10 @@ export const IconButton = (props: IIconButton) => {
             borderColor: primary,
             aspectRatio: 1
         } : {
-            backgroundColor: title ? background2 : 'transparent',
-            borderWidth: title ? 1 : 0,
-            borderColor: color,
-            paddingHorizontal: 5
+            // backgroundColor: title ? background2 : 'transparent',
+            // borderWidth: title ? 1 : 0,
+            // borderColor: color,
+            paddingHorizontal: 15
         }),
     };
 
@@ -92,7 +94,10 @@ export const IconButton = (props: IIconButton) => {
                     />
                 )
             }
-            <SpanText hidden={!title} children={title} style={{ textTransform: 'capitalize', paddingRight: 5, fontSize: 13 }} />
+            <SpanText
+                hidden={!title}
+                children={title}
+                style={[{ textTransform: 'capitalize', paddingRight: (props as any).icon ? 5 : 0, fontSize: 13 }, textStyle]} />
         </ContainerSpaceBetween>
     </TouchableOpacity> : null
 }

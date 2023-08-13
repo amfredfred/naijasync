@@ -13,7 +13,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
     const [downloadMessage, setdownloadMessage] = useState<IUseMediaLibrary['downloadMessage']>()
     const [downloadProgreess, setDownloadProgreess] = useState<IUseMediaLibrary['downloadProgreess']>()
     const [downloadStataus, setDownloadStatus] = useState<IUseMediaLibrary['downloadStataus']>('idle')
-
     const {
         states,
         setData
@@ -32,34 +31,26 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         }
     }
 
-    const handleAlbumCreationAndAssetAddition = async (dirname: string, albumName: 'naijaSync') => {
+    const handleAlbumCreationAndAssetAddition: IUseMediaLibrary['handleAlbumCreationAndAssetAddition'] = async (dirname: string, albumName: 'naijaSync') => {
         try {
             let itemsToMove = await FS.readDirectoryAsync(dirname);
             const existingAlbum = await Library.getAlbumAsync(albumName);
             let initialAsset = `${dirname}${itemsToMove[0]}`;
-
-            console.log("AOLBUN_NAIJA_SYNCIS", existingAlbum)
-
             const moveItemsToAlbum = async () => {
                 const movedItems = await Promise.all(itemsToMove.map(async (fileName) => {
                     const sourceFilePath = `${dirname}${fileName}`;
-                    console.log("FILE_PATH_IT_IS", sourceFilePath);
                     const asset = await Library.createAssetAsync(sourceFilePath);
-                    console.log("FILE_PATH_IT_IS", asset);
                     await Library.addAssetsToAlbumAsync(asset, existingAlbum.title);
-                    // setData('downloads', asset?.mediaType as "video" | "audio", [...states.downloads?.[asset.mediaType as string], asset.uri])
+                    setData('storage', 'myDownloadedAssets', [...states.storage?.[asset.mediaType as string], asset.uri] )
                 }));
-                console.log(movedItems.length, ' ITEMS_MOVED_TO_ALBUM: ', albumName);
             };
 
             if (!existingAlbum) {
                 if (!initialAsset) {
-                    if (Platform.OS !== 'ios') {
-                        setData('downloads', 'noDownloads', true);
-                    } else {
+                    if (Platform.OS === 'ios') {
                         const album = await Library.createAlbumAsync(albumName);
                         console.log("ALBUM_CREATED_IOS: ", album);
-                    }
+                    } else { }
                 } else {
                     const asset = await Library.createAssetAsync(initialAsset);
                     const album = await Library.createAlbumAsync(albumName, asset, false);
@@ -67,10 +58,12 @@ export default function useMediaLibrary(): IUseMediaLibrary {
                     console.log("ALBUM_CREATED: ", album);
                 }
             }
-
+            console.log(existingAlbum, ": : : : : Alu")
             moveItemsToAlbum();
+            return true
         } catch (error) {
             console.error('ERROR_OCCURED: ', error);
+            return false
         }
     };
 
@@ -79,7 +72,7 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             if (libPermision?.granted) {
                 await FS.makeDirectoryAsync(dirname, { intermediates: true });
                 setData('storage', 'storageFolderDirectoryUri', dirname);
-            } else if (libPermision.status === 'denied' && !libPermision.canAskAgain) {
+            } else if (libPermision?.status === 'denied' && !libPermision?.canAskAgain) {
                 // requestAndSetStorageFolderDirectoryUri(dirname)
             }
         } catch (error) {
@@ -90,8 +83,7 @@ export default function useMediaLibrary(): IUseMediaLibrary {
     };
 
     useEffect(() => {
-        console.log(" ENSURE_DOWNLOAD_DIRECTORY_EXISTS")
-        ensureDownloadsDirectoryExists(dirname)
+        // ensureDownloadsDirectoryExists(dirname)
     }, [libPermision, states?.storage?.storageFolderDirectoryUri === dirname])
 
     useEffect(() => {
@@ -99,6 +91,9 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             if (downloadStataus === 'downloading') {
                 downloadResumable?.pauseAsync?.();
                 setdownloadMessage({})
+            }
+            if (downloadStataus === 'finished') {
+                handleAlbumCreationAndAssetAddition(dirname, 'naijaSync')
             }
         };
     }, [downloadStataus]);
@@ -170,7 +165,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             setDownloadStatus('erorred')
         }
     }
-
     const cancelDownload = async () => {
         await downloadResumable.cancelAsync()
         setDownloadStatus('canceled')
@@ -178,6 +172,13 @@ export default function useMediaLibrary(): IUseMediaLibrary {
     const resumeDownload = async () => {
         await downloadResumable.resumeAsync()
         setDownloadStatus('downloading')
+    }
+
+    const getMydownloads: IUseMediaLibrary['getMydownloads'] = async (items) => {
+        const album = await Library.getAlbumAsync(albumName)
+        const myassets = await Library.getAssetsAsync({ mediaType: items, album: album.id })
+        // setData('storage', 'myDownloadedAssets', myassets.assets)
+        return myassets
     }
 
     return {
@@ -188,6 +189,8 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         pauseDownload,
         cancelDownload,
         resumeDownload,
+        getMydownloads,
+        handleAlbumCreationAndAssetAddition,
         downloadStataus,
         downloadMessage
     }

@@ -27,6 +27,9 @@ export type IPostItem = {
     thumb: string
     src: string
     index?: number
+    empty?: boolean
+    stretched?: boolean
+    explorer?:boolean
 } & ({
     type: 'video'
 } | {

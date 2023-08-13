@@ -32,7 +32,6 @@ export default function View() {
     };
 
     const beginDownload = () => {
-        console.log("SHOULD DOWNLOAD");
         createDownload((params as any)?.src, "new-movies-2023.mp4");
     };
 
@@ -54,9 +53,6 @@ export default function View() {
 
         }
     }, [libPermision])
-
-
-    console.log(downloadStataus)
 
     return (
         <ContainerFlex>

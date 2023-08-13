@@ -61,9 +61,6 @@ export default function VideoPlayer(props: IPostItem) {
         }
     }, [])
 
-
-
-
     const PlayerControls = (
         <ContainerBlock>
 

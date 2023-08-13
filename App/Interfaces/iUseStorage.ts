@@ -1,3 +1,5 @@
+import { Asset } from "expo-media-library";
+
 export interface IAuth {
     stage?: "landing" | "register" | "login" | "confirmPhone" | "confirmPassword";
     fullName?: string;
@@ -15,7 +17,7 @@ export interface IUser {
     isAuthenticated?: boolean;
     accessToken?: string;
 }
-  
+
 export interface IUserDownloads {
     audio: string[]
     video: string[]
@@ -23,14 +25,15 @@ export interface IUserDownloads {
 }
 
 export interface IStorageFolder {
-    storageFolderDirectoryUri: string
+    storageFolderDirectoryUri: string,
+    downloadsStorageAlbumName: string,
+    myDownloadedAssets: Asset[]
 }
 
 export interface IStorageItems {
     user?: IUser;
     states?: IAppStates;
     authing?: IAuth;
-    downloads?: IUserDownloads
     storage?: IStorageFolder
 }
 

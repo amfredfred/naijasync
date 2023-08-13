@@ -11,33 +11,29 @@ import { useCallback, useEffect, useState } from 'react';
 import DataContextProvider from "../Contexts/DataContext";
 import Downloads from "../Screens/User/Downloads";
 import useAppStatus from "../Hooks/useAppStatus";
-import { AppOpenAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
-
+// import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
+import "expo-dev-client"
+import Explorer from "../Screens/User/Explorer";
 
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
     const { status } = useAppStatus()
-
     const Stack = createNativeStackNavigator();
-    //
 
-    const adUnitId = __DEV__ ? TestIds.APP_OPEN : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+    // const { load, show, error, isLoaded } = useAppOpenAd(TestIds.APP_OPEN, {
+    //     requestNonPersonalizedAdsOnly: true,
+    //     keywords: ['fashion', 'clothing'],
+    // })
 
-    const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
-        requestNonPersonalizedAdsOnly: true,
-        keywords: ['fashion', 'clothing'],
-    });
 
-    useEffect(() => {
-        // // Preload an app open ad
-        // appOpenAd.load();
-
-        // // Show the app open ad when user brings the app to the foreground.
-        // appOpenAd.show();
-
-        console.log(status, TestIds, ":: APP STATUS")
-    }, [status])
+    // useEffect(() => {
+    //     load()
+    //     if (isLoaded) {
+    //         console.log("APP OPEN ADS LOADED")
+    //         show()
+    //     }
+    // }, [isLoaded, load])
 
 
     const UserRoutes = (
@@ -46,6 +42,7 @@ export default function Root() {
                 <Stack.Screen name='Home' component={Home} />
                 <Stack.Screen name='View' component={View} />
                 <Stack.Screen name='Downloads' component={Downloads} />
+                <Stack.Screen name="Explorer" component={Explorer}  />
             </Stack.Navigator>
         </UserLayout>
     )

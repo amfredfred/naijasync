@@ -4,34 +4,43 @@ import { SpanText } from "../../../../Components/Texts"
 import { IPostItem } from "../../../../Interfaces"
 import { Image, ImageBackground, useWindowDimensions } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import { useState } from 'react'
 
 export const VideoListItem = (props: IPostItem) => {
     const { width, height } = useWindowDimensions()
-    const { thumb, caption, src, index, } = props
+    const { thumb, caption, src, index, stretched, explorer } = props
     const { navigate } = useNavigation()
+    const [isLonPressed, setisLonPressed] = useState(false)
+
     return (
         <Button
-            onPress={() => navigate?.('View', props)}
+            onLongPress={() => setisLonPressed(true)}
+            onPressOut={() => setisLonPressed(false)}
+            onPress={() => (navigate as any)?.('View', props)}
             title={null}
             style={{
-                height: 140,
                 padding: 0,
-                width: (width / 1.8),
-                borderRadius: 10,
-                overflow: 'hidden'
             }}
             containerStyle={{
                 padding: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'pink'
+                height: 148,
+                maxHeight: 160,
+                borderRadius: 2,
+                overflow: 'hidden',
+                backgroundColor: 'black',
+                flexGrow: 1,
+                aspectRatio: isLonPressed ? 16 / 9 : stretched ? 16 / 9 : 11 / 18,
             }}
             activeOpacity={.7} >
             <Image
                 source={{ uri: thumb }}
-                style={{ height: '100%', width: '100%' }}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                }}
+
                 resizeMethod="auto"
-                resizeMode='stretch' />
+                resizeMode='cover' />
         </Button>
     )
 }

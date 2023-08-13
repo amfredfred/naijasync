@@ -1,4 +1,26 @@
-import { PermissionResponse } from "expo-media-library"
+import { Asset, PagedInfo, PermissionResponse } from "expo-media-library"
+
+type ValidMediaTypes = "video" | "audio" | "photo" | "unknown";
+
+interface MediaInfo {
+    albumId: string;
+    creationTime: number;
+    duration: number;
+    filename: string;
+    height: number;
+    id: string;
+    mediaType: "photo" | "video" | "audio";
+    modificationTime: number;
+    uri: string;
+    width: number;
+}
+
+interface MediaResponse {
+    data: MediaInfo[];
+    endCursor: string;
+    hasNextPage: boolean;
+    totalCount: number;
+}
 
 export interface IUseMediaLibrary {
     createDownload(url: string, filename: string): void
@@ -12,9 +34,11 @@ export interface IUseMediaLibrary {
         message?: string
     }
     libPermision: PermissionResponse,
-    downloadStataus: "paused" | "finished" | "canceled" | "erorred" | "idle" |"downloading"
+    downloadStataus: "paused" | "finished" | "canceled" | "erorred" | "idle" | "downloading"
     handleLibPermisionsRequest(): void,
+    handleAlbumCreationAndAssetAddition(dirname: string, albumName: 'naijaSync'): Promise<boolean>
     pauseDownload(): void
     cancelDownload(): void
     resumeDownload(): void
+    getMydownloads(items: ValidMediaTypes[]): Promise<PagedInfo<Asset>>
 }
