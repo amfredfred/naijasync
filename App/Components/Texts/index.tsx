@@ -12,7 +12,8 @@ export const SpanText = (props: ISpanText) => {
         color: text,
         fontWeight: '500',
         fontSize: 18,
-        fontFamily:'Montserrat_500Medium'
+        // fontFamily: 'Montserrat_500Medium',
+        textAlignVertical: 'center',
     }
 
     return hidden || <Text style={[styles, style]} {...otherProps} />

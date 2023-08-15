@@ -1,4 +1,4 @@
-import React, { useReducer, createContext, useContext } from 'react'
+import React, { useReducer, createContext, useContext, useEffect } from 'react'
 import { IAppDataContext, IAppDataContextMethods } from '../../Interfaces'
 import useStorage from '../../Hooks/useStorage'
 
@@ -20,10 +20,20 @@ export default function DataContextProvider({ children }) {
         return data
     }
 
-    const [states, dispatch] = useReducer(dataReducer, { ...initialState, ...NaijaSync })
+    const [states, dispatch] = useReducer(dataReducer, { ...initialState })
+
     const setData: IAppDataContextMethods['setItem'] = async (key, item, payload) => {
         dispatch({ type: '', key, item, payload })
     }
+
+    // useEffect(() => {
+    //     (async () => {
+    //         const ss = await method.getItem('@NaijaSync')
+    //         console.log(ss)
+    //     })();
+    // }, [setData])
+
+
 
     return (
         <DataContext.Provider value={{ states, setData }}>

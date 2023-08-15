@@ -22,6 +22,7 @@ const ComingSoon = () => (
 
 export default function Home() {
     const { setData, states: NJS } = useDataContext()
+    const colors  =  useThemeColors()
     const { navigate } = useNavigation()
     const [routes] = useState([
         { key: 'movies', title: 'movies' },
@@ -93,12 +94,13 @@ export default function Home() {
 
     return (
         <ContainerBlock style={{ flex: 1,padding:0 }}>
-            <ContainerBlock style={{ paddingHorizontal:0 }}>
+            <ContainerBlock style={{ paddingHorizontal:0,   }}>
                 <ScrollContainer
                     horizontal
                     contentContainerStyle={{ gap: 10, }}>
                     {expTabs.map((ETab, index) =>
                         <IconButton
+                            key={index}
                             onPress={() => handleNavigateexplore(ETab.exploring)}
                             title={ETab.title}
                             active={index == 0} />

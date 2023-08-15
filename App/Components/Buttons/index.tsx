@@ -13,7 +13,8 @@ export type IButton = TouchableOpacity['props'] & IThemedComponent & {
     color?: "primary" | "secondary"
     variant?: "outlined" | "contained"
     severity?: "error" | "success" | "warning" | "info"
-    active?: boolean
+    active?: boolean,
+    onSelect?(title:string): void
 }
 
 export type IIconButton = IButton & ({ image?: Image['props'], size?: number } | { icon?: React.ReactNode })
@@ -27,7 +28,7 @@ export const Button = (props: IButton & { title: string }) => {
     const { style, title, children, hidden, textStyle, onLongPress, containerStyle, ...otherProps } = props
     const { accent: color, background } = useThemeColors()
     const styled: IButton['style'] = {
-        alignItems:'flex-start'
+        alignItems: 'flex-start'
     }
 
     const onlongpress = (e: any) => {
@@ -53,7 +54,7 @@ export const Button = (props: IButton & { title: string }) => {
 }
 
 export const IconButton = (props: IIconButton) => {
-    const { style, title, children, hidden, textStyle, active, containerStyle, ...otherProps } = props
+    const { style, title, children, hidden, textStyle, onSelect,onPress, active, containerStyle, ...otherProps } = props
     const { accent: color, background2, primary } = useThemeColors()
 
     const styled: IButton['style'] = {
@@ -64,8 +65,9 @@ export const IconButton = (props: IIconButton) => {
     const styledContainer: IButton['style'] = {
         minHeight: (props as any)?.size ?? 30,
         borderRadius: 10,
-        padding: 2,
+        padding: title ? 2 : 3,
         backgroundColor: active ? color : background2,
+        aspectRatio: !title ? 1 : undefined,
         ...(otherProps.variant === 'contained' ? {
             backgroundColor: primary,
             aspectRatio: 1
@@ -77,12 +79,18 @@ export const IconButton = (props: IIconButton) => {
             // backgroundColor: title ? background2 : 'transparent',
             // borderWidth: title ? 1 : 0,
             // borderColor: color,
-            paddingHorizontal: 15
+            paddingHorizontal: title ? 15 : 0
         }),
     };
 
+    const handlePress = (e:any) => {
+        onPress?.(e)
+        onSelect?.(String(title))
+    }
+
     return !hidden ? <TouchableOpacity
         style={[styled, style]}
+        onPress={handlePress}
         {...otherProps} >
         <ContainerSpaceBetween justify="center" style={[styledContainer, containerStyle]}>
             <SpanText hidden={!(props as any)?.icon} style={{ color }} children={(props as any)?.icon} />
@@ -104,10 +112,10 @@ export const IconButton = (props: IIconButton) => {
 
 export const ButtonGradient = (props: IButtonGradient) => {
     const { background2: color } = useThemeColors()
-    const { gradient, children, title, ...otherProps } = props
+    const { gradient, children, title,containerStyle, ...otherProps } = props
     const { width, height } = Dimensions.get('window')
 
-    const containerStyle: LinearGradient['props']['style'] = {
+    const containerStyled: LinearGradient['props']['style'] = {
         borderRadius: 5,
         padding: 10,
         minWidth: width / 3.36,
@@ -116,7 +124,7 @@ export const ButtonGradient = (props: IButtonGradient) => {
 
 
     return (
-        <LinearGradient colors={gradient} style={[containerStyle]}>
+        <LinearGradient colors={gradient} style={[containerStyled, containerStyle]}>
             <TouchableOpacity {...otherProps}>
                 <SpanText
                     hidden={!(props as any)?.icon}

@@ -29,7 +29,32 @@ export type IPostItem = {
     index?: number
     empty?: boolean
     stretched?: boolean
-    explorer?:boolean
+    explorer?: boolean
+
+    id?: string,
+    ownerId?: string, // User who owns the post
+    title?: string,
+    description?: string,
+    fileUrl?: string,
+    thumbnailUrl?: string,
+    views?: string,
+    downloads?: string,
+    likes?: string,
+    duration?: string, // in seconds
+    mimeType?: string,
+    sourceQualities?: string, // JSON array of quality options
+    locationView?: string, //?:string Location where it can be viewed
+    locationDownload?: string, // Location where it can be downloaded
+    tags?: string,
+    ratings?: string, // Average rating
+    price?: string,
+    rewards?: string,
+    downloadable?: string, // Is the file downloadable?
+    playtime?: string
+    fileType?: string
+    postSlug?: string
+    updatedAt?: string
+    createdAt?: string
 } & ({
     type: 'video'
 } | {

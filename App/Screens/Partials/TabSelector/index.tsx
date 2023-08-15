@@ -11,6 +11,7 @@ export default function TabSelector({ hidden }: { hidden?: boolean }) {
     return (
         <ContainerSpaceBetween style={{ gap: 10, flexWrap: 'wrap' }}>
             <ButtonGradient
+                containerStyle={{width:'100%'}}
                 onPress={() => (navigate as any)?.("Downloads")}
                 gradient={['#89CFF0', '#0072B5']}
                 icon={<MaterialIcons size={40} name="file-download-done" />}

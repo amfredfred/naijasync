@@ -89,3 +89,15 @@ export function formatPlaytimeDuration(durationInSeconds: number): string {
 
     return parts.join(':');
 }
+
+export function linkChecker({ link }) {
+    const patterns = [
+        { platform: 'facebook', pattern: /^(https?:\/\/)?(www\.)?(fb\.com|facebook\.com)\/?/i },
+        { platform: 'youtube', pattern: /^(https?:\/\/)?(www\.)?youtube\.com\//i },
+        { platform: 'thread', pattern: /^(https?:\/\/)?(www\.)?example\.com\/thread\//i },
+    ];
+
+    const matchedPlatform = patterns.find(({ pattern }) => pattern.test(link));
+
+    return matchedPlatform
+}

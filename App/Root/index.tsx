@@ -1,4 +1,5 @@
 import { Text, Keyboard } from "react-native"
+import {QueryClientProvider, QueryClient} from '@tanstack/react-query'
 import UserLayout from "../Layouts/User"
 import GuestLayout from "../Layouts/Guest"
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -14,12 +15,14 @@ import useAppStatus from "../Hooks/useAppStatus";
 // import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
 import "expo-dev-client"
 import Explorer from "../Screens/User/Explorer";
+import Search from "../Screens/User/Search";
 
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
     const { status } = useAppStatus()
     const Stack = createNativeStackNavigator();
+    const Client = new QueryClient()
 
     // const { load, show, error, isLoaded } = useAppOpenAd(TestIds.APP_OPEN, {
     //     requestNonPersonalizedAdsOnly: true,
@@ -42,7 +45,8 @@ export default function Root() {
                 <Stack.Screen name='Home' component={Home} />
                 <Stack.Screen name='View' component={View} />
                 <Stack.Screen name='Downloads' component={Downloads} />
-                <Stack.Screen name="Explorer" component={Explorer}  />
+                <Stack.Screen name="Explorer" component={Explorer} />
+                <Stack.Screen name="Search" component={Search} />
             </Stack.Navigator>
         </UserLayout>
     )
@@ -59,11 +63,13 @@ export default function Root() {
 
     return (
         <SafeAreaProvider>
-            <DataContextProvider>
-                <NavigationContainer >
-                    {isAuthenticated ? UserRoutes : GuestRoutes}
-                </NavigationContainer>
-            </DataContextProvider>
+            <QueryClientProvider client={Client}>
+                <DataContextProvider>
+                    <NavigationContainer >
+                        {isAuthenticated ? UserRoutes : GuestRoutes}
+                    </NavigationContainer>
+                </DataContextProvider>
+          </QueryClientProvider>
         </SafeAreaProvider>
     )
 }

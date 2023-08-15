@@ -12,10 +12,12 @@ export interface IAuth {
 export interface IAppStates {
     inAuthState?: boolean;
     isHeaderHidden?: boolean
+    isInSearchMode?: boolean
 }
 export interface IUser {
     isAuthenticated?: boolean;
     accessToken?: string;
+    searchRequestValue?: string
 }
 
 export interface IUserDownloads {
