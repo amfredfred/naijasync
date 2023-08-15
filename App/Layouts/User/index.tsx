@@ -145,7 +145,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                                 <ContainerBlock style={{ padding: 0, backgroundColor: 'transparent', borderBottomColor: 'rgba(255,255,255,0.2)', borderBottomWidth: 1 }}>
                                     {
                                         menuItems.map((item, index) => (
-                                            <ContainerBlock style={{ backgroundColor: 'transparent', paddingHorizontal: 0 }}>
+                                            <ContainerBlock key={index} style={{ backgroundColor: 'transparent', paddingHorizontal: 0 }}>
                                                 <TouchableOpacity key={item.title.trim()} onPress={item.onPress}>
                                                     <ContainerSpaceBetween style={[styles.menuItem]}>
                                                         <ContainerBlock style={{ flexDirection: 'row', gap: 13, paddingLeft: 0, backgroundColor: 'transparent' }}>

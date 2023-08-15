@@ -68,7 +68,7 @@ export default function View() {
                 </ContainerBlock>
                 <ScrollContainer
                     horizontal
-                    contentContainerStyle={{ paddingVertical: 10, gap: 10 }}
+                    contentContainerStyle={{ paddingVertical: 10, gap: 10, }}
                 >
                     <IconButton
                         onPress={downloadStataus == 'paused' ? suspendDownload : beginDownload}
@@ -88,10 +88,6 @@ export default function View() {
                     />
                 </ScrollContainer>
             </ScrollContainer>
-            <Button
-                title="Toggle"
-                onPress={handleToggleHeader}
-            />
         </ContainerFlex>
     );
 }

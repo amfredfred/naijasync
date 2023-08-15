@@ -42,6 +42,7 @@ export default function ListSlider(props: IListSlider) {
                 bounces={false}
                 contentContainerStyle={{ paddingHorizontal: 10, gap: 10 }}
                 renderItem={({ item, index }: { item: IPostItem, index: number }) => <ListSlideItem key={index} index={index} {...item} />}
+                keyExtractor={({ id }) => id}
                 horizontal
                 initialScrollIndex={2}
                 isTVSelectable

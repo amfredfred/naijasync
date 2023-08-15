@@ -13,9 +13,9 @@ export default function useThemeColors(): IApp['themeColors']['dark' | 'light'] 
             primary: '#FF925A',
             secondary: '#FFD17A',
             accent: "#3C6E71",
-            sucess: '',
-            error: '',
-            warning: '',
+            sucess: '#81C784',
+            error: '#E57373',
+            warning: '#FFD54F',
             background2: '#1f1e1e',
             headline: ''
         },
@@ -26,9 +26,9 @@ export default function useThemeColors(): IApp['themeColors']['dark' | 'light'] 
             primary: '#FF925A',
             secondary: '#FFBE96',
             accent: "#148587",
-            sucess: '',
-            error: '',
-            warning: '',
+            sucess: '#4CAF50',
+            error: '#F44336',
+            warning: '#FFC107',
             background2: '#f2f0f0',
             headline: ''
         }

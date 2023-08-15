@@ -16,7 +16,7 @@ import useAppStatus from "../Hooks/useAppStatus";
 import "expo-dev-client"
 import Explorer from "../Screens/User/Explorer";
 import Search from "../Screens/User/Search";
-
+import 'react-native-gesture-handler'
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
@@ -50,7 +50,7 @@ export default function Root() {
             </Stack.Navigator>
         </UserLayout>
     )
-
+  
     const GuestRoutes = (
         <GuestLayout>
             <Text>Guest</Text>

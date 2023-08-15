@@ -6,6 +6,7 @@ import { Linking, Platform } from 'react-native'
 import { formatFileSize } from '../Helpers'
 import { useDataContext } from '../Contexts/DataContext'
 import * as Permissions from 'expo-permissions'
+import { APP_ALBUM_NAME } from '@env'
 
 export default function useMediaLibrary(): IUseMediaLibrary {
     const [libPermision, requestLibPermisions] = Library.usePermissions()
@@ -18,8 +19,8 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         setData
     } = useDataContext()
 
-    const dirname = states?.storage?.storageFolderDirectoryUri ?? `${FS.documentDirectory}naijasync`
-    const albumName = 'naijaSync';
+    const dirname = states?.storage?.storageFolderDirectoryUri ?? `${FS.documentDirectory}${APP_ALBUM_NAME}/`
+    const albumName = APP_ALBUM_NAME;
 
     const OpenSettingsToEnablePermissions = async () => {
         if (Platform.OS === 'android') {
@@ -31,69 +32,84 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         }
     }
 
-    const handleAlbumCreationAndAssetAddition: IUseMediaLibrary['handleAlbumCreationAndAssetAddition'] = async (dirname: string, albumName: 'naijaSync') => {
+    const handleAlbumCreationAndAssetAddition: IUseMediaLibrary['handleAlbumCreationAndAssetAddition'] = async () => {
         try {
-            let itemsToMove = await FS.readDirectoryAsync(dirname);
-            const existingAlbum = await Library.getAlbumAsync(albumName);
-            let initialAsset = `${dirname}${itemsToMove[0]}`;
+
+            const [itemsToMove, existingAlbum] = await Promise.all([
+                FS.readDirectoryAsync(dirname),
+                Library.getAlbumAsync(albumName)
+            ])
+
+            console.log(itemsToMove, existingAlbum)
+
             const moveItemsToAlbum = async () => {
-                const movedItems = await Promise.all(itemsToMove.map(async (fileName) => {
+                const assets = await Promise.all(itemsToMove.map(async (fileName) => {
                     const sourceFilePath = `${dirname}${fileName}`;
                     const asset = await Library.createAssetAsync(sourceFilePath);
-                    await Library.addAssetsToAlbumAsync(asset, existingAlbum.title);
-                    setData('storage', 'myDownloadedAssets', [...states.storage?.[asset.mediaType as string], asset.uri] )
+                    return asset;
                 }));
+                await Library.addAssetsToAlbumAsync(assets, existingAlbum.id, false);
+                console.log("======================================================DID WELL=========================")
+                // setData('storage', 'myDownloadedAssets', [...assets]);
             };
 
             if (!existingAlbum) {
-                if (!initialAsset) {
-                    if (Platform.OS === 'ios') {
-                        const album = await Library.createAlbumAsync(albumName);
-                        console.log("ALBUM_CREATED_IOS: ", album);
-                    } else { }
+                if (Platform.OS === 'ios') {
+                    const album = await Library.createAlbumAsync(albumName);
+                    console.log("ALBUM_CREATED_IOS:", album);
                 } else {
-                    const asset = await Library.createAssetAsync(initialAsset);
-                    const album = await Library.createAlbumAsync(albumName, asset, false);
-                    itemsToMove = await FS.readDirectoryAsync(dirname);
-                    console.log("ALBUM_CREATED: ", album);
+                    const initialAsset = `${dirname}${itemsToMove?.[0]}`;
+                    if (initialAsset.indexOf('undefined') >= 0) {
+                        setData('storage', 'hasDownloadedMedias', false)
+                        console.log("DOWNLOAD SOMETHING FIRST");
+                        return false
+                    } else {
+                        const asset = await Library.createAssetAsync(initialAsset);
+                        const album = await Library.createAlbumAsync(albumName, asset, false);
+                        console.log("ALBUM_CREATED:", album);
+                    }
+                    moveItemsToAlbum()
+                    setData('storage', 'hasDownloadedMedias', true)
+                    return true;
                 }
+            } else {
+                moveItemsToAlbum()
+                return true;
             }
-            console.log(existingAlbum, ": : : : : Alu")
-            moveItemsToAlbum();
-            return true
         } catch (error) {
             console.error('ERROR_OCCURED: ', error);
-            return false
+            return false;
         }
     };
 
-    const ensureDownloadsDirectoryExists = async (dirname: string) => {
+    const ensureDownloadsDirectoryExists = async () => {
         try {
             if (libPermision?.granted) {
                 await FS.makeDirectoryAsync(dirname, { intermediates: true });
-                setData('storage', 'storageFolderDirectoryUri', dirname);
+                // setData('storage', 'storageFolderDirectoryUri', dirname);
             } else if (libPermision?.status === 'denied' && !libPermision?.canAskAgain) {
                 // requestAndSetStorageFolderDirectoryUri(dirname)
             }
         } catch (error) {
             console.log("FATAL_ERROR_IN_NEXTED: ", error)
         }
-        if (libPermision?.granted)
-            handleAlbumCreationAndAssetAddition(dirname, 'naijaSync')
+        // if (libPermision?.granted)
+        //     handleAlbumCreationAndAssetAddition(dirname, 'naijaSync')
     };
 
     useEffect(() => {
-        // ensureDownloadsDirectoryExists(dirname)
+        ensureDownloadsDirectoryExists()
     }, [libPermision, states?.storage?.storageFolderDirectoryUri === dirname])
 
     useEffect(() => {
+        if (downloadStataus === 'finished') {
+            handleAlbumCreationAndAssetAddition()
+        }
+
         return () => {
             if (downloadStataus === 'downloading') {
                 downloadResumable?.pauseAsync?.();
                 setdownloadMessage({})
-            }
-            if (downloadStataus === 'finished') {
-                handleAlbumCreationAndAssetAddition(dirname, 'naijaSync')
             }
         };
     }, [downloadStataus]);
@@ -142,7 +158,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         try {
             const { uri } = await startDownload(dData)
             setDownloadStatus('finished')
-            console.log(uri, ": DOWNLOADED TO")
         } catch (error) {
             setdownloadMessage({
                 isErorr: true,
@@ -150,7 +165,9 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             })
             setDownloadStatus('erorred')
         }
-
+        finally {
+            setDownloadStatus('idle')
+        }
     }
 
     const pauseDownload = async () => {
@@ -175,11 +192,35 @@ export default function useMediaLibrary(): IUseMediaLibrary {
     }
 
     const getMydownloads: IUseMediaLibrary['getMydownloads'] = async (items) => {
-        const album = await Library.getAlbumAsync(albumName)
-        const myassets = await Library.getAssetsAsync({ mediaType: items, album: album.id })
-        // setData('storage', 'myDownloadedAssets', myassets.assets)
-        return myassets
-    }
+        try {
+            const album = await Library.getAlbumAsync(albumName);
+
+            if (!album) {
+                // throw new Error(`Album "${albumName}" not found.`);
+                const createdAlbum = await handleAlbumCreationAndAssetAddition()
+                // getMydownloads(items)
+                console.log("Created Album", createdAlbum, album, albumName)
+            }
+            console.log("Created Album", "OUTSIDE_--- ----___ ---", album, albumName)
+
+            const assetOptions = {
+                mediaType: items,
+                album: album?.id,
+            };
+
+            const myassetsResponse = await Library.getAssetsAsync(assetOptions);
+
+            if (myassetsResponse?.assets) {
+                return myassetsResponse.assets;
+            } else {
+                throw new Error('No assets found.');
+            }
+        } catch (error) {
+            console.error('Error in getMydownloads:', error);
+            throw error; // Rethrow the error to handle it in the caller function
+        }
+    };
+
 
     return {
         createDownload,

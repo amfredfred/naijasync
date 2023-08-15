@@ -33,7 +33,7 @@ export const InputText = (props: ITextInput) => {
         color: colors?.text,
         width: '80%',
         flex: 1,
-        fontFamily: 'Montserrat_500Medium',
+        // fontFamily: 'Montserrat_500Medium',
     }
 
     const containerStyles: ITextInput['containerStyle'] = {

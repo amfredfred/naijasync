@@ -28,7 +28,9 @@ export const Button = (props: IButton & { title: string }) => {
     const { style, title, children, hidden, textStyle, onLongPress, containerStyle, ...otherProps } = props
     const { accent: color, background } = useThemeColors()
     const styled: IButton['style'] = {
-        alignItems: 'flex-start'
+        alignItems: 'flex-start', 
+        width: '100%',
+        flex:1
     }
 
     const onlongpress = (e: any) => {

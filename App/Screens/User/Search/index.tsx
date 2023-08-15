@@ -11,9 +11,9 @@ import { useEffect, useState } from 'react'
 import { IPostItem } from "../../../Interfaces";
 import useTimeout from "../../../Hooks/useTimeout";
 import ListSlideItem from "../../Partials/ListSlider/ListSliderItem";
+import { Ionicons } from "@expo/vector-icons";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Ionicons } from "@expo/vector-icons";
 dayjs.extend(relativeTime);
 
 export default function Search() {

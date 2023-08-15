@@ -1,52 +1,23 @@
 import TabSelector from "../../Partials/TabSelector";
-import PagerView from 'react-native-pager-view';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+
 import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, RefreshControl, Dimensions } from 'react-native';
 import useThemeColors from "../../../Hooks/useThemeColors";
 import ContentTables from "../../Partials/ContentTables";
-import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import { useDataContext } from "../../../Contexts/DataContext";
-import { useEffect } from 'react'
 import React from 'react';
 // import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { ContainerBlock, ScrollContainer } from "../../../Components/Containers";
 import { Button, IconButton } from "../../../Components/Buttons";
 import { useNavigation } from "@react-navigation/native";
 
-const ComingSoon = () => (
-    <View style={styles.scene}>
-        <Text>Coming Soon!!! 🚀🚀🚀🌟</Text>
-    </View>
-);
-
 export default function Home() {
     const { setData, states: NJS } = useDataContext()
     const colors  =  useThemeColors()
     const { navigate } = useNavigation()
-    const [routes] = useState([
-        { key: 'movies', title: 'movies' },
-        { key: 'music', title: 'music' },
-        { key: 'betting', title: 'betting' },
-        { key: 'more', title: 'more...' },
-    ]);
-    const expTabs = [
-        { title: 'Home', exploring: "all" },
-        { title: 'Comedy', exploring: "comedy " },
-        { title: 'Action', exploring: "action movies" },
-        { title: 'Sci-Fi', exploring: "sci-fi movies" },
-        { title: 'Nollywood', exploring: "nollywood movies" },
-    ]
-
+ 
     const [isRewardAdReady, setisRewardAdReady] = useState(false)
     const [hasEarnedRewards, sethasEarnedRewards] = useState(false)
-
-    const renderScene = SceneMap({
-        movies: ContentTables,
-        music: ComingSoon,
-        betting: ComingSoon,
-        more: () => TabSelector({ 'hidden': false })
-    });
 
     const handleNavigateexplore = (genre: string) => {
         (navigate as any)?.("Explorer", { genre });
@@ -92,6 +63,14 @@ export default function Home() {
     //     }
     // }
 
+    const expTabs = [
+        { title: 'Home', exploring: "all" },
+        { title: 'Comedy', exploring: "comedy " },
+        { title: 'Action', exploring: "action movies" },
+        { title: 'Sci-Fi', exploring: "sci-fi movies" },
+        { title: 'Nollywood', exploring: "nollywood movies" },
+    ]
+
     return (
         <ContainerBlock style={{ flex: 1,padding:0 }}>
             <ContainerBlock style={{ paddingHorizontal:0,   }}>
@@ -110,38 +89,6 @@ export default function Home() {
 
             <ContentTables />
 
-            {/* <PagerView
-                style={styles.pagerView}
-                initialPage={0}
-                onPageSelected={(event) => setIndex(event.nativeEvent.position)}
-                onPageScroll={(data) => handleScroll(data as any)}  >
-                <TabView
-                    navigationState={{ index, routes }}
-                    renderScene={renderScene}
-                    onIndexChange={setIndex}
-                    initialLayout={initialLayout}
-                    renderTabBar={(props) => <TabBar
-                        style={{ backgroundColor: 'transparent', }}
-                        inactiveColor={colors.text}
-                        activeColor={colors.accent}
-                        {...props}
-                    />} />
-            </PagerView> */}
-
         </ContainerBlock>
     )
 }
-
-
-
-const styles = StyleSheet.create({
-    pagerView: {
-        flex: 1,
-    },
-    scene: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-});

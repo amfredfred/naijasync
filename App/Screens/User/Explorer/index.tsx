@@ -48,7 +48,7 @@ export default function Explorer() {
             BHND.remove()
         }
     }, [])
-    
+
 
     return (
         <ContainerFlex style={{ padding: 0 }}>
@@ -61,7 +61,7 @@ export default function Explorer() {
                 />
             </ContainerSpaceBetween>
             <FlatList
-                data={[...Videos, ...Videos, ...Videos]}
+                data={[...Videos]}
                 bouncesZoom={false}
                 bounces={false}
                 style={{ backgroundColor: background2, }}
@@ -71,12 +71,11 @@ export default function Explorer() {
                     gap: 10,
                     flexWrap: 'wrap',
                     justifyContent: 'space-between'
-
                 }}
                 contentContainerStyle={{
                     gap: 10,
                     paddingVertical: 10,
-                    justifyContent:'space-between'
+                    justifyContent: 'space-between'
                 }}
                 renderItem={({ item, index }: { item: IPostItem, index: number }) =>
                     <ListSlideItem
@@ -85,8 +84,8 @@ export default function Explorer() {
                         // stretched={Boolean(index%2)}
                         {...item}
                     />}
+                keyExtractor={({ id }) => id}
             />
         </ContainerFlex>
     )
 }
- 
