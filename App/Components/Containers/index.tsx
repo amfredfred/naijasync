@@ -70,7 +70,7 @@ export const Overlay = (props: ActivityIndicator['props'] & IThemedComponent & {
         top: 0,
         width: width,
         height: '100%',
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(0,0,0,1)',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',

@@ -29,8 +29,8 @@ export interface IUserDownloads {
 export interface IStorageFolder {
     storageFolderDirectoryUri: string,
     downloadsStorageAlbumName: string,
-    myDownloadedAssets: Asset[]
-    hasDownloadedMedias?:boolean
+    myDownloadedAssets: Asset[],
+    hasDownloadedMedias: boolean
 }
 
 export interface IStorageItems {

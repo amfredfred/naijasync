@@ -1,5 +1,5 @@
 import { Text, Keyboard } from "react-native"
-import {QueryClientProvider, QueryClient} from '@tanstack/react-query'
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import UserLayout from "../Layouts/User"
 import GuestLayout from "../Layouts/Guest"
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -16,7 +16,6 @@ import useAppStatus from "../Hooks/useAppStatus";
 import "expo-dev-client"
 import Explorer from "../Screens/User/Explorer";
 import Search from "../Screens/User/Search";
-import 'react-native-gesture-handler'
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
@@ -38,6 +37,12 @@ export default function Root() {
     //     }
     // }, [isLoaded, load])
 
+    const SearchStack = () => (
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
+            <Stack.Screen name="Search" component={Search} />
+        </Stack.Navigator>
+    )
+
 
     const UserRoutes = (
         <UserLayout>
@@ -46,11 +51,11 @@ export default function Root() {
                 <Stack.Screen name='View' component={View} />
                 <Stack.Screen name='Downloads' component={Downloads} />
                 <Stack.Screen name="Explorer" component={Explorer} />
-                <Stack.Screen name="Search" component={Search} />
+                <Stack.Screen name="Search" component={SearchStack} />
             </Stack.Navigator>
         </UserLayout>
     )
-  
+
     const GuestRoutes = (
         <GuestLayout>
             <Text>Guest</Text>
@@ -69,7 +74,7 @@ export default function Root() {
                         {isAuthenticated ? UserRoutes : GuestRoutes}
                     </NavigationContainer>
                 </DataContextProvider>
-          </QueryClientProvider>
+            </QueryClientProvider>
         </SafeAreaProvider>
     )
 }

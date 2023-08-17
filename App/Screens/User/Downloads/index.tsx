@@ -1,5 +1,5 @@
 import { Video } from "expo-av";
-import { Button, IconButton } from "../../../Components/Buttons";
+import { Button, ButtonGradient, IconButton } from "../../../Components/Buttons";
 import { ContainerBlock, ContainerFlex, ContainerSpaceBetween, ScrollContainer } from "../../../Components/Containers";
 import { HeadLine, SpanText } from "../../../Components/Texts";
 import { useDataContext } from "../../../Contexts/DataContext";
@@ -11,9 +11,12 @@ import { RefreshControl, FlatList, Dimensions, StyleSheet, Image, Pressable } fr
 import * as Library from 'expo-media-library'
 import PagerView from 'react-native-pager-view';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { APP_NAME } from '@env'
+import { APP_NAME, APP_ALBUM_NAME } from '@env'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 dayjs.extend(relativeTime);
 
 const { width, height } = Dimensions.get('window')
@@ -27,7 +30,7 @@ const ComingSoon = () => (
 
 export default function Downloads() {
     const colors = useThemeColors()
-    const { states } = useDataContext()
+    const { navigate } = useNavigation()
     const [isRefreshing, setIsRefreshing] = useState<boolean>()
     const [UserDownloads, setUserDownloads] = useState<{
         videos?: Library.AssetInfo[],
@@ -40,8 +43,18 @@ export default function Downloads() {
     const {
         libPermision,
         handleLibPermisionsRequest,
-        getMydownloads
+        getMydownloads,
+        hasDownloadedMedias
     } = useMediaLibrary()
+
+    //Tab
+
+    const [routes] = useState([
+        { key: 'vodeos', title: "movies", albumable: 'videos' },
+        { key: 'music', title: 'music', albumable: 'audios' },
+        { key: 'photos', title: 'Photos', albumable: 'photos' },
+        { key: 'others', title: 'more...', albumable: 'unknown' },
+    ]);
 
     const onRefresh = async () => {
         try {
@@ -72,21 +85,27 @@ export default function Downloads() {
     }
 
     const accessButton = (
-        <ContainerBlock>
+        <LinearGradient
+            colors={[colors.background, colors.background2]}
+            style={{ paddingBottom: 20, borderTopRightRadius: 20, padding: 10, borderTopLeftRadius: 20, flex: 1 }}>
             <HeadLine
                 children="Media Library Access"
                 style={{ paddingHorizontal: 0, marginBottom: 10, fontSize: 40 }}
             />
+            <SpanText
+                onPress={handleLibPermisionsRequest}
+                style={{ color: libPermision?.granted ? colors.warning : colors.error, fontSize: 12 }}
+                children={" Media Access is " + (libPermision?.status)} />
             <SpanText
                 children={`${APP_NAME} need access to your media library to show your photos and videos.`}
                 style={{ fontSize: 18, fontWeight: '300', opacity: .7 }}
             />
             <Button
                 onPress={handleLibPermisionsRequest}
-                containerStyle={{ borderRadius: 50, backgroundColor: colors.accent, marginTop: 20, borderTopEndRadius: 10, borderTopStartRadius: 10 }}
+                containerStyle={{ borderRadius: 50, backgroundColor: colors.accent, marginTop: 20 }}
                 textStyle={{ textAlign: 'center', width: '100%', }}
                 title={"Grant Media Access"} />
-        </ContainerBlock>
+        </LinearGradient>
     )
 
     const VideosList = () => (
@@ -100,7 +119,7 @@ export default function Downloads() {
             data={UserDownloads.videos}
             renderItem={({ item }) => (
                 <Pressable key={item.creationTime} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
-                    <ContainerBlock style={{ padding: 0, position: 'relative', borderRadius: 10 }}>
+                    <ContainerBlock style={{ padding: 0, position: 'relative', borderRadius: 10, overflow: 'hidden', borderWidth: 1, }}>
                         <Image
                             source={{ uri: item?.uri }}
                             height={90}
@@ -135,21 +154,10 @@ export default function Downloads() {
         />
     );
 
-
-
     useEffect(() => {
-        onRefresh()
+        onRefresh() 
         console.log("REFRSHIGN FROM FGHJKSKGHDSJHDSDSD")
-    }, [])
-
-    //Tab
-
-    const [routes] = useState([
-        { key: 'vodeos', title: "movies", albumable: 'videos' },
-        { key: 'music', title: 'music', albumable: 'audios' },
-        { key: 'photos', title: 'Photos', albumable: 'photos' },
-        { key: 'others', title: 'more...', albumable: 'unknown' },
-    ]);
+    }, [libPermision])
 
     const renderScene = SceneMap({
         vodeos: VideosList,
@@ -165,7 +173,7 @@ export default function Downloads() {
 
     const PAGINGS = (
         <PagerView
-            style={styles.pagerView}
+            style={[styles.pagerView, { backgroundColor: colors.background2 }]}
             onPageScroll={() => console.log("SCROLLED")}
             initialPage={0}
         >
@@ -175,35 +183,80 @@ export default function Downloads() {
                 onIndexChange={handlePagerIndexChange}
                 // initialLayout={initialLayout}
                 renderTabBar={(props) => <TabBar
-                    style={{ backgroundColor: 'green', }}
+                    style={{ backgroundColor: colors.background, }}
                     inactiveColor={colors.text}
-                    activeColor={colors.accent}
+                    activeColor={colors.primary}
                     {...props}
                 />} />
         </PagerView>
     )
 
-    console.log(libPermision?.granted, "MEDIA ACCESS")
+    const hasNoDownloads = (
+        < LinearGradient
+            colors={[colors.background, colors.background]}
+            style={{ flex: 1, justifyContent: 'center' }}>
+            <HeadLine
+                children="Zero Downloads!!"
+                style={{ paddingHorizontal: 20, marginBottom: 10, fontSize: 40 }}
+            />
+            <SpanText
+                style={{ fontSize: 18, fontWeight: '300', opacity: .7, paddingHorizontal: 20, width: '90%', marginBottom: 10 }}
+                children={`${APP_NAME}\nYou haven't downloaded anything yet. Press the button to explore and download content.`}
+            />
+            <ContainerBlock style={{ borderRadius: 5, flexDirection: 'row', backgroundColor: 'transparent', flexWrap: 'wrap', gap: 20, padding: 20 }}>
+                <ButtonGradient
+                    icon={<MaterialIcons size={40} name="audiotrack" color={'white'} />}
+                    containerStyle={{ width: '40%', flexGrow: 1 }}
+                    title={"Explore Music"}
+                    gradient={['#FF6B6B', '#FF8E53']}
+                    onPress={() => (navigate as any)?.("Search", { exploring: 'music audio' })}
+                />
+                <ButtonGradient
+                    gradient={['#3A8DFF', '#3ABEFF']}
+                    icon={<MaterialIcons size={40} name="airplay" color={'white'} />}
+                    containerStyle={{ width: '40%' }}
+                    title={"Movies"}
+                    onPress={() => (navigate as any)?.("Search", { exploring: 'movies video videos' })}
+                />
+                {/* <ButtonGradient
+                    gradient={['green', '#26C0F7']}
+                    icon={<MaterialIcons size={40} name="favorite" color={'white'} />}
+                    containerStyle={{ width: '40%', flexGrow: 1 }}
+                    title={"Free bettin Odds"}
+                    onPress={() => (navigate as any)?.("Search", { exploring: 'betting' })}
+                /> */}
+            </ContainerBlock>
+        </LinearGradient>
+    )
 
     return (
-        <ContainerFlex>
+        <ContainerFlex
+            style={{ backgroundColor: colors.background2 }}
+        >
             <HeadLine
+                hidden={!libPermision?.granted || !hasDownloadedMedias}
                 children={
                     <>
                         Downloads •
                         <SpanText
                             onPress={handleLibPermisionsRequest}
-                            style={{ color: libPermision?.granted ? colors.warning : colors.error }}
-                            children={" " + (UserDownloads?.[routes?.[index]?.albumable]?.length ?? (libPermision?.status + " access To")) + " "} />
+                            style={{ color: libPermision?.granted ? colors.warning : colors.error, fontSize: 12 }}
+                            children={" " + (UserDownloads?.[routes?.[index]?.albumable]?.length ?? "") + " "} />
                         {routes?.[index]?.albumable}
                     </>
                 }
-                style={{ fontWeight: '900', textTransform: 'uppercase', paddingVertical: 10, paddingHorizontal: 15, borderBottomColor: libPermision?.granted ? colors.warning : colors.error, borderBottomWidth: 2 }}
+                style={{
+                    fontWeight: '900',
+                    textTransform: 'uppercase',
+                    paddingVertical: 10,
+                    paddingHorizontal: 15,
+                    // borderBottomColor: libPermision?.granted ? colors.warning : colors.error,
+                    // borderBottomWidth: 2
+                }}
             />
             {!libPermision?.granted ? accessButton :
                 <ContainerBlock style={{ flex: 1, padding: 0 }}>
-
-                    {PAGINGS}
+                    {hasDownloadedMedias ? PAGINGS : hasNoDownloads}
                 </ContainerBlock>
             }
         </ContainerFlex>

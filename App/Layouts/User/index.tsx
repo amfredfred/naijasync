@@ -80,7 +80,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                             onPress={handleCancelSearchSection}
                         />
                         <InputText
-                            onFocus={handleToSearchhandle}
+                            onPressIn={handleToSearchhandle}
                             // onBlur={handleSearchInputBlur}
                             placeholder="Search..."
                             onChangeText={onSearchInputTextChange}

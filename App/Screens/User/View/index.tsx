@@ -9,9 +9,14 @@ import { Button, IconButton } from "../../../Components/Buttons";
 import { useDataContext } from "../../../Contexts/DataContext";
 import useThemeColors from "../../../Hooks/useThemeColors";
 import useMediaLibrary from "../../../Hooks/useMediaLibrary";
+import { useQueries } from "@tanstack/react-query";
+import axios from "axios";
+import { REQUESTS_API } from "@env";
 
 export default function View() {
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const colors = useThemeColors();
+    const { params } = useRoute();
 
     const {
         createDownload,
@@ -22,16 +27,24 @@ export default function View() {
         handleLibPermisionsRequest
     } = useMediaLibrary();
 
-    const colors = useThemeColors();
+    const [FetchedPost] = useQueries({
+        queries: [
+            {
+                queryFn: async () => axios<IPostItem>({ url: `${REQUESTS_API}posts/${4}`, method: "GET" }),
+                queryKey: [`post-id-${4}`],
+                cacheTime: 5000,
+                retry: true,
+            }
+        ],
+    })
 
-    const { params } = useRoute();
 
     const onRefresh = () => {
         // Handle refresh here
     };
 
     const beginDownload = () => {
-        createDownload((params as any)?.src, "new-movies-2023.mp4");
+        createDownload((params as any)?.src, `${Math.random() * 10}-new-movies-2023.mp4`);
     };
 
     const suspendDownload = () => {
@@ -55,7 +68,7 @@ export default function View() {
 
     return (
         <ContainerFlex>
-            <VideoPlayer {...params as IPostItem} />
+            <VideoPlayer {...FetchedPost?.data?.data} />
             <ScrollContainer
                 refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={isRefreshing} />}
             >

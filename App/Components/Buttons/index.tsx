@@ -30,7 +30,7 @@ export const Button = (props: IButton & { title: string }) => {
     const styled: IButton['style'] = {
         alignItems: 'flex-start', 
         width: '100%',
-        flex:1
+        // flex: 1,
     }
 
     const onlongpress = (e: any) => {
@@ -126,7 +126,10 @@ export const ButtonGradient = (props: IButtonGradient) => {
 
 
     return (
-        <LinearGradient colors={gradient} style={[containerStyled, containerStyle]}>
+        <LinearGradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            colors={gradient} style={[containerStyled, containerStyle]}>
             <TouchableOpacity {...otherProps}>
                 <SpanText
                     hidden={!(props as any)?.icon}
@@ -141,7 +144,7 @@ export const ButtonGradient = (props: IButtonGradient) => {
                     )
                 }
                 <SpanText
-                    style={{ textTransform: 'capitalize', color }}
+                    style={{ textTransform: 'capitalize', fontSize:20 }}
                     hidden={!title}
                     children={title} />
             </TouchableOpacity>

@@ -14,6 +14,7 @@ import ListSlideItem from "../../Partials/ListSlider/ListSliderItem";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useRoute } from "@react-navigation/native";
 dayjs.extend(relativeTime);
 
 export default function Search() {
@@ -23,6 +24,9 @@ export default function Search() {
     const [fetchLimit, setfetchLimit] = useState(4)
     const [shouldQuery, setshouldQuery] = useState(false)
     const [isRefreshing, setisRefreshing] = useState(false)
+    const { params } = useRoute()
+    
+    console.log(params)
 
     const colors = useThemeColors()
 
@@ -52,6 +56,10 @@ export default function Search() {
             setshouldQuery(true)
         console.log('TIME OUT')
     }
+    useEffect(() => {
+
+
+    }, [])
 
     useTimeout({
         deps: [user?.searchRequestValue, isSelectedTarget],
@@ -64,11 +72,9 @@ export default function Search() {
 
     }
 
-
-    console.log(`${REQUESTS_API}${$movies.data?.data?.results?.[0]?.thumbnailUrl}`)
-
     return (
         <ContainerBlock style={{ padding: 0, flex: 1 }}>
+            
             <ContainerBlock style={{ paddingHorizontal: 0, }}>
                 <ScrollContainer
                     horizontal

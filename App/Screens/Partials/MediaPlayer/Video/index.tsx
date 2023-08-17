@@ -7,11 +7,12 @@ import { Button } from "../../../../Components/Buttons";
 import { useDataContext } from "../../../../Contexts/DataContext";
 import { BackHandler } from 'react-native'
 import { SpanText } from "../../../../Components/Texts";
+import { REQUESTS_API } from "@env";
 
 
 export default function VideoPlayer(props: IPostItem) {
     const { background2, text } = useThemeColors()
-    const { src, thumb } = props
+    const { fileUrl, thumb, thumbnailUrl } = props
 
     //Refs
     const video = useRef<Video>();
@@ -51,9 +52,9 @@ export default function VideoPlayer(props: IPostItem) {
             showPoster: true,
         })
 
-        video.current?.loadAsync({
-            uri: src,
-        })
+        // video.current?.loadAsync({
+        //     uri: `${REQUESTS_API}${fileUrl}`,
+        // })
 
         const BHND = BackHandler.addEventListener('hardwareBackPress', handleBackPress)
         return () => {
@@ -71,11 +72,11 @@ export default function VideoPlayer(props: IPostItem) {
         <ContainerBlock style={{ position: 'relative', padding: 0, zIndex: 1, backgroundColor: background2, elevation: 20, shadowColor: text }}>
             <Overlay
                 hidden={!onVideoBuffer || !onVideoLoading}
-                imageSource={thumb}
+                imageSource={`${REQUESTS_API}${fileUrl}`}
             />
             {!isShwoingControls || PlayerControls}
             <Video
-                posterSource={{ uri: thumb }}
+                posterSource={{ uri: thumbnailUrl }}
                 style={{ width: '100%', aspectRatio: '16/9' }}
                 // source={{ uri: src, }}
                 useNativeControls={!onVideoBuffer || !onVideoLoading}

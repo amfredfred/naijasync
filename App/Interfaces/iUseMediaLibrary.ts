@@ -34,6 +34,7 @@ export interface IUseMediaLibrary {
         message?: string
     }
     libPermision: PermissionResponse,
+    hasDownloadedMedias:boolean
     downloadStataus: "paused" | "finished" | "canceled" | "erorred" | "idle" | "downloading"
     handleLibPermisionsRequest(): void,
     handleAlbumCreationAndAssetAddition(): void
