@@ -16,6 +16,7 @@ import useAppStatus from "../Hooks/useAppStatus";
 import "expo-dev-client"
 import Explorer from "../Screens/User/Explorer";
 import Search from "../Screens/User/Search";
+// import { BottomSheetProvider } from '@gorhom/bottom-sheet';
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
@@ -46,7 +47,7 @@ export default function Root() {
 
     const UserRoutes = (
         <UserLayout>
-            <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+            <Stack.Navigator initialRouteName="Downloads" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
                 <Stack.Screen name='Home' component={Home} />
                 <Stack.Screen name='View' component={View} />
                 <Stack.Screen name='Downloads' component={Downloads} />
@@ -71,7 +72,9 @@ export default function Root() {
             <QueryClientProvider client={Client}>
                 <DataContextProvider>
                     <NavigationContainer >
-                        {isAuthenticated ? UserRoutes : GuestRoutes}
+                        {/* <BottomSheetProvider> */}
+                            {isAuthenticated ? UserRoutes : GuestRoutes}
+                        {/* </BottomSheetProvider> */}
                     </NavigationContainer>
                 </DataContextProvider>
             </QueryClientProvider>

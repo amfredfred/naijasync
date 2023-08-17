@@ -38,6 +38,7 @@ export interface IUseMediaLibrary {
     downloadStataus: "paused" | "finished" | "canceled" | "erorred" | "idle" | "downloading"
     handleLibPermisionsRequest(): void,
     handleAlbumCreationAndAssetAddition(): void
+    handleRemoveAssetFromAlbum(assetId:string[]):void
     pauseDownload(): void
     cancelDownload(): void
     resumeDownload(): void

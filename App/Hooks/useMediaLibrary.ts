@@ -2,7 +2,7 @@ import * as Library from 'expo-media-library'
 import { IUseMediaLibrary } from '../Interfaces/iUseMediaLibrary'
 import * as FS from 'expo-file-system'
 import { useEffect, useState } from 'react'
-import { Linking, Platform } from 'react-native'
+import { Linking, Platform, Alert } from 'react-native'
 import { formatFileSize } from '../Helpers'
 import { useDataContext } from '../Contexts/DataContext'
 import * as Permissions from 'expo-permissions'
@@ -10,6 +10,10 @@ import { APP_ALBUM_NAME } from '@env'
 import { PermissionsAndroid } from 'react-native';
 
 export default function useMediaLibrary(): IUseMediaLibrary {
+
+    const dirname = `${FS.documentDirectory}${APP_ALBUM_NAME}/`
+    const albumName = APP_ALBUM_NAME;
+
     const [libPermision, requestLibPermisions] = Library.usePermissions()
     const [downloadResumable, setResumeableDownload] = useState<FS.DownloadResumable>()
     const [downloadMessage, setdownloadMessage] = useState<IUseMediaLibrary['downloadMessage']>()
@@ -19,14 +23,133 @@ export default function useMediaLibrary(): IUseMediaLibrary {
     //
     const [hasDownloadedMedias, setHasDownloadedMedias] = useState(false)
 
+    const handleRemoveAssetFromAlbum: IUseMediaLibrary['handleRemoveAssetFromAlbum'] = async (assetId) => {
+        try {
+            const removeAssetOrAssets = async () => {
+                const album = await Library.getAlbumAsync(albumName)
+                const deleted = await Library.removeAssetsFromAlbumAsync(assetId, album.id);
+                if (deleted)
+                    getMydownloads(['audio', 'photo', 'video', 'unknown'])
+                console.log('Asset removed from album successfully');
+            }
+            Alert.alert(
+                "DELETE ITEM",
+                "Are you sure you want to delete this ietm?",
+                [
+                    { text: "Delete", onPress: removeAssetOrAssets },
+                    { text: "cancel", onPress: () => true }
+                ]
+            )
 
-    const {
-        states,
-        setData
-    } = useDataContext()
+        } catch (error) {
+            console.error('Error removing asset from album:', error);
+        }
+    };
 
-    const dirname = states?.storage?.storageFolderDirectoryUri ?? `${FS.documentDirectory}${APP_ALBUM_NAME}/`
-    const albumName = APP_ALBUM_NAME;
+    const handleAlbumCreationAndAssetAddition: IUseMediaLibrary['handleAlbumCreationAndAssetAddition'] = async () => {
+        try {
+            const [itemsToMove, existingAlbum] = await Promise.all([
+                FS.readDirectoryAsync(dirname),
+                Library.getAlbumAsync(albumName),
+            ]);
+
+            if (!existingAlbum) {
+                const isIOS = Platform.OS === 'ios';
+                if (isIOS) {
+                    const album = await Library.createAlbumAsync(albumName);
+                    console.log("ALBUM_CREATED_IOS:", album);
+                    return !album;
+                } else {
+                    const initialAsset = `${dirname}${itemsToMove?.[0]}`;
+                    if (initialAsset.indexOf('undefined') >= 0) {
+                        setHasDownloadedMedias(false);
+                        console.log("DOWNLOAD SOMETHING FIRST");
+                        return false;
+                    } else {
+                        console.log(initialAsset, "INITIAL ASSET");
+                        const asset = await Library.createAssetAsync(initialAsset);
+                        console.info(asset, "ASSET CREATED");
+                        const album = await Library.createAlbumAsync(albumName, asset, false);
+                        console.log("ALBUM_CREATED:", album);
+                    }
+                }
+            }
+
+            const assetsInAlbum = await Library.getAssetsAsync({
+                album: existingAlbum?.id,
+                mediaType: ['audio', 'photo', 'unknown', 'video'],
+            });
+
+            const addedAssets = assetsInAlbum.assets.map(item => item.filename);
+            const assestsToMove = [];
+
+            for (const fileName of itemsToMove) {
+                const sourceFilePath = `${dirname}${fileName}`;
+                try {
+                    if (!addedAssets.includes(fileName)) {
+                        const asset = await Library.createAssetAsync(sourceFilePath);
+                        assestsToMove.push(asset.id);
+                    } else {
+                        console.info(fileName, ": ALREADY ADDED");
+                    }
+                } catch (error) {
+                    console.log("ERROR_CREATING_ASSETS");
+                }
+            }
+
+            try {
+                if (assestsToMove.length > 0) {
+                    await Library.addAssetsToAlbumAsync(assestsToMove, existingAlbum?.id);
+                }
+            } catch (error) {
+                console.log("ERROR_MOVING_ITEMS_TO_STORAGE", error);
+            }
+
+            return true;
+        } catch (error) {
+            console.error('ERROR_OCCURED: ', error);
+            return false;
+        }
+    };
+
+    const getMydownloads: IUseMediaLibrary['getMydownloads'] = async (items) => {
+        if (!libPermision.granted) {
+            console.log("READ_MEDIAS_PERMISSION_NOT_GRANTED!!")
+            await requestLibPermisions()
+        }
+        try {
+            const album = await Library.getAlbumAsync(albumName);
+            handleAlbumCreationAndAssetAddition()
+            if (album?.id) {
+                const myassetsResponse = await Library.getAssetsAsync({
+                    mediaType: items,
+                    album: album?.id,
+                });
+                if (myassetsResponse?.assets) {
+                    setHasDownloadedMedias(true)
+                    return myassetsResponse.assets;
+                } else {
+                    setHasDownloadedMedias(false)
+                    // throw new Error('No assets found.');
+                }
+            } else {
+                console.log(`Album ${albumName} not found!`)
+                // throw new Error(`Album ${albumName} not found!`);
+            }
+
+        } catch (error) {
+            console.error('Error in getMydownloads:', error);
+            throw error; // Rethrow the error to handle it in the caller function
+        }
+    };
+
+    const handleLibPermisionsRequest = async () => {
+        if (!libPermision?.granted && libPermision?.canAskAgain) {
+            await requestLibPermisions()
+        } else if (libPermision?.status === 'denied' && !libPermision?.canAskAgain) {
+            OpenSettingsToEnablePermissions()
+        }
+    }
 
     const OpenSettingsToEnablePermissions = async () => {
         if (Platform.OS === 'android') {
@@ -37,112 +160,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             await Linking.openURL('app-settings:' + Permissions.getAsync('mediaLibrary'));
         }
     }
-
-
-
-    async function requestExternalStoragePermission() {
-        console.log("ACLAE FOR ER")
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: 'Storage Permission',
-                    message: 'App needs access to external storage to copy files.',
-                    buttonPositive: 'OK',
-                }
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log('Storage permission granted.');
-            } else {
-                console.log('Storage permission denied.');
-            }
-            console.log(" ALREADY")
-        } catch (error) {
-            console.error('Error requesting storage permission:', error);
-        }
-    }
-
-
-    const handleAlbumCreationAndAssetAddition: IUseMediaLibrary['handleAlbumCreationAndAssetAddition'] = async () => {
-        try {
-
-            const [itemsToMove, existingAlbum] = await Promise.all([
-                FS.readDirectoryAsync(dirname),
-                Library.getAlbumAsync(albumName),
-            ])
-            const [{ assets: itemsInAlbum }] = await Promise.all([
-                Library.getAssetsAsync({
-                    album: existingAlbum?.id,
-                    mediaType: ['audio', 'photo', 'unknown', 'video']
-                })
-            ])
-
-            const addedAssets = itemsInAlbum?.map(item => item.filename)
-
-            const moveItemsToAlbum = async () => {
-                const items = itemsToMove
-                const assestsToMove = [];
-
-                await Promise.all(items?.map(async (fileName) => {
-                    const sourceFilePath = `${dirname}${fileName}`;
-                    console.log(fileName)
-                    try {
-                        if (!addedAssets.includes(fileName)) {
-                            const asset = await Library.createAssetAsync(sourceFilePath);
-                            assestsToMove.push(asset.id)
-                        }
-                        else {
-                            console.info(fileName, ": ALREADY ADDED")
-                        }
-                    } catch (error) {
-                        console.log("ERROR_CREATING_ASSETS")
-                    }
-                }));
-                try {
-                    if (assestsToMove.length > 0) {
-                        await Library.addAssetsToAlbumAsync(assestsToMove, existingAlbum?.id);
-                    }
-                } catch (error) {
-                    console.log("ERROR_MOVING_ITEMS_TO STORAGE", error)
-                }
-
-                console.log("======================================================DID WELL=========================")
-                // // setData('storage', 'myDownloadedAssets', [...assets]);
-            };
-
-            if (!existingAlbum) {
-                if (Platform.OS === 'ios') {
-                    const album = await Library.createAlbumAsync(albumName);
-                    console.log("ALBUM_CREATED_IOS:", album);
-                    return !album
-                } else {
-                    const initialAsset = `${dirname}${itemsToMove?.[0]}`;
-                    if (initialAsset.indexOf('undefined') >= 0) {
-                        setHasDownloadedMedias(false)
-                        console.log("DOWNLOAD SOMETHING FIRST");
-                        return false
-                    }
-                    else {
-                        console.log(initialAsset, "INITILA ASSETS")
-                        // const indo = await Library.getAssetInfoAsync(asset, options)
-                        const asset = await Library.createAssetAsync(initialAsset);
-                        console.info(asset, " ASSET CREATED ")
-                        const album = await Library.createAlbumAsync(albumName, asset, false);
-                        console.log("ALBUM_CREATED:", album);
-                    }
-                    moveItemsToAlbum()
-                    // setHasDownloadedMedias(true)
-                    return true;
-                }
-            } else {
-                moveItemsToAlbum()
-                return true;
-            }
-        } catch (error) {
-            console.error('ERROR_OCCURED: ', error);
-            return false;
-        }
-    };
 
     const ensureDownloadsDirectoryExists = async () => {
         try {
@@ -158,31 +175,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         // if (libPermision?.granted)
         //     handleAlbumCreationAndAssetAddition(dirname, 'naijaSync')
     };
-
-    useEffect(() => {
-        ensureDownloadsDirectoryExists()
-    }, [libPermision, states?.storage?.storageFolderDirectoryUri === dirname])
-
-    useEffect(() => {
-        if (downloadStataus === 'finished') {
-            handleAlbumCreationAndAssetAddition()
-        }
-
-        return () => {
-            if (downloadStataus === 'downloading') {
-                downloadResumable?.pauseAsync?.();
-                setdownloadMessage({})
-            }
-        };
-    }, [downloadStataus]);
-
-    const handleLibPermisionsRequest = async () => {
-        if (!libPermision?.granted && libPermision?.canAskAgain) {
-            await requestLibPermisions()
-        } else if (libPermision?.status === 'denied' && !libPermision?.canAskAgain) {
-            OpenSettingsToEnablePermissions()
-        }
-    }
 
     const onDownloading = ({ totalBytesWritten, totalBytesExpectedToWrite }) => {
         setDownloadProgreess({
@@ -219,7 +211,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
 
         try {
             const { uri } = await startDownload(dData)
-            console.log(uri, " DOWNLOADEDE TO")
             setDownloadStatus('finished')
         } catch (error) {
             setdownloadMessage({
@@ -254,40 +245,47 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         setDownloadStatus('downloading')
     }
 
-    const getMydownloads: IUseMediaLibrary['getMydownloads'] = async (items) => {
-        if (!libPermision.granted) {
-            console.log("READ_MEDIAS_PERMISSION_NOT_GRANTED!!")
-            await requestLibPermisions()
+    useEffect(() => {
+        ensureDownloadsDirectoryExists()
+    }, [libPermision])
+
+    useEffect(() => {
+        if (downloadStataus === 'finished') {
+            handleAlbumCreationAndAssetAddition()
         }
+
+        return () => {
+            if (downloadStataus === 'downloading') {
+                downloadResumable?.pauseAsync?.();
+                setdownloadMessage({})
+            }
+        };
+    }, [downloadStataus]);
+
+
+
+    async function requestExternalStoragePermission() {
+        console.log("ACLAE FOR ER")
         try {
-            const album = await Library.getAlbumAsync(albumName);
-            const createdAlbum = await handleAlbumCreationAndAssetAddition()
-            if (!album) {
-
-            }
-
-            if (album?.id) {
-                const myassetsResponse = await Library.getAssetsAsync({
-                    mediaType: items,
-                    album: album?.id,
-                });
-                if (myassetsResponse?.assets) {
-                    setHasDownloadedMedias(true)
-                    return myassetsResponse.assets;
-                } else {
-                    setHasDownloadedMedias(false)
-                    // throw new Error('No assets found.');
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                {
+                    title: 'Storage Permission',
+                    message: 'App needs access to external storage to copy files.',
+                    buttonPositive: 'OK',
                 }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log('Storage permission granted.');
             } else {
-                console.log(`Album ${albumName} not found!`)
-                // throw new Error(`Album ${albumName} not found!`);
+                console.log('Storage permission denied.');
             }
-
+            console.log(" ALREADY")
         } catch (error) {
-            console.error('Error in getMydownloads:', error);
-            throw error; // Rethrow the error to handle it in the caller function
+            console.error('Error requesting storage permission:', error);
         }
-    };
+    }
+
 
 
     return {
@@ -296,6 +294,7 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         libPermision,
         hasDownloadedMedias,
         handleLibPermisionsRequest,
+        handleRemoveAssetFromAlbum,
         pauseDownload,
         cancelDownload,
         resumeDownload,

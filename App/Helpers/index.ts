@@ -1,3 +1,5 @@
+import { Linking } from 'react-native'
+
 export const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
 
@@ -100,4 +102,20 @@ export function linkChecker({ link }) {
     const matchedPlatform = patterns.find(({ pattern }) => pattern.test(link));
 
     return matchedPlatform
+}
+
+
+export async function openURi(uri: string, onCannotOpenUri?: () => void, onError?: () => void) {
+    try {
+        const supported = await Linking.canOpenURL(uri);
+        if (supported) {
+            await Linking.openURL(uri);
+        } else {
+            console.error('Cannot open URL:', uri);
+            onCannotOpenUri?.()
+        }
+    } catch (error) {
+        onError?.()
+        console.error('Error opening URL:', error);
+    }
 }

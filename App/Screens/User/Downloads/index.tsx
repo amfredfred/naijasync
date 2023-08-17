@@ -2,12 +2,11 @@ import { Video } from "expo-av";
 import { Button, ButtonGradient, IconButton } from "../../../Components/Buttons";
 import { ContainerBlock, ContainerFlex, ContainerSpaceBetween, ScrollContainer } from "../../../Components/Containers";
 import { HeadLine, SpanText } from "../../../Components/Texts";
-import { useDataContext } from "../../../Contexts/DataContext";
-import { add, formatDuration, formatFileSize, formatPlaytimeDuration } from "../../../Helpers";
+import { add, formatDuration, formatFileSize, formatPlaytimeDuration, openURi } from "../../../Helpers";
 import useMediaLibrary from "../../../Hooks/useMediaLibrary";
 import useThemeColors from "../../../Hooks/useThemeColors";
-import { useEffect, useRef, useState } from 'react'
-import { RefreshControl, FlatList, Dimensions, StyleSheet, Image, Pressable } from 'react-native'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { RefreshControl, FlatList, Dimensions, StyleSheet, Image, Pressable, ImageBackground, BackHandler, Linking } from 'react-native'
 import * as Library from 'expo-media-library'
 import PagerView from 'react-native-pager-view';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
@@ -15,18 +14,20 @@ import { APP_NAME, APP_ALBUM_NAME } from '@env'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { LinearGradient } from "expo-linear-gradient";
-import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-dayjs.extend(relativeTime);
+import BottomSheet, { useBottomSheet, useBottomSheetDynamicSnapPoints } from '@gorhom/bottom-sheet';
+import ShareContent from "../../Partials/ShareFile";
+import { FilesBrowser } from "./FilesBrowser";
 
-const { width, height } = Dimensions.get('window')
+
+dayjs.extend(relativeTime);
 
 const ComingSoon = () => (
     <ContainerBlock  >
         <SpanText>Coming Soon!!! 🚀🚀🚀🌟</SpanText>
     </ContainerBlock>
 );
-
 
 export default function Downloads() {
     const colors = useThemeColors()
@@ -38,7 +39,12 @@ export default function Downloads() {
         photos?: Library.AssetInfo[],
         others?: Library.AssetInfo[]
     }>({})
+
+    const [BottomSheetDate, setBottomSheetDate] = useState<Library.AssetInfo>()
+
     const [index, setIndex] = useState(0)
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const handleClosePress = () => bottomSheetRef.current.close()
 
     const {
         libPermision,
@@ -108,59 +114,83 @@ export default function Downloads() {
         </LinearGradient>
     )
 
-    const VideosList = () => (
-        <FlatList
-            bouncesZoom={false}
-            bounces={false}
-            contentContainerStyle={{
-                justifyContent: 'space-between',
-                paddingVertical: 10,
-            }}
-            data={UserDownloads.videos}
-            renderItem={({ item }) => (
-                <Pressable key={item.creationTime} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
-                    <ContainerBlock style={{ padding: 0, position: 'relative', borderRadius: 10, overflow: 'hidden', borderWidth: 1, }}>
-                        <Image
-                            source={{ uri: item?.uri }}
-                            height={90}
-                            resizeMethod="resize"
-                            resizeMode='contain'
-                            style={{ aspectRatio: '16/9' }}
-                        />
-                        <SpanText
-                            children={formatPlaytimeDuration(item.duration)}
-                            numberOfLines={2}
-                            style={{
-                                marginBottom: 6, position: 'absolute', right: 5, bottom: 5, padding: 3, backgroundColor: 'rgba(0,0,0,0.6)',
-                                lineHeight: 25, fontFamily: 'Montserrat_400Regular',
-                            }} />
-                    </ContainerBlock>
-                    <ContainerBlock style={{ backgroundColor: 'transparent', paddingVertical: 0, overflow: 'hidden', flexGrow: 1, maxWidth: '60%' }}>
-                        <SpanText
-                            children={item.filename}
-                            numberOfLines={2}
-                            style={{ marginBottom: 6, lineHeight: 25, fontFamily: 'Montserrat_400Regular', }} />
-                        <SpanText
-                            children={dayjs(new Date(item.creationTime * 1000)).format('D MMM, YYYY')}
-                            style={{ fontSize: 12, opacity: .6, fontFamily: 'Montserrat_400Regular', }}
-                        />
+    const handleDownloadedItemClicked = async (item: Library.AssetInfo) => {
+        setBottomSheetDate(item)
+        bottomSheetRef.current.expand()
+    }
 
-                    </ContainerBlock>
-                </Pressable>
+    console.log(BottomSheetDate)
 
-            )}
-            keyExtractor={({ id }) => id}
-            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
-        />
-    );
+    // const VideosList = () => (
+    //     <FlatList
+    //         bouncesZoom={false}
+    //         bounces={false}
+    //         contentContainerStyle={{
+    //             justifyContent: 'space-between',
+    //             paddingVertical: 10,
+    //         }}
+    //         data={UserDownloads.videos}
+    //         renderItem={({ item }) => (
+    //             <Pressable
+    //                 onPress={() => handleDownloadedItemClicked(item)}
+    //                 key={item.creationTime} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+    //                 <ContainerBlock style={{ padding: 0, position: 'relative', borderRadius: 10, overflow: 'hidden', borderWidth: 1, }}>
+    //                     <Image
+    //                         source={{ uri: item?.uri }}
+    //                         height={90}
+    //                         resizeMethod="resize"
+    //                         resizeMode='contain'
+    //                         style={{ aspectRatio: '16/9' }}
+    //                     />
+    //                     <SpanText
+    //                         children={formatPlaytimeDuration(item.duration)}
+    //                         numberOfLines={2}
+    //                         style={{
+    //                             marginBottom: 6, position: 'absolute', right: 5, bottom: 5, padding: 3, backgroundColor: 'rgba(0,0,0,0.6)',
+    //                             lineHeight: 25, fontFamily: 'Montserrat_400Regular',
+    //                         }} />
+    //                 </ContainerBlock>
+    //                 <ContainerBlock style={{ backgroundColor: 'transparent', paddingVertical: 0, overflow: 'hidden', flexGrow: 1, maxWidth: '60%' }}>
+    //                     <SpanText
+    //                         children={item.filename}
+    //                         numberOfLines={2}
+    //                         style={{ marginBottom: 6, lineHeight: 25, fontFamily: 'Montserrat_400Regular', }} />
+    //                     <SpanText
+    //                         children={dayjs(new Date(item.creationTime * 1000)).format('D MMM, YYYY')}
+    //                         style={{ fontSize: 12, opacity: .6, fontFamily: 'Montserrat_400Regular', }}
+    //                     />
+
+    //                 </ContainerBlock>
+    //             </Pressable>
+
+    //         )}
+    //         keyExtractor={({ id }) => id}
+    //         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+    //     />
+    // );
+
+    const handlebackbuttonPress = () => {
+        if ('') {
+            handleClosePress()
+            return true
+        } else {
+
+        }
+        return false
+    }
 
     useEffect(() => {
-        onRefresh() 
-        console.log("REFRSHIGN FROM FGHJKSKGHDSJHDSDSD")
-    }, [libPermision])
+        onRefresh()
+
+        const BHND = BackHandler.addEventListener('hardwareBackPress', handlebackbuttonPress)
+
+        return () => {
+            BHND.remove()
+        }
+    }, [])
 
     const renderScene = SceneMap({
-        vodeos: VideosList,
+        vodeos: () => FilesBrowser({ assets: UserDownloads?.videos }),
         music: ComingSoon,
         photos: ComingSoon,
         others: ComingSoon
@@ -229,6 +259,10 @@ export default function Downloads() {
         </LinearGradient>
     )
 
+    const handleOpenUrl = async (assetUri: string) => {
+        openURi(assetUri)
+    }
+
     return (
         <ContainerFlex
             style={{ backgroundColor: colors.background2 }}
@@ -259,6 +293,65 @@ export default function Downloads() {
                     {hasDownloadedMedias ? PAGINGS : hasNoDownloads}
                 </ContainerBlock>
             }
+
+            <BottomSheet
+                ref={bottomSheetRef}
+                enablePanDownToClose
+                overDragResistanceFactor={23}
+                snapPoints={['60%']}
+                handleIndicatorStyle={{ backgroundColor: colors.text, width: 80, height: 8 }}
+                backgroundStyle={[{ 'backgroundColor': colors.background },]}
+                onClose={() => { console.log("REQUESTED CLOSE") }}
+            >
+                <ContainerBlock style={{ padding: 0, flex: 1 }}>
+                    <ImageBackground
+                        style={{ padding: 10 }}
+                        resizeMethod="resize"
+                        blurRadius={100}
+                        resizeMode='cover'
+                        source={{ uri: BottomSheetDate?.uri }}
+                    >
+                        <ContainerSpaceBetween>
+                            <Image
+                                source={{ uri: BottomSheetDate?.uri }}
+                                resizeMethod="resize"
+                                resizeMode='contain'
+                                style={{ aspectRatio: '16/9', width: 200, borderRadius: 10 }}
+                            />
+
+                            <IconButton
+                                onPress={() => handleOpenUrl(BottomSheetDate?.uri)}
+                                icon={<Ionicons name="play" size={70} color={'white'} />}
+                                containerStyle={{ padding: 7, backgroundColor: 'transparent' }}
+                                style={{ minWidth: 70, maxWidth: 70, aspectRatio: 1 }}
+                            />
+                        </ContainerSpaceBetween>
+                    </ImageBackground>
+
+                    <ScrollContainer
+                        horizontal
+                        contentContainerStyle={{ flex: 1, gap: 20, padding: 10, backgroundColor: colors.background2, maxHeight: 70 }}
+                    >
+                        <IconButton
+                            containerStyle={{ padding: 7, backgroundColor: colors.background, }}
+                            style={{ minWidth: 30, maxWidth: 50, aspectRatio: 1 }}
+                            icon={<Ionicons name="share-social" size={36} />}
+                            onPress={() => ShareContent({
+                                url: 'https://townsquare.media/site/442/files/2018/07/green-lantern-elba.jpg?w=980&q=75',
+                                message: "share item",
+                                title: 'share dfdf'
+                            })}
+                        />
+                        <IconButton
+                            containerStyle={{ padding: 7, backgroundColor: colors.background }}
+                            style={{ minWidth: 30, maxWidth: 50, aspectRatio: 1 }}
+                            title={undefined}
+                            icon={<MaterialIcons name="delete-outline" size={36} />}
+                            onPress={() => { }}
+                        />
+                    </ScrollContainer>
+                </ContainerBlock>
+            </BottomSheet>
         </ContainerFlex>
     )
 }
