@@ -40,7 +40,7 @@ export interface IStorageItems {
     storage?: IStorageFolder
 }
 
-export type IStorageKeys = keyof IStorageItems;
+export type IStorageKeys = keyof IStorageItems
 export type IPayloadKeys<T extends IStorageKeys> = T extends IStorageKeys ? keyof IStorageItems[T] : never
 export type IPayloadType<T extends IStorageKeys, P extends IPayloadKeys<T>> = P extends keyof IStorageItems[T] ? IStorageItems[T][P] : never
 

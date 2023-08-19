@@ -18,7 +18,7 @@ export interface IMarkedAsset extends AssetInfo {
 export interface IFilesBrowser {
     assets: AssetInfo[]
     isRefreshing?: boolean
-    onRefresh?(): void
+    onRefresh?(props?: ("audio" | "video" | "unknown" | "photo")[]): void
     onPressItem?(prop: IMarkedAsset): IMarkedAsset
     onLongPressItem?(prop: IMarkedAsset): IMarkedAsset
     hidden?: boolean
@@ -83,7 +83,7 @@ export function FilesBrowser(props: IFilesBrowser) {
         try {
             setIsRefreshing(true)
             onRefresh?.()
-            setIsRefreshing(false)
+            setIsRefreshing(false) 
         } catch (error) {
 
         }
@@ -93,6 +93,7 @@ export function FilesBrowser(props: IFilesBrowser) {
     }
 
     const onPressListItem = (props: IMarkedAsset) => {
+
 
         return props
     }

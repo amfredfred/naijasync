@@ -1,4 +1,5 @@
 import { Linking } from 'react-native'
+import { IMediaType } from '../Interfaces';
 
 export const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -119,3 +120,52 @@ export async function openURi(uri: string, onCannotOpenUri?: () => void, onError
         console.error('Error opening URL:', error);
     }
 }
+
+
+
+export function getMediaType(link: string): IMediaType {
+    if (!link) {
+        return undefined
+    }
+    const mediaExtensions: { [key: string]: IMediaType } = {
+        // Video Extensions
+        '.mp4': IMediaType.Video,
+        '.avi': IMediaType.Video,
+        '.mkv': IMediaType.Video,
+        '.mov': IMediaType.Video,
+        '.wmv': IMediaType.Video,
+        '.flv': IMediaType.Video,
+        '.webm': IMediaType.Video,
+        // Audio Extensions
+        '.mp3': IMediaType.Audio,
+        '.wav': IMediaType.Audio,
+        '.ogg': IMediaType.Audio,
+        '.flac': IMediaType.Audio,
+        '.aac': IMediaType.Audio,
+        '.wma': IMediaType.Audio,
+        // Image Extensions
+        '.jpg': IMediaType.Image,
+        '.jpeg': IMediaType.Image,
+        '.png': IMediaType.Image,
+        '.gif': IMediaType.Image,
+        '.bmp': IMediaType.Image,
+        '.webp': IMediaType.Image,
+        // Document Extensions
+        '.pdf': IMediaType.Document,
+        '.doc': IMediaType.Document,
+        '.docx': IMediaType.Document,
+        '.ppt': IMediaType.Document,
+        '.pptx': IMediaType.Document,
+        '.xls': IMediaType.Document,
+        '.xlsx': IMediaType.Document,
+        '.txt': IMediaType.Document,
+        // Archive Extensions
+        '.zip': IMediaType.Archive,
+        '.rar': IMediaType.Archive,
+        '.7z': IMediaType.Archive,
+    };
+
+    const fileExtension = link.substring(link.lastIndexOf('.'));
+
+    return mediaExtensions[fileExtension] || IMediaType.Other;
+};

@@ -190,10 +190,10 @@ export default function Downloads() {
     }, [])
 
     const renderScene = SceneMap({
-        vodeos: () => FilesBrowser({ assets: UserDownloads?.videos }),
-        music: ComingSoon,
-        photos: ComingSoon,
-        others: ComingSoon
+        vodeos: () => FilesBrowser({ assets: UserDownloads?.videos, onRefresh }),
+        music: () => FilesBrowser({ assets: UserDownloads?.audios, onRefresh }),
+        photos: () => FilesBrowser({ assets: UserDownloads?.photos, onRefresh }),
+        others: () => FilesBrowser({ assets: UserDownloads?.others, onRefresh })
     });
 
     const handlePagerIndexChange = (index: number) => {

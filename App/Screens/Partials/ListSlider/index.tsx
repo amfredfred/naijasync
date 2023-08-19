@@ -10,9 +10,13 @@ import useThemeColors from "../../../Hooks/useThemeColors";
 import { useNavigation } from "@react-navigation/native";
 import useStorage from "../../../Hooks/useStorage";
 import { useDataContext } from "../../../Contexts/DataContext";
+import { useMediaPlaybackContext } from "../../Statics/MediaViewer/Context";
 
 export default function ListSlider(props: IListSlider) {
     const { items = [], headline } = props
+    const {
+        setMedia
+    } = useMediaPlaybackContext()
 
     const { text } = useThemeColors()
     const { navigate } = useNavigation()
@@ -21,6 +25,11 @@ export default function ListSlider(props: IListSlider) {
         (navigate as any)?.("Explorer", { genre });
         setData('states', 'isHeaderHidden', true);
     }
+
+    const handleOnPressListItem = async (props: IPostItem) => {
+        setMedia?.({sources:[props.src], thumbnailUri:props.thumb})
+    }
+
     return (
         <ContainerBlock
             style={{ padding: 0, paddingVertical: 10, }}>
@@ -41,7 +50,7 @@ export default function ListSlider(props: IListSlider) {
                 initialNumToRender={4}
                 bounces={false}
                 contentContainerStyle={{ paddingHorizontal: 10, gap: 10 }}
-                renderItem={({ item, index }: { item: IPostItem, index: number }) => <ListSlideItem key={index} index={index} {...item} />}
+                renderItem={({ item, index }: { item: IPostItem, index: number }) => <ListSlideItem onPress={handleOnPressListItem} key={index} index={index} {...item} />}
                 keyExtractor={({ id }) => id}
                 horizontal
                 initialScrollIndex={2}

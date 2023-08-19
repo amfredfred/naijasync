@@ -12,11 +12,18 @@ export const VideoListItem = (props: IPostItem) => {
     const { navigate } = useNavigation()
     const [isLonPressed, setisLonPressed] = useState(false)
 
+    const handleOnPress = (props: IPostItem) => {
+        console.log("PRESSED")
+        props?.onPress?.(props)
+        // return props
+    }
+
     return (
         <Button
             onLongPress={() => setisLonPressed(true)}
             onPressOut={() => setisLonPressed(false)}
-            onPress={() => (navigate as any)?.('View', props)}
+            onPress={() => handleOnPress(props)}
+            // (navigate as any)?.('View', props)
             title={null}
             style={{
                 padding: 0,

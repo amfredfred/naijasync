@@ -1,28 +1,43 @@
 import { IStorageItems, IStorageMethods } from './iUseStorage'
 
+// Interface for themed components
 export interface IThemedComponent {
     hidden?: null | boolean
 }
 
+// Enumeration for different types of media
+export enum IMediaType {
+    Video = 'video',
+    Audio = 'audio',
+    Image = 'image',
+    Document = 'document',
+    Archive = 'archive',
+    Other = 'other',
+}
+
+// Interface for defining color schemes
 export interface IColors {
     background: string
-    headerBackgorund: string
+    headerBackground: string
     text: string
     headline: string
     primary: string
     secondary: string
     accent: string
-    sucess: string
+    success: string
     error: string
     warning: string
     background2: string
 }
+
+// Interface for defining themes
 export interface ITheme {
     light: IColors
     dark: IColors
 }
 
-export type IPostItem = {
+// Interface for individual post items
+export interface IPostItem {
     caption: string
     thumb: string
     src: string
@@ -30,9 +45,11 @@ export type IPostItem = {
     empty?: boolean
     stretched?: boolean
     explorer?: boolean
+    onPress(props: this): void
 
+    // Additional post metadata
     id?: string,
-    ownerId?: string, // User who owns the post
+    ownerId?: string,
     title?: string,
     description?: string,
     fileUrl?: string,
@@ -40,36 +57,37 @@ export type IPostItem = {
     views?: string,
     downloads?: string,
     likes?: string,
-    duration?: string, // in seconds
+    duration?: string,
     mimeType?: string,
-    sourceQualities?: string, // JSON array of quality options
-    locationView?: string, //?:string Location where it can be viewed
-    locationDownload?: string, // Location where it can be downloaded
+    sourceQualities?: string,
+    locationView?: string,
+    locationDownload?: string,
     tags?: string,
-    ratings?: string, // Average rating
+    ratings?: string,
     price?: string,
     rewards?: string,
-    downloadable?: string, // Is the file downloadable?
+    downloadable?: string,
     playtime?: string
     fileType?: string
     postSlug?: string
     updatedAt?: string
     createdAt?: string
-} & ({
-    type: 'video'
-} | {
-    type: 'audio'
-})
 
+    type: IMediaType
+}
+
+// Interface for a list slider component
 export interface IListSlider {
     children?: React.ReactNode
     items: IPostItem[]
     headline?: React.ReactNode
 }
 
+// Interface for the overall app context
 export interface IApp {
     themeColors: ITheme
 }
 
+// Type for the app's data context
 export type IAppDataContext = IStorageItems
 export type IAppDataContextMethods = IStorageMethods

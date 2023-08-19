@@ -14,6 +14,7 @@ export const useDataContext = () => useContext(DataContext)
 
 export default function DataContextProvider({ children }) {
     const { method, NaijaSync } = useStorage("@NaijaSync")
+    
     const dataReducer = (state, { type, key, item, payload }): IAppDataContext => {
         const data = { ...state, [key]: { ...state?.[key], [item]: payload } }
         method.setItem(key, item, payload)
