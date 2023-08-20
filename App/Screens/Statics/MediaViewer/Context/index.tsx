@@ -53,16 +53,19 @@ export const useMediaViewer = (props: IMediaPlayableProps): IMediaViewer => {
         if (mediaType === 'audio') {
             audioObjectRef.current?.sound?.setPositionAsync(newPosition);
         } else if (mediaType === 'video') {
+            console.log("SEEKD", percentage)
             videoRef.current?.setStatusAsync({ positionMillis: newPosition });
         }
     };
 
     const handleLoad = (data) => {
+        console.log("LOADED")
         setMediaState((prevState) => ({ ...prevState, duration: data.durationMillis }));
     };
 
     const loadMediaPlayable = async () => {
         if (mediaType === 'audio') {
+            await videoRef?.current?.unloadAsync?.()
             const playbackObject = await Audio.Sound.createAsync(
                 { uri: sources?.[0] },
                 { shouldPlay: false },
@@ -70,6 +73,7 @@ export const useMediaViewer = (props: IMediaPlayableProps): IMediaViewer => {
             );
             audioObjectRef.current = playbackObject;
         } else if (mediaType === 'video') {
+            await audioObjectRef.current.sound.unloadAsync()
             await videoRef?.current?.loadAsync({ uri: sources?.[0] }, {}, true);
         }
     };
@@ -145,6 +149,7 @@ export const useMediaViewer = (props: IMediaPlayableProps): IMediaViewer => {
             handleError,
             type: mediaType,
             states: mediaState,
+            mediaRef: videoRef
         },
     };
 };

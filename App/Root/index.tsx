@@ -19,6 +19,7 @@ import Search from "../Screens/User/Search";
 import MediaViewer from "../Screens/Statics/MediaViewer";
 import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
 // import { BottomSheetProvider } from '@gorhom/bottom-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
@@ -73,11 +74,13 @@ export default function Root() {
         <SafeAreaProvider>
             <QueryClientProvider client={Client}>
                 <DataContextProvider>
-                    <MediaViewerProvider>
-                        <NavigationContainer >
-                            {isAuthenticated ? UserRoutes : GuestRoutes}
-                        </NavigationContainer>
-                    </MediaViewerProvider>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <MediaViewerProvider>
+                            <NavigationContainer >
+                                {isAuthenticated ? UserRoutes : GuestRoutes}
+                            </NavigationContainer>
+                        </MediaViewerProvider>
+                    </GestureHandlerRootView>
                 </DataContextProvider>
             </QueryClientProvider>
         </SafeAreaProvider>

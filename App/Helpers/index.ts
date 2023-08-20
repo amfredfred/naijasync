@@ -166,6 +166,5 @@ export function getMediaType(link: string): IMediaType {
     };
 
     const fileExtension = link.substring(link.lastIndexOf('.'));
-
     return mediaExtensions[fileExtension] || IMediaType.Other;
 };

@@ -1,40 +1,16 @@
-import { Video, Audio, ResizeMode } from 'expo-av'
-import { useRef, useMemo, useEffect, useState } from 'react'
-import { View, ImageBackground, Image, StyleSheet, Dimensions } from 'react-native'
-import { ContainerBlock, ContainerSpaceBetween, Overlay, ScrollContainer } from '../../../Components/Containers'
+import { Video, } from 'expo-av'
+import { useRef, useEffect, useState } from 'react'
+import { View, Image, StyleSheet, Dimensions } from 'react-native'
+import { ContainerBlock, ContainerSpaceBetween } from '../../../Components/Containers'
 import { HeadLine, SpanText } from '../../../Components/Texts'
 import { Button, IconButton } from '../../../Components/Buttons'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import useThemeColors from '../../../Hooks/useThemeColors'
-import { getMediaType } from '../../../Helpers'
-import { IMediaType, IMediaPlayable } from './Interface'
-import { useDataContext } from '../../../Contexts/DataContext'
-import { useMediaPlaybackContext, useMediaViewer } from './Context'
+import { IMediaPlayable } from './Interface'
+import { useMediaViewer } from './Context'
 import VideoPlayer from './Video'
+import Animated, { useSharedValue } from 'react-native-reanimated'
 
-export interface IMediaPlayableProps {
-    mediaRef: IMediaViewer['media']['mediaRef'],
-    sources: string[]
-}
-
-export type IImageMedia = {
-    image: boolean
-}
-
-type IExploreableMediaType = IMediaType
-
-export type IMediaViewer = {
-    data: {
-        sources: string[]
-        thumbnailUri?: string
-    }
-    mediaType: IExploreableMediaType
-    media: (IMediaPlayable)
-}
-
-export interface IMediaViewerOptions {
-    mode: "fullscreen" | "collapsed" | "floating" | "hidden"
-}
 
 const { width, height } = Dimensions.get('window')
 
@@ -45,20 +21,7 @@ export default function MediaViewer() {
         mediaRef: videoRef
     })
 
-    const [playerMode, setPlayerMode] = useState<IMediaViewerOptions['mode']>('collapsed')
-
-    useEffect(() => {
-        setonVideoLoading(true)
-        return () => {
-            setonVideoLoading(false)
-        }
-    }, [data, media])
-
-    const [onVideoBuffer, setonVideoBuffer] = useState(true)
-    const [onVideoLoading, setonVideoLoading] = useState(true)
-    //
-    const [isShwoingControls, setisShwoingControls] = useState<boolean>()
-    //
+    const [playerMode, setPlayerMode] = useState<IMediaPlayable['mode']>('collapsed')
     const onVideoLoadStart = () => {
 
     }
@@ -67,19 +30,17 @@ export default function MediaViewer() {
         return false
     }
 
-    const handlePlayerModeChange = (mode: IMediaViewerOptions['mode']) => {
+    const handlePlayerModeChange = (mode: IMediaPlayable['mode']) => {
         setPlayerMode(mode)
     }
 
     const handleLoad = () => {
         console.log("VIDEO LAODIED")
-        setonVideoLoading(false)
         // Handle onLoad logic here
     };
 
     const handleLoadStart = () => {
         console.log("VIDEO LOAD START")
-        setonVideoLoading(true)
         // Handle onLoadStart logic here
     };
 
@@ -163,17 +124,19 @@ export default function MediaViewer() {
         handlePlaybackStatusUpdate
     }
 
-    let Compoenet = <></>
+    let Component = <></>
 
     if (media.type === 'video')
-        Compoenet = <VideoPlayer
+        Component = <VideoPlayer
             {...UsePlayerProps}
             play={media.play}
             pause={media.pause}
             ref={videoRef}
         />
+    else if (media.type === 'audio')
+        Component = AudioPlayer
 
-    return (Compoenet)
+    return (Component)
 }
 
 const styles = StyleSheet.create({

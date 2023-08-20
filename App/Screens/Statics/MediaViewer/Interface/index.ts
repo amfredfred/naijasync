@@ -31,7 +31,10 @@ export interface IMediaPlayable {
         duration?: number
     }
     type: IMediaType
+    mode?: "fullscreen" | "collapsed" | "floating" | "hidden"
 }
+
+
 
 export interface IMediaViewerProvider {
     setMedia(props: { sources: string[], thumbnailUri?: string }): void;
