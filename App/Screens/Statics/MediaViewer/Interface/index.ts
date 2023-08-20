@@ -29,7 +29,7 @@ export interface IMediaPlayable {
     source?: string
     mediaPlayableAudioRef?: Audio.SoundObject
     states: {
-        playState?: "paused" | "stopped" | "errored" | "ended" | "playing" | 'loading' | 'canPlay' | "seeking",
+        playState?: "paused" | "stopped" | "errored" | "ended" | "playing" | 'loading' | 'canPlay' | "seeking"| "shouldPlay"
         progress?: number
         duration?: number
     }
@@ -45,11 +45,7 @@ export interface IMediaViewerProvider {
     data: {
         sources: string[],
         thumbnailUri: string
-    }
-}
-
-// Define a common interface for media playable props
-export interface IMediaPlayableProps {
+    },
     mediaRef: IMediaViewer['media']['mediaRef'];
 }
 

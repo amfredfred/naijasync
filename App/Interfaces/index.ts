@@ -83,6 +83,25 @@ export interface IListSlider {
     headline?: React.ReactNode
 }
 
+export interface IAuth {
+    stage?: "landing" | "register" | "login" | "confirmPhone" | "confirmPassword";
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    password?: string;
+    confirmPassword?: string;
+    referralCode?: string;
+}
+export interface IAppStates {
+    inAuthState?: boolean;
+    isHeaderHidden?: boolean
+    isNavigationTabsHiddeh?: boolean
+}
+export interface IUser {
+    isAuthenticated?: boolean;
+    accessToken?: string;
+}
+
 // Interface for the overall app context
 export interface IApp {
     themeColors: ITheme

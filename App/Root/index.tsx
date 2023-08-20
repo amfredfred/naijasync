@@ -16,10 +16,12 @@ import useAppStatus from "../Hooks/useAppStatus";
 import "expo-dev-client"
 import Explorer from "../Screens/User/Explorer";
 import Search from "../Screens/User/Search";
+import { Linking } from 'react-native';
 import MediaViewer from "../Screens/Statics/MediaViewer";
 import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
 // import { BottomSheetProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ToastProvider from "../Contexts/ToastContext";
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
@@ -40,6 +42,15 @@ export default function Root() {
     //         show()
     //     }
     // }, [isLoaded, load])
+
+
+    // Listen for deep link events
+    Linking.addEventListener('url', ({ url }) => {
+        const route = url.replace(/.*?:\/\//g, '');
+        console.log(route, " FROM LINKING")
+        // Use route to navigate to the appropriate screen
+    });
+
 
     const SearchStack = () => (
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
@@ -79,6 +90,7 @@ export default function Root() {
                             <MediaViewerProvider>
                                 {isAuthenticated ? UserRoutes : GuestRoutes}
                             </MediaViewerProvider>
+                            <ToastProvider />
                         </NavigationContainer>
                     </GestureHandlerRootView>
                 </DataContextProvider>

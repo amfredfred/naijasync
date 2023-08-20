@@ -8,6 +8,7 @@ import { useDataContext } from '../Contexts/DataContext'
 import * as Permissions from 'expo-permissions'
 import { APP_ALBUM_NAME } from '@env'
 import { PermissionsAndroid } from 'react-native';
+import useStorage from './useStorage'
 
 export default function useMediaLibrary(): IUseMediaLibrary {
 
@@ -19,6 +20,10 @@ export default function useMediaLibrary(): IUseMediaLibrary {
     const [downloadMessage, setdownloadMessage] = useState<IUseMediaLibrary['downloadMessage']>()
     const [downloadProgreess, setDownloadProgreess] = useState<IUseMediaLibrary['downloadProgreess']>()
     const [downloadStataus, setDownloadStatus] = useState<IUseMediaLibrary['downloadStataus']>('idle')
+    const {
+        method,
+        NaijaSync
+    } = useStorage()
 
     //
     const [hasDownloadedMedias, setHasDownloadedMedias] = useState(false)
@@ -189,6 +194,22 @@ export default function useMediaLibrary(): IUseMediaLibrary {
         return Ddata?.downloadAsync?.()
     }
 
+    const handleSaveDownload = async (data) => {
+        try {
+            await downloadResumable.pauseAsync();
+            console.log('Paused download operation, saving for future retrieval');
+            method.setItem('storage', 'pendingDownloads', [
+                // ...NaijaSync?.storage?.pendingDownloads,
+                // {
+                //     status: "paused",
+                //     id:
+                // }
+            ]);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     const createDownload: IUseMediaLibrary['createDownload'] = async (url, filename) => {
         if (!libPermision?.granted) await handleLibPermisionsRequest()
         let link = url,
@@ -261,6 +282,9 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             }
         };
     }, [downloadStataus]);
+
+
+   
 
 
 

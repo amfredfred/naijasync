@@ -5,7 +5,7 @@ import { IThemedComponent } from "../../../../Interfaces";
 import { useState, forwardRef, useEffect, useRef } from 'react'
 import { IconButton } from "../../../../Components/Buttons";
 import { IMediaPlayable, IMediaViewer } from "../Interface";
-import { View, StyleSheet, Dimensions, StatusBar, PanResponder, Text, BackHandler, Keyboard, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Dimensions, StatusBar, PanResponder, Text, BackHandler, Keyboard, TouchableOpacity, ScrollView, FlatList } from 'react-native'
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -13,6 +13,7 @@ import useTimeout from "../../../../Hooks/useTimeout";
 import { formatDuration, formatPlaytimeDuration } from "../../../../Helpers";
 import { useNavigation } from "@react-navigation/native";
 import ShareContent from "../../../Partials/ShareFile";
+import { Videos } from "../../../../dummy-data";
 
 
 export type IVideoPlayer = IThemedComponent & IMediaPlayable & {
@@ -25,6 +26,7 @@ const { width, height } = Dimensions.get('window')
 const VIDEO_HEIGHT = 230
 
 const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
+
     const colors = useThemeColors()
     const [isShwoingControls, setisShwoingControls] = useState(false)
     const [isVideoLoading, setisVideoLoading] = useState(false)
@@ -40,6 +42,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
     const lastDragPosition = useSharedValue(34);
     const contConH = useSharedValue(VIDEO_HEIGHT)
     const contConDis = useSharedValue('none')
+    const listConOpacity = useSharedValue(1)
 
     const conAnimatedStyle = useAnimatedStyle(() => {
         return {
@@ -54,6 +57,10 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
         };
     });
 
+    const listReanimated = useAnimatedStyle(() => ({
+        opacity: listConOpacity.value
+    }))
+
     const gesture = Gesture.Pan()
         .onStart(e => {
             contConH.value = withSpring(100)
@@ -62,16 +69,18 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
         .onBegin(e => {
         })
         .onUpdate(e => {
-            // draggingVideo.value = true;
+            listConOpacity.value = Math.abs(height / Math.max(0, Math.min(lastDragPosition.value + e.translationY / 1, height - VIDEO_HEIGHT)) / 100)
             conH.value = Math.max(0, Math.min(lastDragPosition.value + e.translationY / 1, height - VIDEO_HEIGHT));
         })
         .onEnd(e => {
             if (e.translationY <= height / 2) {
                 conH.value = 0
                 viewMode.value = "fullscreen"
+                listConOpacity.value = 1
             } else if (e.translationY >= height / 2) {
                 conH.value = height - VIDEO_HEIGHT
                 viewMode.value = "collapsed"
+                listConOpacity.value = 0
             }
             lastDragPosition.value = e.translationY
             draggingVideo.value = false;
@@ -242,7 +251,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
     )
 
     const MediaDefinition = (
-        <View style={{ width: '100%' }}>
+        <View style={{ width: '100%', flex: 1 }}>
             <TouchableOpacity
                 onPress={() => {
                     contConDis.value = 'flex'
@@ -256,32 +265,44 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
                     Ronaldo Goal - Al Nassr vs Al Shorta 1-0 Highlights & All Goals - 2023
                 </Text>
             </TouchableOpacity>
-            <ScrollView
-                horizontal
-                contentContainerStyle={{ paddingVertical: 10, gap: 10, }}
-            >
-                <IconButton
-                    onPress={null}
-                    title={null}
-                    containerStyle={[styles.iconsButton, { marginLeft: 10 }]}
-                    icon={<MaterialCommunityIcons size={25} name="download" />}
-                />
-                <IconButton
-                    title="share"
-                    onPress={() => ShareContent({
-                        title: 'sahre',
-                        message: 'message',
-                        url: VP?.source?.[0]
-                    })}
-                    containerStyle={styles.iconsButton}
-                    icon={<MaterialCommunityIcons size={25} name="share" />}
-                />
-                <IconButton
-                    title="report"
-                    containerStyle={styles.iconsButton}
-                    icon={<MaterialIcons size={25} name="report" />}
-                />
-            </ScrollView>
+            <View>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={{ maxHeight: 40, backgroundColor: 'orangered' }}
+                    contentContainerStyle={{ paddingHorizontal: 10, gap: 10, alignItems: 'center' }}
+                >
+                    <IconButton
+                        onPress={null}
+                        title={"download"}
+                        containerStyle={[styles.iconsButton]}
+                        icon={<MaterialCommunityIcons size={25} name="download" />}
+                    />
+                    <IconButton
+                        title="share"
+                        onPress={() => ShareContent({
+                            title: 'sahre',
+                            message: 'message',
+                            url: VP?.source?.[0]
+                        })}
+                        containerStyle={styles.iconsButton}
+                        icon={<MaterialCommunityIcons size={25} name="share" />}
+                    />
+                    <IconButton
+                        title="report"
+                        containerStyle={styles.iconsButton}
+                        icon={<MaterialIcons size={25} name="report" />}
+                    />
+                    <IconButton
+                        title="watch later"
+                        containerStyle={styles.iconsButton}
+                        icon={<MaterialIcons size={25} name="watch-later" />}
+                    />
+                </ScrollView>
+                <View style={{backgroundColor:'green', height:50, width:'100%'}}>
+
+                </View>
+           </View>
             <GestureDetector gesture={contenGetsture}>
                 <Animated.View
                     entering={SlideInDown}
@@ -293,6 +314,14 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
 
                 </Animated.View>
             </GestureDetector>
+            <Animated.FlatList
+                style={[{ flex: 1 }, listReanimated]}
+                data={Videos}
+                renderItem={({ item, index }) => {
+                    return <Text style={{ color: 'white', height: 40, width: '100%', backgroundColor: 'pink', marginBottom: 10 }}>{item.src}</Text>
+                }}
+                keyExtractor={(item) => item.id}
+            />
         </View>
     )
 
@@ -386,7 +415,8 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         borderTopLeftRadius: 20,
         position: 'absolute',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        zIndex: 1
     },
 
     contentDescriptionContainerBar: {
@@ -417,6 +447,9 @@ const styles = StyleSheet.create({
     },
     iconsButton: {
         borderWidth: 0,
+        borderRadius: 50,
+        gap: 5,
+        paddingHorizontal: 10
     },
 });
 

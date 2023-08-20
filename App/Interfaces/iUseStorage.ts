@@ -31,6 +31,7 @@ export interface IStorageFolder {
     downloadsStorageAlbumName: string,
     myDownloadedAssets: Asset[],
     hasDownloadedMedias: boolean
+    pendingDownloads: Record<string, [Object]>[]
 }
 
 export interface IStorageItems {

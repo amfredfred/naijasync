@@ -1,13 +1,12 @@
 import { Video, } from 'expo-av'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, forwardRef } from 'react'
 import { View, Image, StyleSheet, Dimensions } from 'react-native'
 import { ContainerBlock, ContainerSpaceBetween } from '../../../Components/Containers'
 import { HeadLine, SpanText } from '../../../Components/Texts'
 import { Button, IconButton } from '../../../Components/Buttons'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import useThemeColors from '../../../Hooks/useThemeColors'
-import { IMediaPlayable } from './Interface'
-import { useMediaViewer } from './Context'
+import { IMediaPlayable, IMediaViewer } from './Interface'
 import VideoPlayer from './Video'
 import Animated, { useSharedValue } from 'react-native-reanimated'
 import AudioPlayer from './Audio'
@@ -16,25 +15,7 @@ import useMediaLibrary from '../../../Hooks/useMediaLibrary'
 
 const { width, height } = Dimensions.get('window')
 
-export default function MediaViewer() {
-    const videoRef = useRef<Video>(null);
-
-    const { data, media, } = useMediaViewer({
-        mediaRef: videoRef
-    })
-
-    const [playerMode, setPlayerMode] = useState<IMediaPlayable['mode']>('collapsed')
-    const onVideoLoadStart = () => {
-
-    }
-
-    const handleBackPress = () => {
-        return false
-    }
-
-    const handlePlayerModeChange = (mode: IMediaPlayable['mode']) => {
-        setPlayerMode(mode)
-    }
+export const MediaViewer = forwardRef<Video, IMediaViewer>(({ data, media }, videoRef) => {
 
     const handleLoad = () => {
         console.log("VIDEO LAODIED")
@@ -80,11 +61,6 @@ export default function MediaViewer() {
     const UsePlayerProps = {
         ...data,
         ...media,
-        handleLoad,
-        handleLoadStart,
-        handleError,
-        handlePlaybackStatusUpdate,
-        handleDownloadItem
     }
 
     let Component = <></>
@@ -105,7 +81,10 @@ export default function MediaViewer() {
         />
 
     return (Component)
-}
+})
+
+
+export default MediaViewer
 
 const styles = StyleSheet.create({
     container: {
