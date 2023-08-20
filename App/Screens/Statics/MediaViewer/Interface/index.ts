@@ -17,13 +17,16 @@ export interface IMediaPlayable {
     skipNextTo(props: number | 5): void
     skipPrevTo(props: number | 5): void
     remove(): void
+    connect?(mediaLnk: string, thumbnailUri?: string, shoupdPlay?: boolean): void
     setMediaState(props: (props: this['states']) => this['states']): void
     handleSeek(props: any): void
     handleLoad(props: any): void;
     handleLoadStart(): void;
     handleError(props: any): void;
     handlePlaybackStatusUpdate(status: any): void;
+    handleDownloadItem(uri: string): void
     mediaRef?: React.RefObject<Video>
+    source?: string
     mediaPlayableAudioRef?: Audio.SoundObject
     states: {
         playState?: "paused" | "stopped" | "errored" | "ended" | "playing" | 'loading' | 'canPlay' | "seeking",

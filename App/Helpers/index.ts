@@ -1,5 +1,6 @@
 import { Linking } from 'react-native'
 import { IMediaType } from '../Interfaces';
+import { Notifications } from 'react-native-notifications';
 
 export const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -120,7 +121,6 @@ export async function openURi(uri: string, onCannotOpenUri?: () => void, onError
         console.error('Error opening URL:', error);
     }
 }
-
 
 
 export function getMediaType(link: string): IMediaType {

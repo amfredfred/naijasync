@@ -20,7 +20,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
     const [keyBoardShown, setkeyBoardShown] = useState(false)
 
-    const { headerBackgorund: HBG, background, background2, text } = useThemeColors()
+    const {  background, background2, text } = useThemeColors()
     const { states: { states, user, storage }, setData } = useDataContext()
     const { navigate, goBack, canGoBack } = useNavigation()
 

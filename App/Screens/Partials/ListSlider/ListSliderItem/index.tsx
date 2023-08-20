@@ -28,6 +28,7 @@ export const VideoListItem = (props: IPostItem) => {
             style={{
                 padding: 0,
             }}
+            key={props.id}
             containerStyle={{
                 padding: 0,
                 height: 148,

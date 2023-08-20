@@ -10,6 +10,8 @@ import { IMediaPlayable } from './Interface'
 import { useMediaViewer } from './Context'
 import VideoPlayer from './Video'
 import Animated, { useSharedValue } from 'react-native-reanimated'
+import AudioPlayer from './Audio'
+import useMediaLibrary from '../../../Hooks/useMediaLibrary'
 
 
 const { width, height } = Dimensions.get('window')
@@ -56,63 +58,23 @@ export default function MediaViewer() {
 
     const colors = useThemeColors()
 
-    const AudioPlayer = (
-        <ContainerBlock
-            style={{
-                backgroundColor: colors.background, padding: 0, position: 'relative',
-                height: playerMode === 'collapsed' ? 60 : playerMode === 'fullscreen' ? height - 60 : 60
-            }}>
-            <View style={styles.progressBarContainer}>
-                <View style={[styles.progressBar, { width: `${media?.states?.progress ?? 0}%` }]} />
-            </View>
-            <ContainerSpaceBetween style={{ backgroundColor: 'transparent', gap: 10 }}>
-                <Image
-                    source={{ uri: data?.thumbnailUri }}
-                    style={{ width: 40, borderRadius: 50, aspectRatio: 1 }}
-                    resizeMethod='resize'
-                    resizeMode='contain'
-                />
+    const {
+        createDownload,
+        downloadMessage,
+        downloadProgreess,
+        downloadStataus,
+        hasDownloadedMedias,
+        handleAlbumCreationAndAssetAddition,
+        handleLibPermisionsRequest,
+        libPermision,
+        pauseDownload,
+        cancelDownload,
+        resumeDownload
+    } = useMediaLibrary()
 
-                <ContainerSpaceBetween
-                    style={{ padding: 0, flex: 1 }} >
-                    <Button
-                        onPress={() => handlePlayerModeChange(playerMode === 'collapsed' ? 'fullscreen' : 'collapsed')}
-                        title={undefined} style={{ backgroundColor: 'transparent' }}>
-                        <HeadLine children="Kene Lu Ya" style={{ padding: 0 }} />
-                        <SpanText children="ADA Ehi" style={{ fontSize: 11, fontWeight: '300' }} />
-                    </Button>
-                </ContainerSpaceBetween>
-
-                <IconButton
-                    onPress={media.states.playState === 'playing' ? media?.pause : media.play}
-                    containerStyle={{}}
-                    icon={<MaterialIcons
-                        name={'unfold-more'}
-                        color={colors.text}
-                        size={40}
-                    />}
-                />
-                <IconButton
-                    onPress={media.states.playState === 'playing' ? media?.pause : media.play}
-                    containerStyle={{}}
-                    icon={<MaterialIcons
-                        name={'more-horiz'}
-                        color={colors.text}
-                        size={40}
-                    />}
-                />
-                <IconButton
-                    onPress={media.states.playState === 'playing' ? media?.pause : media.play}
-                    containerStyle={{}}
-                    icon={<Ionicons
-                        name={media.states.playState === 'playing' ? 'pause' : 'play'}
-                        color={colors.text}
-                        size={40}
-                    />}
-                />
-            </ContainerSpaceBetween>
-        </ContainerBlock>
-    )
+    const handleDownloadItem = async (uri: string) => {
+        console.log("DONLAOD_LINK: ", uri)
+    }
 
 
     const UsePlayerProps = {
@@ -121,7 +83,8 @@ export default function MediaViewer() {
         handleLoad,
         handleLoadStart,
         handleError,
-        handlePlaybackStatusUpdate
+        handlePlaybackStatusUpdate,
+        handleDownloadItem
     }
 
     let Component = <></>
@@ -134,7 +97,12 @@ export default function MediaViewer() {
             ref={videoRef}
         />
     else if (media.type === 'audio')
-        Component = AudioPlayer
+        Component = <AudioPlayer
+            {...UsePlayerProps}
+            play={media?.play}
+            pause={media?.pause}
+        // ref={}
+        />
 
     return (Component)
 }

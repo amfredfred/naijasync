@@ -22,7 +22,7 @@ export function MediaViewerProvider({ children }) {
     }
 
     const removeMedia: IMediaViewerProvider['removeMedia'] = () => {
-        dispatch({ key: 'data', payload: {} })
+        dispatch({ payload: { sources: [], thumbnailUri: '' } })
     }
 
     return (
@@ -36,7 +36,7 @@ export function MediaViewerProvider({ children }) {
 export const useMediaViewer = (props: IMediaPlayableProps): IMediaViewer => {
     const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({});
     const { data, setMedia, removeMedia } = useMediaPlaybackContext()
-    const mediaType: IMediaType = getMediaType(data.sources?.[0]);
+    let mediaType: IMediaType = getMediaType(data.sources?.[0]);
     const audioObjectRef = useRef<Audio.SoundObject>(null);
     const videoRef = props.mediaRef
     let thumbnailUri = data.thumbnailUri
@@ -45,7 +45,11 @@ export const useMediaViewer = (props: IMediaPlayableProps): IMediaViewer => {
     const handlePlaybackStatusUpdate = (data) => {
         const { positionMillis, playableDurationMillis } = data;
         const calculatedProgress = (positionMillis / playableDurationMillis) * 100;
-        setMediaState((prevState) => ({ ...prevState, progress: calculatedProgress }));
+        setMediaState((prevState) => ({
+            ...prevState,
+            progress: Number((calculatedProgress ?? 0).toFixed(0)),
+            duration: playableDurationMillis / 1000
+        }));
     };
 
     const handleSeek = (percentage) => {
@@ -63,50 +67,85 @@ export const useMediaViewer = (props: IMediaPlayableProps): IMediaViewer => {
         setMediaState((prevState) => ({ ...prevState, duration: data.durationMillis }));
     };
 
-    const loadMediaPlayable = async () => {
-        if (mediaType === 'audio') {
-            await videoRef?.current?.unloadAsync?.()
-            const playbackObject = await Audio.Sound.createAsync(
-                { uri: sources?.[0] },
-                { shouldPlay: false },
-                handlePlaybackStatusUpdate
-            );
-            audioObjectRef.current = playbackObject;
-        } else if (mediaType === 'video') {
-            await audioObjectRef.current.sound.unloadAsync()
-            await videoRef?.current?.loadAsync({ uri: sources?.[0] }, {}, true);
+    const clearAllRefs = async () => {
+        setMediaState({});
+        await videoRef?.current?.unloadAsync?.()
+        await audioObjectRef?.current?.sound?.unloadAsync?.()
+    }
+
+    const loadMediaPlayable = async (shouldPlay?: boolean) => {
+        try {
+            if (mediaType === 'audio') {
+                const playbackObject = await Audio.Sound.createAsync?.(
+                    { uri: sources?.[0] },
+                    { shouldPlay: shouldPlay },
+                    handlePlaybackStatusUpdate
+                );
+                await Audio.setAudioModeAsync({
+                    allowsRecordingIOS: false,
+                    playsInSilentModeIOS: true,
+                    // interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
+                    shouldDuckAndroid: true,
+                    // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
+                    staysActiveInBackground: true,
+                });
+                audioObjectRef.current = playbackObject;
+            } else if (mediaType === 'video') {
+                await videoRef?.current?.loadAsync?.({ uri: sources?.[0] }, {
+                    'shouldCorrectPitch': true,
+                }, true);
+            }
+            setMediaState(S => ({ ...S, playState: 'canPlay' }))
+            await play()
+        } catch (error) {
+            console.log("ERROR: loadMediaPlayable-> ", error)
+            await clearAllRefs()
+            setMediaState(S => ({ ...S, playState: 'errored' }))
         }
     };
 
 
+
     useEffect(() => {
+
         if (mediaType) {
             loadMediaPlayable();
         }
+
         return () => {
-            setMediaState({});
+            clearAllRefs()
         };
     }, [data.sources?.[0]]);
 
     const play = async () => {
-        if (mediaType === 'audio') {
-            await audioObjectRef?.current?.sound?.playAsync();
-        } else if (mediaType === 'video') {
-            await videoRef?.current?.playAsync();
+        try {
+            if (mediaType === 'audio') {
+                await audioObjectRef?.current?.sound?.playAsync();
+            } else if (mediaType === 'video') {
+                await videoRef?.current?.playAsync();
+            }
+            setMediaState((prevState) => ({ ...prevState, playState: 'playing' }));
+        } catch (error) {
+            console.log("ERROR: play-> ", error)
+            setMediaState((prevState) => ({ ...prevState, playState: 'errored' }));
         }
-        setMediaState((prevState) => ({ ...prevState, playState: 'playing' }));
     };
 
     const pause = async () => {
-        if (mediaType === 'audio') {
-            await audioObjectRef?.current?.sound?.pauseAsync();
-        } else if (mediaType === 'video') {
-            await videoRef.current.pauseAsync();
+        try {
+            if (mediaType === 'audio') {
+                await audioObjectRef?.current?.sound?.pauseAsync();
+            } else if (mediaType === 'video') {
+                await videoRef.current.pauseAsync();
+            }
+            setMediaState((prevState) => ({ ...prevState, playState: 'paused' }));
+        } catch (error) {
+            console.log("ERROR: pause-> ", error)
+            setMediaState((prevState) => ({ ...prevState, playState: 'errored' }));
         }
-        setMediaState((prevState) => ({ ...prevState, playState: 'paused' }));
     };
 
-    const skipNextTo = async () => {
+    const skipNextTo: IMediaPlayable['skipNextTo'] = async (to) => {
 
     }
     const skipPrevTo: IMediaPlayable['skipPrevTo'] = async (to) => {
@@ -114,10 +153,26 @@ export const useMediaViewer = (props: IMediaPlayableProps): IMediaViewer => {
     }
 
     const remove: IMediaPlayable['remove'] = async () => {
-
+        try {
+            removeMedia()
+            clearAllRefs()
+            console.log("REMOVE CALLED")
+        } catch (error) {
+            console.log("ERROR: remove-> ", error)
+        }
     }
 
-
+    const connect: IMediaPlayable['connect'] = async (mediaLink, thumbnailUri, shouldPlayNow) => {
+        try {
+            setMedia({
+                sources: [mediaLink],
+                thumbnailUri,
+            })
+            await play()
+        } catch (error) {
+            console.log("ERROR: connect-> ", error)
+        }
+    }
 
     const handleLoadStart = () => {
         console.log("VIDEO LOAD START")
@@ -147,6 +202,8 @@ export const useMediaViewer = (props: IMediaPlayableProps): IMediaViewer => {
             handleLoad,
             handleLoadStart,
             handleError,
+            connect,
+            source: sources?.[0],
             type: mediaType,
             states: mediaState,
             mediaRef: videoRef

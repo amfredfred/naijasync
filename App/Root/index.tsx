@@ -75,11 +75,11 @@ export default function Root() {
             <QueryClientProvider client={Client}>
                 <DataContextProvider>
                     <GestureHandlerRootView style={{ flex: 1 }}>
-                        <MediaViewerProvider>
-                            <NavigationContainer >
+                        <NavigationContainer >
+                            <MediaViewerProvider>
                                 {isAuthenticated ? UserRoutes : GuestRoutes}
-                            </NavigationContainer>
-                        </MediaViewerProvider>
+                            </MediaViewerProvider>
+                        </NavigationContainer>
                     </GestureHandlerRootView>
                 </DataContextProvider>
             </QueryClientProvider>

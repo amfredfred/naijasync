@@ -40,7 +40,7 @@ export default function ListSlider(props: IListSlider) {
                     containerStyle={{ backgroundColor: 'transparent', paddingRight: 5 }}
                     icon={<Ionicons name="arrow-forward" size={30} color={text}
                         onPress={() => handleNavigateexplore(typeof headline == 'string' ? headline : null)}
-                        title={headline}
+                        title={headline} 
                     />}
                 />
             </ContainerSpaceBetween>
