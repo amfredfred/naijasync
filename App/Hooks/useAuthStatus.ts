@@ -15,12 +15,11 @@ export type IAuthStatus = {
     confirmNumber(): void
 }
 
-const useAuthStatus = (props: { permanent?: IAuthStatus['person'] }): IAuthStatus => {
+const useAuthStatus = (props?: { permanent?: IAuthStatus['person'] }): IAuthStatus => {
     const [authStatus, setAuthStatus] = useState<IAuthStatus['person']>('isNew')
     const [privillege, setPrivillege] = useState()
     const { states: MN, setData } = useDataContext()
-
-    const { permanent } = props
+ 
 
     useEffect(() => {
         const checkAuthStatus = async () => {
@@ -38,7 +37,7 @@ const useAuthStatus = (props: { permanent?: IAuthStatus['person'] }): IAuthStatu
             }
         }
 
-        if (permanent) return setAuthStatus(permanent)
+        if (props?.permanent) return setAuthStatus(props?.permanent)
         checkAuthStatus()
     }, [MN?.states, MN.user])
 

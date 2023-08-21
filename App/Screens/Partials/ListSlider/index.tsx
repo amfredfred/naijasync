@@ -47,13 +47,11 @@ export default function ListSlider(props: IListSlider) {
             <FlatList
                 data={items}
                 bouncesZoom={false}
-                initialNumToRender={4}
                 bounces={false}
                 contentContainerStyle={{ paddingHorizontal: 10, gap: 10 }}
                 renderItem={({ item, index }: { item: IPostItem, index: number }) => <ListSlideItem onPress={handleOnPressListItem} key={index} index={index} {...item} />}
                 keyExtractor={({ id }) => id}
                 horizontal
-                initialScrollIndex={2}
                 isTVSelectable
                 importantForAccessibility='auto'
             />

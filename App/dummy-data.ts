@@ -7,12 +7,6 @@ export const Videos: import("./Interfaces").IPostItem[] = [
     },
     {
         "type": "video",
-        "src":  "https://g.azikiwe.h.sabishare.com/dl/GzgHZPREv42/7b97cee370a9c765066ef23cd6cd358429797babce4f024238894ac33c5b73b5/Spider-Man_Across_the_Spider-Verse_(2023)_(NetNaija.com).mkv",
-        'thumb': 'https://townsquare.media/site/442/files/2018/07/green-lantern-elba.jpg?w=980&q=75',
-        'caption': 'video titile',
-    },
-    {
-        "type": "video",
         "src": "https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/footage/beach-cliffs.mp4",
         'thumb': 'https://townsquare.media/site/442/files/2023/07/attachment-3Y8A7222_r.jpg?w=980&q=75',
         'caption': 'video titile',

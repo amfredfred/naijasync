@@ -21,7 +21,7 @@ const ToastContext = createContext<IToast>(null)
 
 export const useToast = () => useContext(ToastContext)
 
-export default function ToastProvider() {
+export default function ToastProvider({children}) {
 
     const themeColors = useThemeColors()
 
@@ -46,6 +46,7 @@ export default function ToastProvider() {
 
     return (
         <ToastContext.Provider value={{ toast }} >
+            {children}
             <ContainerBlock
                 hidden={!toastInfo.message}
                 style={{ position: 'absolute', top: 0, backgroundColor: 'red' }}>

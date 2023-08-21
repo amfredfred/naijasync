@@ -65,49 +65,51 @@ export const InputText = (props: ITextInput) => {
 }
 
 export const ProgressBar = (props: IProgressBar) => {
-    const { statusText, filled, severity, barStyle } = props
+    const { statusText, filled, severity, barStyle, hidden } = props
     const colors = useThemeColors()
 
     const barStyled: IContainer['style'] = {
         minWidth: '100%',
         maxWidth: '100%',
-        height: 10,
-        minHeight: 10,
-        maxHeight: 10,
-        borderRadius: 50,
+        height: 3,
+        minHeight: 3,
+        maxHeight: 3,
         position: 'relative',
-        backgroundColor: 'green',
-        padding:10
+        zIndex: 10
     }
 
     const fillerStyled: IContainer['style'] = {
         width: String(filled) + "%" as any,
-        height: '100%',
-        borderRadius: 50,
-        backgroundColor: severity === 'error' ? colors.error : severity === 'success' ? colors.sucess : severity === 'warning' ? colors.warning : colors.primary
+        // height: '100%',
+        height: 4,
+        minHeight: 4,
+        maxHeight: 4,
+        backgroundColor: severity === 'error' ? colors.error : severity === 'success' ? colors.success : severity === 'warning' ? colors.warning : colors.primary
     }
 
     const statusTextStyled: TextInput['props']['style'] = {
         position: 'absolute',
-        top: -20,
         zIndex: 10,
         padding: 2,
+        fontSize: 6,
+        backgroundColor: severity === 'error' ? colors.error : severity === 'success' ? colors.success : severity === 'warning' ? colors.warning : colors.primary,
+        paddingHorizontal: 5,
+        right: 0,
         borderRadius: 50,
-        // fontSize: 10,
-        // backgroundColor: severity === 'error' ? colors.error : severity === 'success' ? colors.sucess : severity === 'warning' ? colors.warning : colors.secondary,
-        // paddingHorizontal: 6,
-        right: 0
+        transform: [
+            { translateY: -4 }
+        ]
     }
 
+    if (hidden) return null
 
     return (
         <View
             style={[barStyled, barStyle]}
-            children={
-                <>
-                    <SpanText style={[statusTextStyled]} children={statusText ?? (filled + "%")} />
-                    <View style={fillerStyled} />
-                </>}
+            children={<View
+                children={<SpanText style={[statusTextStyled]} children={statusText ?? (filled + "%")} />}
+                style={fillerStyled} />
+            }
         />
     )
 

@@ -168,3 +168,17 @@ export function getMediaType(link: string): IMediaType {
     const fileExtension = link.substring(link.lastIndexOf('.'));
     return mediaExtensions[fileExtension] || IMediaType.Other;
 };
+
+
+export const getTags = (inputString: string) => {
+    const hashtagRegex = /#(\w+)/g;
+
+    const matches = inputString.match(hashtagRegex);
+
+    if (matches) {
+        const extractedHashtag = matches[0];
+        console.log(extractedHashtag);
+    } else {
+
+    }
+}

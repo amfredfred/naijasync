@@ -10,8 +10,7 @@ const MediaPlaybackContext = createContext<IMediaViewerProvider | null>(null)
 export const useMediaPlaybackContext = () => useContext(MediaPlaybackContext)
 
 
-
-export function MediaViewerProvider({children}) {
+export function MediaViewerProvider({ children }) {
 
     const mediaReducer = (state, { key, payload }: { key?: any, payload }) => {
         const saveable = key ? { [key]: payload } : payload
@@ -21,6 +20,7 @@ export function MediaViewerProvider({children}) {
 
     const [data, dispatch] = useReducer(mediaReducer, { ...initialState })
     const setMedia: IMediaViewerProvider['setMedia'] = ({ sources, thumbnailUri }) => {
+        console.log(sources)
         dispatch({ payload: { sources, thumbnailUri } })
     }
 
@@ -97,7 +97,7 @@ export function MediaViewerProvider({children}) {
             await play()
         } catch (error) {
             console.log("ERROR: loadMediaPlayable-> ", error)
-            await clearAllRefs()
+            // await clearAllRefs()
             setMediaState(S => ({ ...S, playState: 'errored' }))
         }
     };
@@ -111,14 +111,10 @@ export function MediaViewerProvider({children}) {
         return () => {
             clearAllRefs()
         };
-    }, [data.sources?.[0]]);
+    }, [data.sources?.[0], mediaRef]);
 
     const play = async () => {
         try {
-            if (mediaState.playState === 'ended') {
-                await mediaRef?.current?.setPositionAsync?.(0)
-                await audioObjectRef?.current?.sound?.setPositionAsync?.(0)
-            }
             if (mediaType === 'audio') {
                 await audioObjectRef?.current?.sound?.playAsync();
             } else if (mediaType === 'video') {
@@ -189,7 +185,7 @@ export function MediaViewerProvider({children}) {
     }
 
 
-    const methodsAndStates =  {
+    const methodsAndStates = {
         data: {
             thumbnailUri: data?.thumbnailUri,
             sources: data?.sources?.[0]
@@ -216,7 +212,7 @@ export function MediaViewerProvider({children}) {
     };
 
     return (
-        <MediaPlaybackContext.Provider  value={{ setMedia, removeMedia, data, mediaRef }}  >
+        <MediaPlaybackContext.Provider value={{ setMedia, removeMedia, data, mediaRef }}  >
             {children}
             <MediaViewer ref={mediaRef} {...methodsAndStates} />
         </MediaPlaybackContext.Provider>

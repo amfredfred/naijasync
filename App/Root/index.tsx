@@ -22,6 +22,7 @@ import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
 // import { BottomSheetProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ToastProvider from "../Contexts/ToastContext";
+import PostFormProvider from "../Contexts/FormContext";
 
 export default function Root() {
     const [isAuthenticated, setisAuthenticated] = useState(true)
@@ -84,16 +85,19 @@ export default function Root() {
     return (
         <SafeAreaProvider>
             <QueryClientProvider client={Client}>
-                <DataContextProvider>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                        <NavigationContainer >
-                            <MediaViewerProvider>
-                                {isAuthenticated ? UserRoutes : GuestRoutes}
-                            </MediaViewerProvider>
-                            <ToastProvider />
-                        </NavigationContainer>
-                    </GestureHandlerRootView>
-                </DataContextProvider>
+                <ToastProvider>
+                    <DataContextProvider>
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                            <NavigationContainer>
+                                <PostFormProvider>
+                                    <MediaViewerProvider>
+                                        {isAuthenticated ? UserRoutes : GuestRoutes}
+                                    </MediaViewerProvider>
+                                </PostFormProvider>
+                            </NavigationContainer>
+                        </GestureHandlerRootView>
+                    </DataContextProvider>
+                </ToastProvider>
             </QueryClientProvider>
         </SafeAreaProvider>
     )

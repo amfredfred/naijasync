@@ -92,7 +92,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
                     <IconButton
                         hidden={states?.isInSearchMode}
-                        icon={<Ionicons size={30} name="settings" />}
+                        icon={<Ionicons size={30} name="create" />}
                     />
                     <IconButton
                         onPress={() => setOpen((prevOpen) => !prevOpen)}

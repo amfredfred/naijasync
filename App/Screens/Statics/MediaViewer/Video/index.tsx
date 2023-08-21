@@ -5,7 +5,7 @@ import { IThemedComponent } from "../../../../Interfaces";
 import { useState, forwardRef, useEffect, useRef } from 'react'
 import { IconButton } from "../../../../Components/Buttons";
 import { IMediaPlayable, IMediaViewer } from "../Interface";
-import { View, StyleSheet, Dimensions, StatusBar, PanResponder, Text, BackHandler, Keyboard, TouchableOpacity, ScrollView, FlatList } from 'react-native'
+import { View, StyleSheet, Dimensions, StatusBar, PanResponder, Text, BackHandler, TouchableOpacity, ScrollView, FlatList } from 'react-native'
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -14,6 +14,9 @@ import { formatDuration, formatPlaytimeDuration } from "../../../../Helpers";
 import { useNavigation } from "@react-navigation/native";
 import ShareContent from "../../../Partials/ShareFile";
 import { Videos } from "../../../../dummy-data";
+import { ProgressBar } from "../../../../Components/Inputs";
+import { HeadLine } from "../../../../Components/Texts";
+import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
 
 
 export type IVideoPlayer = IThemedComponent & IMediaPlayable & {
@@ -172,22 +175,22 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
         }
     }
 
+    useKeyboardEvent({
+        onHide: () => {
+            setkeyBoardShown(s => false)
+            VP?.play()
+        },
+        onShow: () => {
+            setkeyBoardShown(s => true)
+            VP?.pause()
+        }
+    })
+
     //Effects 
     useEffect(() => {
 
         const BHND = BackHandler.addEventListener('hardwareBackPress', hanleBackPress)
-        const keyboardshown = Keyboard.addListener('keyboardDidShow', () => {
-            setkeyBoardShown(s => true)
-            VP?.pause()
-        })
-        const keyboardhidden = Keyboard.addListener('keyboardDidHide', () => {
-            setkeyBoardShown(s => false)
-            VP?.play()
-        })
-
         return () => {
-            keyboardshown.remove()
-            keyboardhidden.remove()
             BHND.remove()
         }
     }, [])
@@ -269,8 +272,8 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    style={{ maxHeight: 40, backgroundColor: 'orangered' }}
-                    contentContainerStyle={{ paddingHorizontal: 10, gap: 10, alignItems: 'center' }}
+                    style={{ maxHeight: 40, }}
+                    contentContainerStyle={{ padding: 10, gap: 10, alignItems: 'center' }}
                 >
                     <IconButton
                         onPress={null}
@@ -299,10 +302,11 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
                         icon={<MaterialIcons size={25} name="watch-later" />}
                     />
                 </ScrollView>
-                <View style={{backgroundColor:'green', height:50, width:'100%'}}>
-
-                </View>
-           </View>
+                <ProgressBar
+                    // hidden
+                    filled={VP?.states?.progress ?? 0}
+                />
+            </View>
             <GestureDetector gesture={contenGetsture}>
                 <Animated.View
                     entering={SlideInDown}
@@ -311,7 +315,27 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
                     <View style={[styles.spaceBetween, { height: 20, justifyContent: 'center' }]}>
                         <View style={[styles.contentDescriptionContainerBar, { backgroundColor: colors.text }]} />
                     </View>
-
+                    <View style={[styles.spaceBetween, { borderBottomColor: 'darkgrey', borderBottomWidth: 1, paddingHorizontal: 10 }]}>
+                        <HeadLine children={'ABOUT INFO'} />
+                        <IconButton
+                            onPress={() => {
+                                contConDis.value = 'none'
+                            }}
+                            style={{ width: 35, backgroundColor: 'transparent' }}
+                            icon={<MaterialIcons
+                                name={'close'}
+                                color={colors.text}
+                                size={35}
+                            />}
+                        />
+                    </View>
+                    <ScrollView style={[styles.contentDescriptionContainerInner]}>
+                        <Text
+                            style={[{ color: colors.text, maxWidth: '100%', lineHeight: 27, fontSize: 18 }]}>
+                            Ronaldo Goal - Al Nassr vs Al Shorta 1-0 Highlights & All Goals - 20
+                            Ronaldo Goal - Al Nassr vs Al Shorta 1-0 Highlights & All Goals - 2023
+                        </Text>
+                    </ScrollView>
                 </Animated.View>
             </GestureDetector>
             <Animated.FlatList
@@ -411,19 +435,20 @@ const styles = StyleSheet.create({
         width: '100%',
         top: 0,
         height: height - VIDEO_HEIGHT,
-        backgroundColor: 'pink',
-        borderTopRightRadius: 20,
-        borderTopLeftRadius: 20,
         position: 'absolute',
         overflow: 'hidden',
-        zIndex: 1
+        zIndex: 12
     },
 
     contentDescriptionContainerBar: {
-        width: 100,
+        width: 60,
         height: 5,
         borderRadius: 50,
         backgroundColor: 'red'
+    },
+    contentDescriptionContainerInner: {
+        flex: 1,
+        padding: 10
     },
 
     progressBarContainer: {

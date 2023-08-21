@@ -9,6 +9,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import useThemeColors from '../../../../Hooks/useThemeColors'
 import { useMediaPlaybackContext } from '../Context'
 import { Videos } from '../../../../dummy-data'
+import { useToast } from '../../../../Contexts/ToastContext'
 
 const { width, height } = Dimensions.get('window')
 
@@ -23,6 +24,7 @@ export type IAudioPlayer = IThemedComponent & IMediaPlayable & {
 const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => {
     const { thumbnailUri, ...AV } = props
     const colors = useThemeColors()
+    const { toast } = useToast()
 
     const [isShwoingList, setisShwoingList] = useState(false)
     const handleToggleAudioList = () => {
