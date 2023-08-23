@@ -22,27 +22,10 @@ export default function ContentTables() {
 
     return (
         <ScrollContainer
-            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
-        >
+            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />} >
             <ListSlider
                 headline='Hollywood'
                 items={Videos} />
-            <ListSlider
-                headline='NollyWood'
-                items={Videos}
-            />
-            <ListSlider
-                headline='Skits'
-                items={Videos}
-            />
-            <ListSlider
-                headline='2023'
-                items={Videos}
-            />
-            <ListSlider
-                headline='2023 movies'
-                items={Videos}
-            />
         </ScrollContainer>
     )
 

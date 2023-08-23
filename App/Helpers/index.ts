@@ -170,15 +170,34 @@ export function getMediaType(link: string): IMediaType {
 };
 
 
-export const getTags = (inputString: string) => {
+export const getTags = (inputString: string):string[] => {
     const hashtagRegex = /#(\w+)/g;
 
     const matches = inputString.match(hashtagRegex);
 
     if (matches) {
-        const extractedHashtag = matches[0];
-        console.log(extractedHashtag);
+        // const extractedHashtag = matches[0];
+        return [...new Set(matches.map(match => match.slice(1)))];
+        // console.log(extractedHashtag);
     } else {
-
+        return []
     }
+}
+
+
+export const extractUrl = (text: string) => {
+    // const text = "Links: https://github.com/flyerhq, www.example.com, ftp://example.org, and google.com";
+
+    // Regular expression to match URLs
+    const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(ftp:\/\/[^\s]+)|(\b[\w-]+(\.[a-z]{2,})+\S*)/gi;
+
+    // Use the match method to find all URLs in the text
+    const urls = text.match(urlRegex);
+
+    if (urls) {
+        console.log("Extracted URLs:", urls);
+    } else {
+        console.log("No URLs found in the text.");
+    }
+
 }

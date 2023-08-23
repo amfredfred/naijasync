@@ -1,39 +1,47 @@
 import { ContainerBlock } from "../../../Components/Containers";
 import { useDataContext } from "../../../Contexts/DataContext";
 import useThemeColors from "../../../Hooks/useThemeColors";
-import { useState, useRef } from 'react'
-import { Image, TextInput, TouchableOpacity } from 'react-native'
+import { useState, useRef, useEffect } from 'react'
+import { Image, ScrollView, TextInput, TouchableOpacity } from 'react-native'
 import useAuthStatus from "../../../Hooks/useAuthStatus";
 import useKeyboardEvent from "../../../Hooks/useKeyboardEvent";
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
-import { StyleSheet, Dimensions, StatusBar, View, KeyboardAvoidingView, Platform, Text } from 'react-native'
+import { StyleSheet, Dimensions, StatusBar, View, KeyboardAvoidingView, Platform, Text, ImageBackground, BackHandler } from 'react-native'
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Picker } from '@react-native-picker/picker'
 import * as FilePicker from 'expo-document-picker'
 import { AssetInfo } from "expo-media-library";
 import UploadIcon from '../../../../assets/upload-icon.png'
+import ImportIcon from '../../../../assets/import-icon.png'
+import AddImageIcn from '../../../../assets/upload-image-icon.png'
 import Animated, { FadeIn, FadeOut, SlideInDown, SlideInUp, SlideOutDown, SlideOutUp, useSharedValue } from 'react-native-reanimated'
 import PagerView from "react-native-pager-view";
-import { formatFileSize } from "../../../Helpers";
+import { formatFileSize, getTags } from "../../../Helpers";
 import { usePostFormContext } from "../../../Contexts/FormContext";
 import { IPostFormMethods } from "../../../Interfaces/IPostContext";
+import { IconButton } from "../../../Components/Buttons";
+import { ProgressBar } from "../../../Components/Inputs";
+import PreViewLink from "../../Statics/LinkPreview";
+import useLinkPreview from "../../../Hooks/useLinkPreview";
 
 export interface IPostForm {
-    postableTypes: "QUESTION" | "STATUS" | "BLOG" | "MOVIE"
+    postableTypes: "QUESTION" | "STATUS" | "BLOG" | "MOVIE" | "IMPORT"
 }
 
 const { width, height } = Dimensions.get('window')
 
 const EDITOR_HEIGHT = 230
 
-export default function PostsForm() {
+export default function PostsForm(props: { hidden: boolean }) {
 
     const [PostMode, setPostMode] = useState<IPostForm['postableTypes']>('MOVIE')
     const [selectedFilesToUpload, setselectedFilesToUpload] = useState<FilePicker.DocumentPickerResult['assets']>([])
     const [selectedThumbnail, setselectedThumbnail] = useState<FilePicker.DocumentPickerResult['assets']>()
     const [isShowingKeyboard, setisShowingKeyboard] = useState(false)
     const [isMediaFilesExpanded, setisMediaFilesExpanded] = useState(true)
+    const [tags, setTags] = useState([])
     const [isPreviewingThumb, setisPreviewingThumb] = useState(false)
+
 
     const [isEditorFocused, setisEditorFocused] = useState(false)
 
@@ -41,6 +49,14 @@ export default function PostsForm() {
     const dataContext = useDataContext()
     const themeColors = useThemeColors()
     const { methods, states } = usePostFormContext()
+
+    const LinkPreview = useLinkPreview({
+        url: states?.importedLink,
+        dep: states?.importedLink,
+        enabled: Boolean(states?.importedLink)
+    })
+
+    console.log(states?.importedLink)
 
     const ITEMS_PER_PAGE = useSharedValue(3)
 
@@ -53,11 +69,48 @@ export default function PostsForm() {
         dep: null
     })
 
-    console.log(isShowingKeyboard)
+    const handleOnBackPress = () => {
+        if (!props.hidden) {
+            methods?.showForm(null, null)
+            return true
+        }
+        return false
+    }
+
+
+
+    useEffect(() => {
+        const BKH = BackHandler.addEventListener('hardwareBackPress', handleOnBackPress) 
+
+        return () => {
+            BKH.remove()
+        }
+    }, [])
 
     const handleSetFormChanges: IPostFormMethods['setData'] = async (key, payload) => {
+        if (key === 'description') {
+            let hashTags = getTags(String(payload))
+            methods?.setData('tags', hashTags)
+        }
+        console.log(payload)
         methods?.setData(key, payload)
     }
+    useEffect(() => {
+        if (PostMode === 'IMPORT') {
+            if (LinkPreview?.description) {
+                handleSetFormChanges('description', LinkPreview?.description)
+            }
+            if (LinkPreview?.title) {
+                handleSetFormChanges('title', LinkPreview?.title)
+            }
+            if (LinkPreview?.firstImage) {
+                setselectedThumbnail([{url:LinkPreview?.firstImage as any} as any])
+            }
+        } 
+ 
+    }, [LinkPreview?.isFetching])
+
+    console.log(LinkPreview)
 
     const handleOnKeyboardShow = async () => {
 
@@ -75,13 +128,15 @@ export default function PostsForm() {
 
     }
 
-    console.log(states.description)
+    const handleTextEditorContainerScrolled = () => {
+        setisMediaFilesExpanded(false)
+    }
 
     const handlePickDocument = async () => {
-        let [type, multiple] = [[], true]
+        let [type, multiple] = [[], false]
 
         if (PostMode === 'MOVIE') {
-            type = ['video/mp4', 'video/webm', 'video/mkv']
+            type = ['video/*', 'image/png', 'image/jpeg', 'image/jpg']
         }
 
         try {
@@ -89,8 +144,11 @@ export default function PostsForm() {
                 multiple,
                 type,
             })
-            setselectedFilesToUpload(pickedItems.assets)
-            console.log(pickedItems)
+            if (!pickedItems.canceled) {
+                setselectedFilesToUpload(pickedItems.assets)
+                if (!selectedThumbnail)
+                    setselectedThumbnail(pickedItems.assets)
+            }
         } catch (error) {
             console.log("ERROR handlePickDocument -> ", error)
         }
@@ -101,8 +159,8 @@ export default function PostsForm() {
             const pickedItems = await FilePicker.getDocumentAsync({
                 type: ['image/jpg', 'image/png', 'image/jpeg']
             })
-            setselectedThumbnail(pickedItems.assets)
-            console.log(pickedItems)
+            if (!pickedItems.canceled)
+                setselectedThumbnail(pickedItems.assets)
         } catch (error) {
             console.log("ERROR handlePickThumb -> ", error)
         }
@@ -126,15 +184,17 @@ export default function PostsForm() {
     const BrowseSelectedFiles = (
         <Animated.View style={[styles.browseSelectedFilesContainer]}>
             {
-                (Boolean(selectedFilesToUpload?.length)) && (
+                (Boolean(selectedFilesToUpload?.length || PostMode === 'IMPORT')) && (
                     <View>
-                        <TouchableOpacity style={[styles.spaceBetween, {
-                            width: '100%',
-                            alignItems: 'center',
-                            opacity: .4,
-                            backgroundColor: themeColors.background2,
-                            borderTopLeftRadius: 20, borderTopRightRadius: 20
-                        }]}>
+                        <TouchableOpacity
+                            onPress={() => setisMediaFilesExpanded(s => !s)}
+                            style={[styles.spaceBetween, {
+                                width: '100%',
+                                alignItems: 'center',
+                                opacity: .4,
+                                backgroundColor: themeColors.background2,
+                                borderTopLeftRadius: 20, borderTopRightRadius: 20
+                            }]}>
                             <MaterialIcons
                                 name={isMediaFilesExpanded ? 'expand-more' : 'expand-less'}
                                 size={34}
@@ -142,56 +202,55 @@ export default function PostsForm() {
                             />
                             <TouchableOpacity
                                 onPress={handlePickThumb}
-                                style={[styles.spaceBetween, styles.roundedButton, { backgroundColor: themeColors.background2 }]}>
-                                <Text style={[styles.textStyle, { color: themeColors.text, opacity: .6, fontSize: 16 }]}>  Upload Thumbnail  </Text>
+                                style={[styles.spaceBetween, styles.roundedButton, { backgroundColor: themeColors.background2, gap: 1 }]}>
+                                <Text style={[styles.textStyle, { color: themeColors.text, fontSize: 16 }]}>Change Thumb  </Text>
                                 <Image
-                                    source={UploadIcon}
-                                    style={{ height: 30, width: 30, borderRadius: 10, }}
+                                    source={AddImageIcn}
+                                    style={{ height: 25, width: 30, borderRadius: 10, }}
                                 />
                             </TouchableOpacity>
                         </TouchableOpacity>
-
                         {
                             selectedThumbnail && (
-                                <View style={{backgroundColor:'red'}}>
+                                <ImageBackground
+                                    source={{ uri: selectedThumbnail?.[0]?.uri }}
+                                    blurRadius={50}
+                                    style={{ maxHeight: height / 3, alignItems: 'center', width: '100%' }}>
                                     {
                                         isMediaFilesExpanded && (
-                                            <Animated.View
+                                            <Animated.Image
                                                 entering={SlideInDown}
                                                 exiting={SlideOutDown}
-                                            >
-
-                                                <Image
-                                                    style={{ width: 100, }}
-                                                    resizeMethod="resize"
-                                                    resizeMode="contain"
-                                                    source={{ uri: selectedThumbnail?.[0].uri }}
-                                                />
-                                            </Animated.View>
+                                                style={{ width: '100%', height: height / 3 }}
+                                                resizeMethod="resize"
+                                                resizeMode="contain"
+                                                source={{ uri: selectedThumbnail?.[0].uri }}
+                                            />
                                         )
                                     }
-                                    <TouchableOpacity style={[styles.textInputContainner]}>
+                                    <TouchableOpacity
+                                        onPress={() => setisMediaFilesExpanded(s => !s)}
+                                        style={[styles.textInputContainner]}>
                                         <Text style={[styles.textStyle, { color: themeColors.text, }]}>
                                             Thumb <Ionicons name='md-checkmark-done' size={20} color={'green'} />
                                         </Text>
                                     </TouchableOpacity>
-                                </View>
+                                </ImageBackground>
                             )
                         }
                     </View>
                 )
             }
+
+
+
             <Animated.View
                 entering={FadeIn}
                 exiting={FadeOut}
-                style={{ width: '100%' }}
-            >
+                style={{ width: '100%' }}  >
                 <ContainerBlock hidden={isShowingKeyboard}>
                     <PagerView
-                        // horizontal
-                        style={{ height: selectedFilesToUpload?.length ? 80 : height / 2, }}
-                    // contentContainerStyle={{ gap: 10 }}
-                    >
+                        style={{ height: selectedFilesToUpload?.length ? 80 : height / 2, }}   >
                         {!selectedFilesToUpload?.length ?
                             <TouchableOpacity
                                 onPress={handlePickDocument}
@@ -205,7 +264,11 @@ export default function PostsForm() {
                             selectedFilesToUpload?.map((item, index) => (
                                 <View style={[styles.spaceBetween, { height: 60, padding: 0 }]}>
                                     <View style={[styles.spaceBetween, { padding: 0, justifyContent: 'flex-start' }]}>
-                                        <Image source={{ uri: item.uri }} style={{ height: 60, width: width / ITEMS_PER_PAGE.value, borderRadius: 5, borderColor: 'red', borderWidth: .3 }} />
+                                        <Image
+                                            resizeMethod="resize"
+                                            resizeMode="contain"
+                                            source={{ uri: item.uri }}
+                                            style={{ height: 60, width: width / ITEMS_PER_PAGE.value, borderRadius: 5, borderColor: 'red', borderWidth: .3 }} />
                                         <View style={{ width: '60%' }}>
                                             <Text style={[styles.textStyle, { fontSize: 15, color: themeColors.text }]} numberOfLines={2}>{item?.name}</Text>
                                             <View style={[styles.spaceBetween]}>
@@ -229,6 +292,7 @@ export default function PostsForm() {
         </Animated.View>
     )
 
+    if (props.hidden) return null
 
     return (
         <KeyboardAvoidingView
@@ -238,6 +302,7 @@ export default function PostsForm() {
                 <View style={[styles.spaceBetween, { borderBottomColor: themeColors.background2, borderBottomWidth: 1 }]}>
                     <View style={[styles.spaceBetween, { padding: 0, flexGrow: 1, justifyContent: 'flex-start' }]}>
                         <Ionicons
+                            onPress={() => methods?.showForm(null, null)}
                             name="arrow-back"
                             color={themeColors.text} size={30}
                         />
@@ -246,11 +311,11 @@ export default function PostsForm() {
                         </Text>
                     </View>
                     <TouchableOpacity
-                        onPress={handlePickDocument}
+                        onPress={() => setPostMode('IMPORT')}
                         style={[styles.spaceBetween, styles.roundedButton, { backgroundColor: themeColors.background2 }]}>
-                        <Text style={[styles.textStyle, { color: themeColors.text, opacity: .6, fontSize: 16 }]}>  Upload  </Text>
+                        <Text style={[styles.textStyle, { color: themeColors.text, opacity: .6, fontSize: 16 }]}>  IMPORT  </Text>
                         <Image
-                            source={UploadIcon}
+                            source={ImportIcon}
                             style={{ height: 30, width: 30, borderRadius: 10, }}
                         />
                     </TouchableOpacity>
@@ -259,31 +324,65 @@ export default function PostsForm() {
                     <View style={[styles.textInputContainner, { backgroundColor: themeColors.background2 }]}>
                         <TextInput
                             style={[styles.textInput, { color: themeColors.text }]}
-                            placeholder="Title"
+                            placeholder={LinkPreview?.title??"Title"}
+                            value={states?.title}
                             numberOfLines={2}
                             onChangeText={(text) => handleSetFormChanges('title', text)}
                             placeholderTextColor={themeColors.text}
                         />
                     </View>
+                    {
+                        PostMode === 'IMPORT' && (
+                            <View style={[styles.textInputContainner, { backgroundColor: themeColors.background2 }]}>
+                                <TextInput
+                                    style={[styles.textInput, { color: themeColors.text }]}
+                                    placeholder="Enter https link to import eg: https://example.com/articel/one"
+                                    numberOfLines={2}
+                                    onChangeText={(text) => handleSetFormChanges('importedLink', text)}
+                                    placeholderTextColor={themeColors.text}
+                                />
+                            </View>
+                        )
+                    }
                     <RichEditor
-                        style={{ backgroundColor: 'green', flex: 1 }}
+                        style={{ flex: 1 }}
                         editorStyle={{ backgroundColor: themeColors.background, color: themeColors.text }}
-                        textZoom={100}
+                        textZoom={110}
                         ref={richText}
-                        placeholder={PostMode === "MOVIE" ? "❤️ Tell us about this post..." : ''}
+                        placeholder={LinkPreview?.description ?? 'Hey 🤚, start typing...'}
                         onChange={(con) => { handleSetFormChanges('description', con) }}
                         allowsLinkPreview
-                        // pasteAsPlainText
+                        onScroll={handleTextEditorContainerScrolled}
+                        pasteAsPlainText
                         showsHorizontalScrollIndicator={false}
+                        useWebView2
                         javaScriptEnabled={false}
+                        initialContentHTML={states?.description}
                         collapsable
-                        // initialFocus
                         geolocationEnabled
-                        // initialContentHTML={'what is up'}
                         autoCapitalize="sentences"
                     />
-
-
+                    <View>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            style={{ maxHeight: 40, }}
+                            contentContainerStyle={{ padding: 10, gap: 10, alignItems: 'center' }}
+                        >
+                            {
+                                states?.tags?.map(tag => <IconButton
+                                    onPress={null}
+                                    title={`#${tag}`}
+                                    style={{ borderRadius: 2 }}
+                                    containerStyle={[styles.iconsButton]}
+                                />)
+                            }
+                        </ScrollView>
+                        <ProgressBar
+                            hidden
+                            filled={10}
+                        />
+                    </View>
                     {isShowingKeyboard || BrowseSelectedFiles}
                 </View>
 
@@ -311,11 +410,11 @@ export default function PostsForm() {
                             // actions.insertVideo, 
                         ]}
                     />
+
                 </ContainerBlock>
 
                 <ContainerBlock
-                    hidden={isShowingKeyboard || !selectedFilesToUpload?.length}
-                >
+                    hidden={isShowingKeyboard || !selectedFilesToUpload?.length}   >
                     <Animated.View
                         entering={SlideInDown}
                         exiting={SlideOutDown}
@@ -340,7 +439,6 @@ const styles = StyleSheet.create({
     container: {
         height,
         top: 0,
-        flex: 1,
         position: 'absolute',
         marginTop: StatusBar.currentHeight,
         width,
@@ -392,13 +490,20 @@ const styles = StyleSheet.create({
         padding: 0
     },
     browseSelectedFilesContainer: {
-        position: 'absolute',
+        // position: 'absolute',
         width,
         bottom: 0,
+        overflow: 'hidden',
     },
     addMediaPlaceholder: {
         width: '100%',
         height: height / 2,
         borderRadius: 5,
+    },
+    iconsButton: {
+        borderWidth: 0,
+        borderRadius: 1,
+        gap: 5,
+        paddingHorizontal: 10
     },
 })

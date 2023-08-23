@@ -15,10 +15,12 @@ import { linkChecker } from "../../Helpers";
 import TabSelector from "../../Screens/Partials/TabSelector";
 import IMAGS from '../../../assets/adaptive-icon.png'
 import DigitalClock from "../../Screens/Partials/DigitalClock";
+import { usePostFormContext } from "../../Contexts/FormContext";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
 
     const [keyBoardShown, setkeyBoardShown] = useState(false)
+    const formContext = usePostFormContext()
 
     const {  background, background2, text } = useThemeColors()
     const { states: { states, user, storage }, setData } = useDataContext()
@@ -91,6 +93,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                     </ContainerSpaceBetween>
 
                     <IconButton
+                        onPress={() => formContext.methods?.showForm('upload', {})}
                         hidden={states?.isInSearchMode}
                         icon={<Ionicons size={30} name="create" />}
                     />
