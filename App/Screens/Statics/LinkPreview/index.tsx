@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import axios from 'axios';
 import useLinkPreview from '../../../Hooks/useLinkPreview';
 
-const PreViewLink = ({ url }: { url: string }) => {
+const PreViewLink = ({ url, enabled }: { url: string, enabled: boolean }) => {
     const previewData = useLinkPreview({
-        url, dep: url,
+        url, dep: url, enabled
     })
     return (
         <View style={styles.container}>

@@ -18,11 +18,19 @@ interface ILinkPreviewData {
     firstVideo?: string;
     isFetching?: boolean
     isError?: boolean
-    message?: string
+    message?: string,
+    error?:any
+}
+
+interface ILinkPreviewProps {
+    onSuccess?(props: ILinkPreviewData): void
+    url: string
+    enabled: boolean
+    dep: any
 }
 
 
-export default function useLinkPreview({ url, dep, enabled }: { url: string, enabled?: boolean, dep: any }): ILinkPreviewData {
+export default function useLinkPreview({ url, dep, enabled, onSuccess }: ILinkPreviewProps): ILinkPreviewData {
     const [previewData, setPreviewData] = useState<ILinkPreviewData>(null);
     const [isValidUrl, setIsValidUrl] = useState(true);
 
@@ -114,31 +122,17 @@ export default function useLinkPreview({ url, dep, enabled }: { url: string, ena
                     content['firstVideo'] = firstVideoMatch[1];
                 }
 
+                onSuccess?.(content)
                 setPreviewData({ ...content });
             };
+            fetchHtmlContent();
 
-            if (isValidUrl)
-                fetchHtmlContent();
-
+            return () => {
+                setPreviewData({})
+            }
         }
 
-    }, [isValidUrl]);
-
-
-    useEffect(() => {
-        // Validate the URL when it changes
-        validateUrl(url);
-    }, [dep, enabled]);
-
-    const validateUrl = (inputUrl: string) => {
-        const isValid = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/.test(inputUrl) ||
-            /^(www\.[^\s/$.?#].[^\s]*$)/.test(inputUrl) ||
-            /^[^\s/$.?#].[^\s]*$/.test(inputUrl); // Allow any domain name
-        
-        if (!isValid)
-            setPreviewData(S => ({ ...S, message: "Invalid Url" }))
-        setIsValidUrl(isValid);
-    };
+    }, [url, dep, enabled]);
 
     return previewData;
 };
