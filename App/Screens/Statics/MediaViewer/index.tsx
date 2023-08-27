@@ -15,7 +15,7 @@ import useMediaLibrary from '../../../Hooks/useMediaLibrary'
 
 const { width, height } = Dimensions.get('window')
 
-export const MediaViewer = forwardRef<Video, IMediaViewer>(({ data, media }, videoRef) => {
+export const MediaViewer = forwardRef<Video, IMediaViewer>(({ data, media, previewing }, videoRef) => {
 
     const handleLoad = () => {
         console.log("VIDEO LAODIED")
@@ -61,6 +61,7 @@ export const MediaViewer = forwardRef<Video, IMediaViewer>(({ data, media }, vid
     const UsePlayerProps = {
         ...data,
         ...media,
+        previewing
     }
 
     let Component = <></>

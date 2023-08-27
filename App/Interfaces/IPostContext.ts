@@ -1,5 +1,9 @@
 'use strict'
 
+export interface IPostType {
+    types: "ARTICLE" | "STATUS" | "GIF" | "UPLOAD" | "IMPORT";
+}
+
 export interface IPostContext {
     id?: number;
     ownerId?: number;

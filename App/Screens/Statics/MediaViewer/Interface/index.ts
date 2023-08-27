@@ -29,18 +29,19 @@ export interface IMediaPlayable {
     source?: string
     mediaPlayableAudioRef?: Audio.SoundObject
     states: {
-        playState?: "paused" | "stopped" | "errored" | "ended" | "playing" | 'loading' | 'canPlay' | "seeking"| "shouldPlay"
+        playState?: "paused" | "stopped" | "errored" | "ended" | "playing" | 'loading' | 'canPlay' | "seeking" | "shouldPlay"
         progress?: number
         duration?: number
     }
     type: IMediaType
-    mode?: "fullscreen" | "collapsed" | "floating" | "hidden"
+    mode?: "fullscreen" | "collapsed" | "floating" | "hidden",
+    previewing?: boolean
 }
 
 
 
 export interface IMediaViewerProvider {
-    setMedia(props: { sources: string[], thumbnailUri?: string }): void;
+    setMedia(props: { sources: string[], thumbnailUri?: string, previewing?: boolean }): void;
     removeMedia: IMediaPlayable['remove']
     data: {
         sources: string[],
@@ -54,9 +55,6 @@ export type IImageMedia = {
     image: boolean;
 }
 
-// Define a common type for exploreable media types
-type IExploreableMediaType = IMediaType;
-
 // Define a common interface for media viewer
 export type IMediaViewer = {
     data?: {
@@ -64,6 +62,7 @@ export type IMediaViewer = {
         thumbnailUri?: string;
     };
     media?: IMediaPlayable;
+    previewing: boolean
 };
 
 // Define a common interface for media viewer options

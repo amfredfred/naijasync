@@ -34,6 +34,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
     const [isShwoingControls, setisShwoingControls] = useState(false)
     const [isVideoLoading, setisVideoLoading] = useState(false)
     const [keyBoardShown, setkeyBoardShown] = useState(false)
+
     const progressRef = useRef(null);
     const viewMode = useSharedValue<IVideoPlayer['mode']>('fullscreen')
     const { canGoBack } = useNavigation()

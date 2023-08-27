@@ -15,6 +15,7 @@ const { width, height } = Dimensions.get('window')
 
 export type IAudioPlayer = IThemedComponent & IMediaPlayable & {
     ref: React.RefObject<Audio.SoundObject>
+    previewing: boolean,
     thumbnailUri?: string
     audioList?: [{
 
@@ -22,7 +23,7 @@ export type IAudioPlayer = IThemedComponent & IMediaPlayable & {
 }
 
 const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => {
-    const { thumbnailUri, ...AV } = props
+    const { thumbnailUri, previewing, ...AV } = props
     const colors = useThemeColors()
     const { toast } = useToast()
 
@@ -35,8 +36,6 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
     const handleRefreshAudioList = () => {
 
     }
-
-    console.log(AV.states?.playState)
 
     const AudioList = (
         <Animated.View
@@ -122,29 +121,44 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
                     <View style={[styles.progressBar, { width: `${AV?.states.progress ?? 0}%` }]} />
                 </View>
                 <View style={[styles.spaceBetween]}>
-                    <Image
-                        source={{ uri: thumbnailUri }}
-                        style={{ width: 40, borderRadius: 50, aspectRatio: 1 }}
-                        resizeMethod='resize'
-                        resizeMode='contain'
-                    />
-
-                    <View
-                        style={{ padding: 0, flex: 1 }} >
-                        <TouchableOpacity  >
-                            <Text children="Kene Lu Ya" style={{ padding: 0, fontWeight: '800', fontSize: 18, color: colors.text }} />
-                            <Text children="ADA Ehi" style={{ fontSize: 11, fontWeight: '300', color: colors.text }} />
+                    {previewing ? (
+                        <TouchableOpacity
+                            onPress={AV?.remove}
+                            style={{ padding: 2, backgroundColor: 'red', borderRadius:50, aspectRatio:1 }}>
+                            <Ionicons
+                                color={colors.text}
+                                name='close'
+                                size={30}
+                            />
                         </TouchableOpacity>
-                    </View>
+                    )
+                        : <>
+                            <Image
+                                source={{ uri: thumbnailUri }}
+                                style={{ width: 40, borderRadius: 50, aspectRatio: 1 }}
+                                resizeMethod='resize'
+                                resizeMode='contain'
+                            />
 
-                    <IconButton
-                        onPress={handleToggleAudioList}
-                        icon={<MaterialIcons
-                            name={isShwoingList ? 'close' : 'queue-music'}
-                            color={colors.text}
-                            size={40}
-                        />}
-                    />
+                            <View
+                                style={{ padding: 0, flex: 1 }} >
+                                <TouchableOpacity  >
+                                    <Text children="Kene Lu Ya" style={{ padding: 0, fontWeight: '800', fontSize: 18, color: colors.text }} />
+                                    <Text children="ADA Ehi" style={{ fontSize: 11, fontWeight: '300', color: colors.text }} />
+                                </TouchableOpacity>
+                            </View>
+
+                            <IconButton
+                                onPress={handleToggleAudioList}
+                                icon={<MaterialIcons
+                                    name={isShwoingList ? 'close' : 'queue-music'}
+                                    color={colors.text}
+                                    size={40}
+                                />}
+                            />
+                        </>
+                    }
+
                     {/* <IconButton
                         onPress={AV.states.playState === 'playing' ? AV?.pause : AV.play}
                         icon={<MaterialIcons

@@ -4,7 +4,7 @@ import { Image, ScrollView, TextInput, TouchableOpacity } from 'react-native'
 import useKeyboardEvent from "../../../Hooks/useKeyboardEvent";
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 import { StyleSheet, Dimensions, StatusBar, View, KeyboardAvoidingView, Platform, Text, ImageBackground, BackHandler } from 'react-native'
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons, Zocial } from "@expo/vector-icons";
 import * as FilePicker from 'expo-document-picker'
 
 import UploadIcon from '../../../../assets/upload-icon.png'
@@ -16,22 +16,21 @@ import Animated, { FadeIn, FadeOut, SlideInDown, SlideInUp, SlideOutDown, SlideO
 import PagerView from "react-native-pager-view";
 import { formatFileSize, getMediaType, getTags } from "../../../Helpers";
 import { usePostFormContext } from "../../../Contexts/FormContext";
-import { IPostFormMethods } from "../../../Interfaces/IPostContext";
+import { IPostFormMethods, IPostType } from "../../../Interfaces/IPostContext";
 import { IconButton } from "../../../Components/Buttons";
 import { ProgressBar } from "../../../Components/Inputs";
 import useLinkPreview from "../../../Hooks/useLinkPreview";
 import useTimeout from "../../../Hooks/useTimeout";
 import { useMediaPlaybackContext } from "../../Statics/MediaViewer/Context";
-
-export interface IPostForm {
-    postableTypes: "QUESTION" | "STATUS" | "BLOG" | "MOVIE" | "IMPORT"
-}
+import FormBottomTabs from "./__/BottomForTabs";
 
 const { width, height } = Dimensions.get('window')
-
 export default function PostsForm(props: { hidden: boolean }) {
 
-    const [PostMode, setPostMode] = useState<IPostForm['postableTypes']>('MOVIE')
+    const [activeTab, setactiveTab] = useState<IPostType['types']>('UPLOAD');
+
+    const { setMedia } = useMediaPlaybackContext()
+
     const [shouldFetchPreview, setshouldFetchPreview] = useState(false)
     const [isShowingKeyboard, setisShowingKeyboard] = useState(false)
     const [isMediaFilesExpanded, setisMediaFilesExpanded] = useState(true)
@@ -39,10 +38,8 @@ export default function PostsForm(props: { hidden: boolean }) {
     const { methods, states } = usePostFormContext()
     const themeColors = useThemeColors()
 
-    const mediaContext = useMediaPlaybackContext()
-
     const [sessionValues, setsessionValues] = useState<{
-        files?: FilePicker.DocumentPickerResult['assets']
+        files?: { uri: string, size: number, name: string }
         thumbnail?: string
         importedLink?: string
         description?: string
@@ -50,12 +47,13 @@ export default function PostsForm(props: { hidden: boolean }) {
         tags?: [],
         video?: string
         audio?: string
+        fileType?: string
     }>({})
 
     const LinkPreview = useLinkPreview({
         url: sessionValues?.importedLink,
         dep: sessionValues?.importedLink,
-        enabled: Boolean(sessionValues?.importedLink && PostMode === 'IMPORT' && shouldFetchPreview),
+        enabled: Boolean(sessionValues?.importedLink && activeTab === 'IMPORT' && shouldFetchPreview),
         onSuccess(props) {
 
             const foundAudio = getMediaType(props?.firstAudio)
@@ -67,7 +65,8 @@ export default function PostsForm(props: { hidden: boolean }) {
                 description: props?.description,
                 thumbnail: props.image ?? props?.firstImage,
                 video: props?.firstVideo,
-                audio: props?.firstAudio
+                audio: props?.firstAudio,
+                fileType: foundAudio ?? foundVideo ?? null
             }))
         },
     })
@@ -119,10 +118,15 @@ export default function PostsForm(props: { hidden: boolean }) {
         setisMediaFilesExpanded(false)
     }
 
+    const handleOnButtonTabPress = (props: IPostType['types']) => {
+        setsessionValues(S => ({}))
+        setactiveTab(props)
+    }
+
     const handlePickDocument = async () => {
         let [type, multiple] = [[], false]
 
-        if (PostMode === 'MOVIE') {
+        if (activeTab === 'UPLOAD') {
             type = ['video/*', 'image/png', 'image/jpeg', 'image/jpg']
         }
 
@@ -132,7 +136,13 @@ export default function PostsForm(props: { hidden: boolean }) {
                 type,
             })
             if (!pickedItems.canceled) {
-                setsessionValues(S => ({ ...S, files: pickedItems.assets }))
+                setsessionValues(S => ({
+                    ...S, files: {
+                        uri: pickedItems.assets?.[0]?.uri,
+                        size: pickedItems.assets?.[0]?.size,
+                        name: pickedItems.assets?.[0]?.name
+                    }
+                }))
                 if (!sessionValues?.thumbnail)
                     setsessionValues(S => ({ ...S, thumbnail: pickedItems.assets?.[0]?.uri }))
             }
@@ -153,9 +163,8 @@ export default function PostsForm(props: { hidden: boolean }) {
         }
     }
 
-    const handelRemoveMediaFromSelection = (index: number) => {
-        const modifiedSelection = sessionValues?.files?.filter((asset, i) => i !== index)
-        setsessionValues(S => ({ ...S, files: modifiedSelection }))
+    const handelRemoveMediaFromSelection = () => {
+        setsessionValues(S => ({ ...S, files: null }))
         setisMediaFilesExpanded(true)
     }
 
@@ -182,13 +191,9 @@ export default function PostsForm(props: { hidden: boolean }) {
                 </Text>
             </View>
             <TouchableOpacity
-                onPress={() => setPostMode(S => (S = (S === 'IMPORT' ? "MOVIE" : "IMPORT")))}
-                style={[styles.spaceBetween, styles.roundedButton, { backgroundColor: PostMode == 'IMPORT' ? 'red' : themeColors.background2 }]}>
-                <Text style={[styles.textStyle, { color: themeColors.text, opacity: .6, fontSize: 16 }]}>  IMPORT  </Text>
-                <Image
-                    source={ImportIcon}
-                    style={{ height: 30, width: 30, borderRadius: 10, }}
-                />
+                onPress={() => { }}
+                style={[styles.spaceBetween, styles.roundedButton, { backgroundColor: themeColors.background2 }]}>
+                <Text style={[styles.textStyle, { color: themeColors.text, opacity: .6, fontSize: 16 }]}>  POST  </Text>
             </TouchableOpacity>
         </View>
     )
@@ -298,69 +303,71 @@ export default function PostsForm(props: { hidden: boolean }) {
         </View >
     )
 
+    const FilesFromImportLink = (
+        <View style={[styles.spaceBetween, {
+            height: 40,
+            backgroundColor: themeColors.background2,
+            borderTopLeftRadius: 10,
+            borderBottomRightRadius: 10
+        }]}>
+            <Text
+                style={[styles.textStyle, { color: themeColors.text, textTransform: 'uppercase', }]}>Preiview {sessionValues?.fileType} </Text>
+            <TouchableOpacity
+                style={{}} >
+                <Ionicons
+                    style={{ fontSize: 30, color: themeColors.text }}
+                    onPress={() => setMedia({
+                        sources: [sessionValues?.audio ?? sessionValues?.video],
+                        previewing: true
+                    })}
+                    name="play"
+                />
+            </TouchableOpacity>
+        </View>
+    )
+
     const PickedFilesToUpload = (
         <PagerView
             style={{ height: 120, marginTop: 10 }}   >
-            {!sessionValues?.files?.length ?
+            {!sessionValues?.files ?
                 <TouchableOpacity
                     onPress={handlePickDocument}
-                    style={[styles.addMediaPlaceholder, styles.spaceBetween, { justifyContent: 'center', alignItems: 'center' }]} >
+                    style={[styles.spaceBetween, { justifyContent: 'center' }]}>
                     <Image
-                        style={{ width: 80, height: 80 }}
+                        source={UploadIcon}
                         resizeMethod="resize"
                         resizeMode="contain"
-                        source={UploadIcon}
+                        style={{ width: 80 }}
                     />
-                    <Text style={[styles.textStyle, { color: themeColors.text, fontSize: 26, opacity: .3 }]}>CHOOSE FILE</Text>
+                    <Text style={[styles.textStyle, { color: themeColors.text }]}>
+                        CHOOSE FILE
+                    </Text>
                 </TouchableOpacity>
                 :
-                sessionValues?.files?.map((item, index) => (
-                    <View style={[styles.spaceBetween, { height: 80, padding: 0 }]}>
-                        <View style={[styles.spaceBetween, { padding: 0, justifyContent: 'flex-start' }]}>
-                            <Image
-                                resizeMethod="resize"
-                                resizeMode='center'
-                                source={{ uri: item.uri }}
-                                style={{ height: 100, width: width / ITEMS_PER_PAGE.value, borderRadius: 5, }} />
-                            <View style={{ width: '60%' }}>
-                                <Text style={[styles.textStyle, { fontSize: 15, color: themeColors.text }]} numberOfLines={2}>{item?.name}</Text>
-                                <View style={[styles.spaceBetween]}>
-                                    <Text style={[styles.textStyle, { fontSize: 15, color: themeColors.text, opacity: .3, marginTop: 4 }]}>{formatFileSize(item?.size)}</Text>
-                                    <Ionicons
-                                        onPress={() => handelRemoveMediaFromSelection(index)}
-                                        name='trash'
-                                        size={20}
-                                        color={themeColors.text}
-                                    />
-                                </View>
+                <View style={[styles.spaceBetween, { height: 80, padding: 0 }]}>
+                    <View style={[styles.spaceBetween, { padding: 0, justifyContent: 'flex-start' }]}>
+                        <Image
+                            resizeMethod="resize"
+                            resizeMode='center'
+                            source={{ uri: sessionValues?.files.uri }}
+                            style={{ height: 100, width: width / ITEMS_PER_PAGE.value, borderRadius: 5, }} />
+                        <View style={{ width: '60%' }}>
+                            <Text style={[styles.textStyle, { fontSize: 15, color: themeColors.text }]} numberOfLines={2}>{sessionValues?.files?.name}</Text>
+                            <View style={[styles.spaceBetween]}>
+                                <Text style={[styles.textStyle, { fontSize: 15, color: themeColors.text, opacity: .3, marginTop: 4 }]}>{formatFileSize(sessionValues?.files?.size)}</Text>
+                                <Ionicons
+                                    onPress={handelRemoveMediaFromSelection}
+                                    name='trash'
+                                    size={20}
+                                    color={themeColors.text}
+                                />
                             </View>
                         </View>
-                        <Text style={[styles.textStyle, { fontSize: 100, color: themeColors.text, position: 'absolute', right: 50, opacity: .1 }]}>{index + 1}</Text>
-                    </View>)
-                )
+                    </View>
+                    <Text style={[styles.textStyle, { fontSize: 100, color: themeColors.text, position: 'absolute', right: 50, opacity: .1 }]}>{1}</Text>
+                </View>
             }
         </PagerView>
-    )
-
-    const CreatePostButton = (
-        <Animated.View
-            entering={SlideInDown}
-            exiting={SlideOutDown}
-            style={[styles.spaceBetween, { padding: 0, }]}>
-            <TouchableOpacity
-                disabled={!states?.title}
-                style={[styles.textInputContainner, styles.spaceBetween, {
-                    margin: 0,
-                    height: 46,
-                    backgroundColor: themeColors.background2,
-                    justifyContent: 'center',
-                    borderRadius: 0
-                }]}     >
-                <Text style={{ color: themeColors.text, fontSize: 20, fontWeight: '600' }}>
-                    POST
-                </Text>
-            </TouchableOpacity>
-        </Animated.View>
     )
 
     if (props.hidden) return null
@@ -373,7 +380,7 @@ export default function PostsForm(props: { hidden: boolean }) {
                 {FormHeader}
                 <View style={[styles.richtextEditorContainer]}>
                     {PostsTitle}
-                    {PostMode === 'IMPORT' && PostInportInput}
+                    {activeTab === 'IMPORT' && PostInportInput}
                     <RichEditor
                         style={{ flex: 1 }}
                         editorStyle={{ backgroundColor: themeColors.background, color: themeColors.text }}
@@ -419,7 +426,8 @@ export default function PostsForm(props: { hidden: boolean }) {
                             exiting={FadeOut}
                             style={{ width: '100%' }}  >
                             {ThumbPreviewer}
-                            {!(isShowingKeyboard || PostMode === 'IMPORT') && PickedFilesToUpload}
+                            {(activeTab === 'UPLOAD') && PickedFilesToUpload}
+                            {(activeTab === 'IMPORT') && FilesFromImportLink}
                         </Animated.View>
                     )}
                 </View>
@@ -452,7 +460,8 @@ export default function PostsForm(props: { hidden: boolean }) {
                         />
                     </Animated.View>
                 }
-                {isShowingKeyboard || CreatePostButton}
+
+                <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard }} />
             </View>
         </KeyboardAvoidingView>
     )
@@ -525,4 +534,27 @@ const styles = StyleSheet.create({
         gap: 5,
         paddingHorizontal: 10
     },
+    postTypeList: {
+        backgroundColor: 'red',
+    },
+    postTypeButton: {
+        alignItems: 'center'
+    },
+    postTypeButtonIcon: {
+        backgroundColor: 'green',
+        borderRadius: 50,
+        fontSize: 30,
+        aspectRatio: 1,
+        textAlign: 'center',
+        verticalAlign: 'middle',
+        padding: 6,
+    },
+    postTypeListContainer: {
+        elevation: 50,
+        marginTop: 10,
+        shadowColor: 'red',
+        zIndex: 4,
+        borderTopColor: 'gren',
+        borderTopWidth: StyleSheet.hairlineWidth
+    }
 })

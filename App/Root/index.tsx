@@ -89,11 +89,11 @@ export default function Root() {
                     <DataContextProvider>
                         <GestureHandlerRootView style={{ flex: 1 }}>
                             <NavigationContainer>
-                                <PostFormProvider>
-                                    <MediaViewerProvider>
+                                <MediaViewerProvider>
+                                    <PostFormProvider>
                                         {isAuthenticated ? UserRoutes : GuestRoutes}
-                                    </MediaViewerProvider>
-                                </PostFormProvider>
+                                    </PostFormProvider>
+                                </MediaViewerProvider>
                             </NavigationContainer>
                         </GestureHandlerRootView>
                     </DataContextProvider>

@@ -5,7 +5,9 @@ import { Audio, Video } from 'expo-av'
 import MediaViewer from '..'
 import { getMediaType } from '../../../../Helpers'
 
-const initialState: IMediaViewer = {}
+const initialState: IMediaViewer = {
+    previewing:false
+}
 const MediaPlaybackContext = createContext<IMediaViewerProvider | null>(null)
 export const useMediaPlaybackContext = () => useContext(MediaPlaybackContext)
 
@@ -19,9 +21,9 @@ export function MediaViewerProvider({ children }) {
     }
 
     const [data, dispatch] = useReducer(mediaReducer, { ...initialState })
-    const setMedia: IMediaViewerProvider['setMedia'] = ({ sources, thumbnailUri }) => {
+    const setMedia: IMediaViewerProvider['setMedia'] = ({ sources, thumbnailUri, previewing }) => {
         console.log(sources)
-        dispatch({ payload: { sources, thumbnailUri } })
+        dispatch({ payload: { sources, thumbnailUri, previewing } })
     }
 
     const removeMedia: IMediaViewerProvider['removeMedia'] = () => {
@@ -188,7 +190,7 @@ export function MediaViewerProvider({ children }) {
     const methodsAndStates = {
         data: {
             thumbnailUri: data?.thumbnailUri,
-            sources: data?.sources?.[0]
+            sources: data?.sources?.[0],
         },
         media: {
             play,
@@ -207,14 +209,15 @@ export function MediaViewerProvider({ children }) {
             source: data?.sources?.[0],
             type: mediaType,
             states: mediaState,
-            mediaRef: mediaRef
+            mediaRef: mediaRef,
         },
+        
     };
 
     return (
         <MediaPlaybackContext.Provider value={{ setMedia, removeMedia, data, mediaRef }}  >
             {children}
-            <MediaViewer ref={mediaRef} {...methodsAndStates} />
+            <MediaViewer ref={mediaRef} {...methodsAndStates} previewing={data?.previewing} />
         </MediaPlaybackContext.Provider>
     )
 }
