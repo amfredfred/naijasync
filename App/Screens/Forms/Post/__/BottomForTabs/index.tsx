@@ -27,7 +27,7 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
             entering={SlideInDown}>
             <ScrollView
                 horizontal
-                contentContainerStyle={[styles.spaceBetween, { backgroundColor: themeColors.background, paddingHorizontal: 20, width: '100%', gap: 10 }]}
+                contentContainerStyle={[styles.spaceBetween, { backgroundColor: themeColors.background2, paddingHorizontal: 20, width: '100%', gap: 10 }]}
                 style={[styles.postTypeList]}>
                 <TouchableOpacity
                     onPress={() => handleOnButtonTabPress("IMPORT")}
@@ -49,7 +49,7 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
                         Article
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                     onPress={() => handleOnButtonTabPress("STATUS")}
                     style={[styles.postTypeButton]}   >
                     <Zocial
@@ -58,7 +58,7 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
                     <Text style={[{ color: themeColors.text }]}>
                         Status
                     </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity
                     onPress={() => handleOnButtonTabPress("GIF")}
                     style={[styles.postTypeButton]}   >
@@ -113,7 +113,6 @@ const styles = StyleSheet.create({
     },
     postTypeListContainer: {
         elevation: 50,
-        marginTop: 10,
         shadowColor: 'red',
         zIndex: 4,
         borderTopColor: 'gren',

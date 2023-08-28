@@ -5,32 +5,19 @@ export interface IPostType {
 }
 
 export interface IPostContext {
-    id?: number;
-    ownerId?: number;
     title?: string;
+    thumbnail?: string,
+    file?: {
+        size?: number,
+        name?: string,
+        uri?: string
+    },
     description?: string | null;
-    fileUrl?: string;
-    thumbnailUrl?: string | null;
-    views?: number;
-    downloads?: number;
-    likes?: number;
-    duration?: number | null;
-    mimeType?: string;
-    fileType?: string;
-    postSlug?: string;
-    sourceQualities?: string[] | null;
-    locationView?: string | null;
-    locationDownload?: string | null;
     tags?: string[] | null;
     postGenre?: string[] | null;
-    ratings?: number;
     price?: number | null;
-    rewards?: number | null;
     downloadable?: boolean;
-    playtime?: number;
-    createdAt?: string;
-    updatedAt?: string;
-    importedLink?:string
+    postType: IPostType['types']
 }
 type PayloadTypes<T extends keyof IPostContext> = IPostContext[T]
 
