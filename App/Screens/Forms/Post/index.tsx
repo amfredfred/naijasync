@@ -224,7 +224,6 @@ const styles = StyleSheet.create({
     },
     containerInner: {
         flex: 1,
-        overflow: 'hidden',
     },
     spaceBetween: {
         flexDirection: 'row',

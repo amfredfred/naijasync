@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState } from 'react';
-import PostsForm, { IPostForm } from '../../Screens/Forms/Post';
+import PostsForm from '../../Screens/Forms/Post';
 import { IPostContext, IPostFormMethods } from '../../Interfaces/IPostContext';
 import { useToast } from '../ToastContext';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import { REQUESTS_API } from '@env';
 
 const initialState: IPostContext = {
 
@@ -21,6 +24,12 @@ export default function PostFormProvider({ children }) {
 
     const [isFormShwon, setisFormShwon] = useState(false)
 
+    const mutation = useMutation({
+        mutationFn: async () => await axios({
+            url: `${REQUESTS_API}posts`
+        })
+    })
+
     const { toast } = useToast()
 
     const setData: IPostFormMethods['setData'] = (key, payload) => {
@@ -30,7 +39,11 @@ export default function PostFormProvider({ children }) {
         }));
     };
 
-    const createPost = async () => {
+    const createPost = async (props: IPostContext) => {
+        const formData = new FormData()
+        if (props?.file)
+            formData.append('upload', props?.file?.uri);
+        
 
         return {} as any
     }

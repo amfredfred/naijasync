@@ -10,14 +10,15 @@ export interface IPostContext {
     file?: {
         size?: number,
         name?: string,
-        uri?: string
+        uri?: string,
+        type?: string
     },
     description?: string | null;
     tags?: string[] | null;
     postGenre?: string[] | null;
     price?: number | null;
     downloadable?: boolean;
-    postType: IPostType['types']
+    postType?: IPostType['types']
 }
 type PayloadTypes<T extends keyof IPostContext> = IPostContext[T]
 

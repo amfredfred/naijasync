@@ -47,6 +47,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
     const contConH = useSharedValue(VIDEO_HEIGHT)
     const contConDis = useSharedValue('none')
     const listConOpacity = useSharedValue(1)
+    
 
     const conAnimatedStyle = useAnimatedStyle(() => {
         return {
@@ -123,6 +124,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
         setisVideoLoading(true)
         VP?.handleLoadStart()
     }
+    
 
 
     const panResponder = PanResponder.create({
