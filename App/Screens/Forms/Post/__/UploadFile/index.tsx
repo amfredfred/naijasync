@@ -31,6 +31,8 @@ export default function UploadFileForm() {
     const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({})
     const [isCaptionInputFocused, setisCaptionInputFocused] = useState(false)
     const [isyKeyboardShown, setisyKeyboardShown] = useState(false)
+    const themeColors = useThemeColors()
+    const { methods, states } = usePostFormContext()
 
     const [sessionValues, setsessionValues] = useState<IPostContext>({ postType: 'UPLOAD' })
 
@@ -87,9 +89,6 @@ export default function UploadFileForm() {
         }
     }
 
-    const themeColors = useThemeColors()
-    const { methods, states } = usePostFormContext()
-
     // Gesture
     const eContinerHeight = useSharedValue(height / 1.7)
     const lasDragPostion = useSharedValue(0)
@@ -110,6 +109,13 @@ export default function UploadFileForm() {
         })
 
     //Handlers
+
+    const handleCreatePost = async () => {
+        const post = await methods?.createPost({
+            ...sessionValues, 'postType': "UPLOAD"
+        })
+        console.log("POSTED: ", post)
+    }
     const handlePickDocument = async () => {
         let [type, multiple] = [['image/*', "video/*", "audio/*"], false]
         try {
@@ -118,16 +124,17 @@ export default function UploadFileForm() {
                 type,
             })
             if (!pickedItems.canceled) {
+                const picked = pickedItems.assets?.[0]
                 setsessionValues(S => ({
                     ...S, file: {
-                        uri: pickedItems.assets?.[0]?.uri,
-                        size: pickedItems.assets?.[0]?.size,
-                        name: pickedItems.assets?.[0]?.name,
-                        type: pickedItems?.assets?.[0]?.mimeType
+                        uri: picked?.uri,
+                        size: picked.size,
+                        name: picked.name,
+                        type: picked?.mimeType
                     }
                 }))
-                if (['video', 'image'].includes(fileType))
-                    setsessionValues(S => ({ ...S, thumbnail: pickedItems.assets?.[0]?.uri }))
+                if (['video', 'image'].includes(picked?.mimeType))
+                    setsessionValues(S => ({ ...S, thumbnail: picked.uri }))
             }
         } catch (error) {
             console.log("ERROR handlePickDocument -> ", error)
@@ -166,8 +173,12 @@ export default function UploadFileForm() {
         setsessionValues(S => ({ ...S, files: null }))
     }
 
+    const handleOnChangetext = (text: string) => {
+        setsessionValues(s => ({ ...s, description: text }))
+    }
+
     const PostCaption = (
-        <View style={[styles.textInputContainner, { height: isyKeyboardShown ? 'auto' : 55 }]}>
+        <View style={[styles.textInputContainner, { height: isyKeyboardShown ? 'auto' : 'auto' }]}>
             <HeadLine
                 style={{ padding: 10, opacity: .7 }}
                 hidden={!isyKeyboardShown}
@@ -180,18 +191,40 @@ export default function UploadFileForm() {
                 - it's a chance to share your story, your thoughts, and your personality.{'\n'}{'\n'}
                 Captions help your audience understand what your post is all about. Whether it's a breathtaking photo, a funny moment, or an inspiring quote, a caption gives context and meaning to your content.
             </SpanText>
-            <TextInput
-                onFocus={() => setisCaptionInputFocused(true)}
-                onBlur={() => setisCaptionInputFocused(false)}
-                style={[styles.textInput, { color: themeColors.text }]}
-                placeholder={isyKeyboardShown ? "Type your caption here..." : "What's up? caption 🖋️"}
-                value={null}
-                onChangeText={null}
-                multiline
-                textBreakStrategy="highQuality"
-                placeholderTextColor={themeColors.text}
-                returnKeyType="default"
-            />
+            <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-end', }]}>
+                <TextInput
+                    onFocus={() => setisCaptionInputFocused(true)}
+                    onBlur={() => setisCaptionInputFocused(false)}
+                    style={[styles.textInput, { color: themeColors.text, flexGrow: 1 }]}
+                    placeholder={isyKeyboardShown ? "Type your caption here..." : "What's up? caption 🖋️"}
+                    value={sessionValues?.description}
+                    onChangeText={handleOnChangetext}
+                    multiline
+                    textBreakStrategy="highQuality"
+                    autoFocus
+                    
+                    placeholderTextColor={themeColors.text}
+                    returnKeyType="default"
+                />
+
+            </View>
+            {
+                !isyKeyboardShown && (
+                    <TouchableOpacity
+                        onPress={handleCreatePost}
+                        style={[styles.spaceBetween, {   gap: 3, borderRadius: 5, height: 50,marginTop:10, backgroundColor: themeColors.success, justifyContent: 'center' }]}
+                    >
+                        <SpanText>
+                            Post
+                        </SpanText>
+                        <Ionicons
+                            size={20}
+                            name='chevron-forward'
+                            color={themeColors.text}
+                        />
+                    </TouchableOpacity>
+                )
+            }
         </View>
     )
 

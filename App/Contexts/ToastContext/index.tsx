@@ -1,14 +1,9 @@
-import React, { useReducer, createContext, useContext, useState } from 'react'
-import { IAppDataContext, IAppDataContextMethods } from '../../Interfaces'
+import React, { createContext, useContext, useState } from 'react'
 import useThemeColors from '../../Hooks/useThemeColors'
 import Animated, { SlideInUp, SlideOutUp } from 'react-native-reanimated'
 import useTimeout from '../../Hooks/useTimeout'
 import { SpanText } from '../../Components/Texts'
-import { ContainerBlock } from '../../Components/Containers'
-import { View, Text, StatusBar } from 'react-native'
-
-const initialState = {
-}
+import { StatusBar } from 'react-native'
 
 interface IToast {
     toast(props: {
@@ -53,7 +48,17 @@ export default function ToastProvider({ children }) {
                     <Animated.View
                         entering={SlideInUp}
                         exiting={SlideOutUp}
-                        style={{ position: 'absolute', top: 0, paddingTop: StatusBar.currentHeight, backgroundColor: 'red', width: '100%', padding: 10 }}>
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            paddingTop: StatusBar.currentHeight,
+                            backgroundColor:
+                                toastInfo.severnity === 'error' ? themeColors.error : toastInfo.severnity === 'success' ? themeColors.success : toastInfo.severnity === 'warning' ? themeColors.warning : themeColors.background,
+                            width: '100%',
+                            padding: 10,
+                            minHeight: 80,
+                            justifyContent: 'center'
+                        }}>
                         <SpanText>
                             {toastInfo?.message}
                         </SpanText>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import PostsForm from '../../Screens/Forms/Post';
 import { IPostContext, IPostFormMethods } from '../../Interfaces/IPostContext';
 import { useToast } from '../ToastContext';
@@ -24,13 +24,45 @@ export default function PostFormProvider({ children }) {
 
     const [isFormShwon, setisFormShwon] = useState(false)
 
-    const mutation = useMutation({
-        mutationFn: async () => await axios({
-            url: `${REQUESTS_API}posts`
+    const mutation = useMutation((info) => {
+        console.log("MUSTATION INFO", info)
+        return axios({
+            url: `${REQUESTS_API}posts`,
+            method: 'POST',
+            data: info,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
         })
     })
 
     const { toast } = useToast()
+
+    useEffect(() => {
+        switch (mutation.status) {
+            case 'error': {
+                mutation.reset()
+                toast({ message: 'Something went wrond, while creating the post 😢', severnity: 'error' })
+                break
+            }
+            case 'success': {
+                toast({ message: 'Your post is online !!', severnity: 'success' })
+                mutation.reset()
+                break
+            }
+            case 'idle': {
+                // toast({ message: 'Your post is online !!', })
+                break
+            }
+            case 'loading': {
+                toast({ message: 'creating post !!' })
+                break
+            }
+        }
+
+        console.log(mutation?.data)
+
+    }, [mutation.status])
 
     const setData: IPostFormMethods['setData'] = (key, payload) => {
         setFormState(prevState => ({
@@ -41,10 +73,25 @@ export default function PostFormProvider({ children }) {
 
     const createPost = async (props: IPostContext) => {
         const formData = new FormData()
+        toast({
+            message: 'Your post is being created',
+        })
+        showForm(null, null)
         if (props?.file)
-            formData.append('upload', props?.file?.uri);
-        
+            formData.append('upload', {
+                type: props.file.type,
+                name: props.file.name,
+                uri: props.file.uri
+            } as any);
+        if (props?.thumbnail)
+            formData.append('thumbnail', {
+                type: 'image/*',
+                name: 'thumbnail.jpg',
+                uri: props?.thumbnail
+            } as any)
+        formData.append('description', props?.description)
 
+        mutation?.mutate(formData as any)
         return {} as any
     }
 
