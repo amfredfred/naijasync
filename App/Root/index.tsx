@@ -7,7 +7,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Landing from "../Screens/Guest/Landing";
 import Home from "../Screens/User/Home";
-import View from "../Screens/User/View";
 import { useCallback, useEffect, useState } from 'react';
 import DataContextProvider from "../Contexts/DataContext";
 import Downloads from "../Screens/User/Downloads";
@@ -66,7 +65,6 @@ export default function Root() {
         <UserLayout>
             <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
                 <Stack.Screen name='Home' component={Home} />
-                <Stack.Screen name='View' component={View} />
                 <Stack.Screen name='Downloads' component={Downloads} />
                 <Stack.Screen name="Explorer" component={Explorer} />
                 <Stack.Screen name="Search" component={SearchStack} />
@@ -93,7 +91,7 @@ export default function Root() {
                             <NavigationContainer>
                                 <MediaViewerProvider>
                                     <PostFormProvider>
-                                        {auth?.person === 'isAuthenticated' ? UserRoutes : GuestRoutes}
+                                        {(auth.person === 'hasSkippedAuthentication' || auth?.person === 'isAuthenticated') ? UserRoutes : GuestRoutes}
                                     </PostFormProvider>
                                 </MediaViewerProvider>
                             </NavigationContainer>

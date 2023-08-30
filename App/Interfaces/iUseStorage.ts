@@ -18,6 +18,7 @@ export interface IUser {
     isAuthenticated?: boolean;
     accessToken?: string;
     searchRequestValue?: string
+    hasSkippedAuthentication?: boolean
 }
 
 export interface IUserDownloads {

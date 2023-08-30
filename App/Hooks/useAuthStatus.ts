@@ -7,7 +7,7 @@ import { IAuth } from '../Interfaces'
 import { useDataContext } from '../Contexts/DataContext'
 
 export type IAuthStatus = {
-    person: "isAuthenticated" | "isOffline" | "isNew",
+    person: "isAuthenticated" | "isOffline" | "isNew" | "hasSkippedAuthentication"
     privillege: "isAdmin" | "isPublisher" | "isModerator" | "isSuperAdmin"
     register(props: IAuth): void,
     login(props: IAuth): void
@@ -19,7 +19,6 @@ const useAuthStatus = (props?: { permanent?: IAuthStatus['person'] }): IAuthStat
     const [authStatus, setAuthStatus] = useState<IAuthStatus['person']>('isNew')
     const [privillege, setPrivillege] = useState()
     const { states: MN, setData } = useDataContext()
- 
 
     useEffect(() => {
         const checkAuthStatus = async () => {
@@ -29,6 +28,9 @@ const useAuthStatus = (props?: { permanent?: IAuthStatus['person'] }): IAuthStat
                 if (!netGen.UNKNOWN) {
                     if (MN?.user?.isAuthenticated)
                         return setAuthStatus('isAuthenticated')
+                    else if (MN.user?.hasSkippedAuthentication) {
+                        setAuthStatus('hasSkippedAuthentication')
+                    }
                     setAuthStatus('isNew')
                 } else setAuthStatus('isOffline')
 

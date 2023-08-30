@@ -1,4 +1,4 @@
-import TabSelector from "../../Partials/TabSelector";
+import TabSelector from "../../__/TabSelector";
 
 import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, RefreshControl, Dimensions } from 'react-native';
@@ -10,13 +10,13 @@ import React from 'react';
 import { ContainerBlock, ScrollContainer } from "../../../Components/Containers";
 import { Button, IconButton } from "../../../Components/Buttons";
 import { useNavigation } from "@react-navigation/native";
-import PostsList from "../../Partials/PostsList";
+import PostsList from "../../__/PostsList";
 
 export default function Home() {
     const { setData, states: NJS } = useDataContext()
-    const colors  =  useThemeColors()
+    const colors = useThemeColors()
     const { navigate } = useNavigation()
- 
+
     const [isRewardAdReady, setisRewardAdReady] = useState(false)
     const [hasEarnedRewards, sethasEarnedRewards] = useState(false)
 
@@ -73,7 +73,7 @@ export default function Home() {
     ]
 
     return (
-        <ContainerBlock style={{ flex: 1,padding:0 }}>
+        <ContainerBlock style={{ flex: 1, padding: 0 }}>
             {/* <ContainerBlock style={{ paddingHorizontal:0,   }}>
                 <ScrollContainer
                     horizontal
@@ -90,7 +90,7 @@ export default function Home() {
 
             <ContentTables /> */}
 
-                <PostsList />
+            <PostsList />
 
         </ContainerBlock>
     )

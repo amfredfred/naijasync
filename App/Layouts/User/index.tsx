@@ -1,20 +1,20 @@
 import { ContainerFlex, ContainerBlock, ContainerSpaceBetween, ScrollContainer } from "../../Components/Containers";
-import { Keyboard, ScrollView, StatusBar, BackHandler } from "react-native";
+import { Keyboard, StatusBar, BackHandler } from "react-native";
 import { SpanText } from "../../Components/Texts";
 import { useEffect, useState } from 'react'
 import { Button, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import useThemeColors from "../../Hooks/useThemeColors";
 import { IconButton } from "../../Components/Buttons";
-import { AntDesign, Feather, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { InputText } from "../../Components/Inputs";
 import { useDataContext } from "../../Contexts/DataContext";
 import { useNavigation } from "@react-navigation/native";
 import { HeadLine } from "../../Components/Texts";
 import { linkChecker } from "../../Helpers";
-import TabSelector from "../../Screens/Partials/TabSelector";
+import TabSelector from "../../Screens/__/TabSelector";
 import IMAGS from '../../../assets/adaptive-icon.png'
-import DigitalClock from "../../Screens/Partials/DigitalClock";
+import DigitalClock from "../../Screens/__/DigitalClock";
 import { usePostFormContext } from "../../Contexts/FormContext";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     const [keyBoardShown, setkeyBoardShown] = useState(false)
     const formContext = usePostFormContext()
 
-    const {  background, background2, text } = useThemeColors()
+    const { background, background2, text } = useThemeColors()
     const { states: { states, user, storage }, setData } = useDataContext()
     const { navigate, goBack, canGoBack } = useNavigation()
 
@@ -171,7 +171,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                                     }
                                 </ContainerBlock>
                             </ScrollContainer>
-                            <ContainerSpaceBetween style={{paddingVertical:0}} justify="flex-start">
+                            <ContainerSpaceBetween style={{ paddingVertical: 0 }} justify="flex-start">
                                 <IconButton
                                     textStyle={{ textTransform: 'uppercase' }}
                                     title={`PPolicy • Terms`}
@@ -186,7 +186,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                             <ContainerSpaceBetween>
                                 <DigitalClock />
                                 <IconButton
-                                    textStyle={{textTransform:'uppercase'}}
+                                    textStyle={{ textTransform: 'uppercase' }}
                                     title={`NAIJASYNC • ${new Date().getFullYear()}`}
                                 />
                             </ContainerSpaceBetween>

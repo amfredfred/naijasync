@@ -12,7 +12,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import useTimeout from "../../../../Hooks/useTimeout";
 import { formatDuration, formatPlaytimeDuration } from "../../../../Helpers";
 import { useNavigation } from "@react-navigation/native";
-import ShareContent from "../../../Partials/ShareFile";
+import ShareContent from "../../../__/ShareFile";
 import { Videos } from "../../../../dummy-data";
 import { ProgressBar } from "../../../../Components/Inputs";
 import { HeadLine } from "../../../../Components/Texts";
@@ -47,7 +47,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
     const contConH = useSharedValue(VIDEO_HEIGHT)
     const contConDis = useSharedValue('none')
     const listConOpacity = useSharedValue(1)
-    
+
 
     const conAnimatedStyle = useAnimatedStyle(() => {
         return {
@@ -124,7 +124,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
         setisVideoLoading(true)
         VP?.handleLoadStart()
     }
-    
+
 
 
     const panResponder = PanResponder.create({

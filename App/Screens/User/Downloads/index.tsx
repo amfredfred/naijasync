@@ -17,7 +17,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import BottomSheet, { useBottomSheet, useBottomSheetDynamicSnapPoints } from '@gorhom/bottom-sheet';
-import ShareContent from "../../Partials/ShareFile";
+import ShareContent from "../../__/ShareFile";
 import { FilesBrowser } from "./FilesBrowser";
 
 

@@ -67,7 +67,7 @@ export default function PostsList() {
                 <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
                     <View style={{ width: 40, aspectRatio: 1, borderRadius: 50, backgroundColor: themeColors.background2, opacity: .6 }} />
                 </View>
-                <View style={[styles.postContentWrapper, { backgroundColor: themeColors.background2, opacity:.6}]} >
+                <View style={[styles.postContentWrapper, { backgroundColor: themeColors.background2, opacity: .6 }]} >
 
                 </View>
             </View>
@@ -107,6 +107,6 @@ const styles = StyleSheet.create({
         flex: 1,
         height: '100%',
         paddingRight: 10,
-        borderRadius:10
+        borderRadius: 10
     }
 })
