@@ -215,7 +215,7 @@ export function MediaViewerProvider({ children }) {
     };
 
     return (
-        <MediaPlaybackContext.Provider value={{ setMedia, removeMedia, data, mediaRef }}  >
+        <MediaPlaybackContext.Provider value={{ setMedia, removeMedia, mediaRef, ...methodsAndStates }}  >
             {children}
             <MediaViewer ref={mediaRef} {...methodsAndStates} previewing={data?.previewing} />
         </MediaPlaybackContext.Provider>

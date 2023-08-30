@@ -48,6 +48,7 @@ export interface IMediaViewerProvider {
         thumbnailUri: string
     },
     mediaRef: IMediaViewer['media']['mediaRef'];
+    media?: IMediaPlayable;
 }
 
 // Define a common type for image media

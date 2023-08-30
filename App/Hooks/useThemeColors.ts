@@ -16,7 +16,7 @@ export default function useThemeColors(): IApp['themeColors']['dark' | 'light'] 
             success: '#81C784',
             error: '#E57373',
             warning: '#FFD54F',
-            background2: '#1f1e1e',
+            background2: '#1e1e20', //#1f1e1e
             headline: ''
         },
         light: {

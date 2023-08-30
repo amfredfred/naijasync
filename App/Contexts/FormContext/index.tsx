@@ -90,6 +90,7 @@ export default function PostFormProvider({ children }) {
             } as any)
         formData.append('description', props?.description)
         formData.append('type', props.postType)
+        formData.append('tags', JSON.stringify(["music", 'videos']))
 
         mutation?.mutate(formData as any)
         return {} as any

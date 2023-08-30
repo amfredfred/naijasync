@@ -1,3 +1,4 @@
+import { IPostType } from './IPostContext'
 import { IStorageItems, IStorageMethods } from './iUseStorage'
 
 // Interface for themed components
@@ -59,10 +60,21 @@ export interface IPostItem {
     likes?: string,
     duration?: string,
     mimeType?: string,
-    sourceQualities?: string,
+    sourceQualities?: {
+        original: {
+            size: number;
+            path: string;
+            name: string;
+            format: string;
+            duration: {
+                formatted: string;
+                playtime: number;
+            }
+        }
+    }
     locationView?: string,
     locationDownload?: string,
-    tags?: string,
+    tags?: string[],
     ratings?: string,
     price?: string,
     rewards?: string,
@@ -72,8 +84,9 @@ export interface IPostItem {
     postSlug?: string
     updatedAt?: string
     createdAt?: string
-
+    puid?: string 
     type: IMediaType
+    postType: IPostType['types']
 }
 
 // Interface for a list slider component

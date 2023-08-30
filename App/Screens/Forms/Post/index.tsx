@@ -120,7 +120,7 @@ export default function PostsForm(props: IPostFormComponent) {
         <View style={[styles.spaceBetween, { backgroundColor: themeColors.background2 }]}>
             <View style={[styles.spaceBetween, { padding: 0, flexGrow: 1, justifyContent: 'flex-start' }]}>
                 <Ionicons
-                    onPress={() => methods?.showForm(null, null)}
+                    onPress={() => showForm(null, null)}
                     name="arrow-back"
                     color={themeColors.text} size={30}
                 />

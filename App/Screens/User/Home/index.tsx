@@ -90,7 +90,7 @@ export default function Home() {
 
             <ContentTables /> */}
 
-            {/* <PostsList /> */}
+                <PostsList />
 
         </ContainerBlock>
     )
