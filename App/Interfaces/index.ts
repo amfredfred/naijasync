@@ -55,7 +55,7 @@ export interface IPostItem {
     description?: string,
     fileUrl?: string,
     thumbnailUrl?: string,
-    views?: string,
+    views?: string | number,
     downloads?: string,
     likes?: string,
     duration?: string,

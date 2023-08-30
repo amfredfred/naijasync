@@ -10,6 +10,7 @@ import useThemeColors from '../../../../Hooks/useThemeColors'
 import { useMediaPlaybackContext } from '../Context'
 import { Videos } from '../../../../dummy-data'
 import { useToast } from '../../../../Contexts/ToastContext'
+import useKeyboardEvent from '../../../../Hooks/useKeyboardEvent'
 
 const { width, height } = Dimensions.get('window')
 
@@ -32,6 +33,13 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
         setisShwoingList(s => !s)
     }
 
+    const [isKeyboadVisible, setisKeyboadVisible] = useState(false)
+
+    useKeyboardEvent({
+        onShow: () => setisKeyboadVisible(true),
+        onHide: () => setisKeyboadVisible(false)
+    })
+
 
     const handleRefreshAudioList = () => {
 
@@ -41,29 +49,33 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
         <Animated.View
             entering={SlideInDown}
             style={[styles.audioListContainer]}>
-            <View style={[styles.spaceBetween, { backgroundColor: 'red', borderTopLeftRadius: 10, borderTopRightRadius: 10, height: 50, overflow: 'hidden', width: '100%' }]}>
-                <Text children="More For You 🎶" style={{ padding: 0, fontWeight: '900', fontSize: 21, color: colors.text }} />
-                <View style={[styles.spaceBetween, { paddingHorizontal: 0 }]}>
-                    <TouchableOpacity
-                        style={[styles.iconsButton]} >
-                        <MaterialIcons
-                            name='search'
-                            color={colors.text}
-                            size={25} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => setisShwoingList(false)}
-                        style={[styles.iconsButton]}  >
-                        <Ionicons
-                            size={25}
-                            color={colors.text}
-                            name='close' />
-                    </TouchableOpacity>
-                </View>
-            </View>
             <FlatList
+                stickyHeaderHiddenOnScroll
+                stickyHeaderIndices={[0]}
+                ListHeaderComponent={() => (
+                    <View style={[styles.spaceBetween, { height: 50, overflow: 'hidden', backgroundColor: colors.background2, width: '100%' }]}>
+                        <Text children="More For You 🎶" style={{ padding: 0, fontWeight: '900', fontSize: 21, color: colors.text }} />
+                        <View style={[styles.spaceBetween, { paddingHorizontal: 0 }]}>
+                            <TouchableOpacity
+                                style={[styles.iconsButton]} >
+                                <MaterialIcons
+                                    name='search'
+                                    color={colors.text}
+                                    size={25} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setisShwoingList(false)}
+                                style={[styles.iconsButton]}  >
+                                <Ionicons
+                                    size={25}
+                                    color={colors.text}
+                                    name='close' />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )}
                 showsVerticalScrollIndicator={false}
-                style={{ padding: 10 }}
+                style={{ paddingHorizontal: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10, overflow: 'hidden', backgroundColor: colors.background2 }}
                 data={[...Videos, ...Videos]}
                 renderItem={({ item, index }) => {
                     return (
@@ -110,9 +122,11 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
         </Animated.View>
     )
 
+    if (isKeyboadVisible) return null
+
     return (
         <Animated.View
-            style={[styles.container, { backgroundColor: colors.background2, position: isShwoingList ? 'absolute' : 'relative' }]}>
+            style={[styles.container, { backgroundColor: colors.background, position: isShwoingList ? 'absolute' : 'relative' }]}>
             {!isShwoingList || AudioList}
 
             <View style={[{ backgroundColor: colors.background2 }]}>

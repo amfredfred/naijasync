@@ -29,6 +29,20 @@ export const formatDecimal = (value: string | number = 0, decimals: undefined | 
     return fixedValue?.split?.('.')?.[0]?.concat?.('.')?.concat?.(decimalPart?.slice?.(0, decimals));
 };
 
+export const formatNumber = (num: number): string => {
+    if (num >= 1e9) {
+        return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+    }
+    if (num >= 1e6) {
+        return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    if (num >= 1e3) {
+        return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+    }
+    return num.toString();
+}
+
+
 // To Uppercase
 export const upperCase = (value: any) => String(String(value)?.toUpperCase());
 
@@ -170,7 +184,7 @@ export function getMediaType(link: string): IMediaType {
 };
 
 
-export const getTags = (inputString: string):string[] => {
+export const getTags = (inputString: string): string[] => {
     const hashtagRegex = /#(\w+)/g;
 
     const matches = inputString.match(hashtagRegex);

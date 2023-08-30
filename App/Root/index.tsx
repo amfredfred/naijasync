@@ -23,11 +23,13 @@ import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ToastProvider from "../Contexts/ToastContext";
 import PostFormProvider from "../Contexts/FormContext";
+import useAuthStatus from "../Hooks/useAuthStatus";
 
 export default function Root() {
-    const [isAuthenticated, setisAuthenticated] = useState(true)
+    // const [isAuthenticated, setisAuthenticated] = useState(true)
     const { status } = useAppStatus()
     const Stack = createNativeStackNavigator();
+    const auth = useAuthStatus()
     const Client = new QueryClient()
 
     // const { load, show, error, isLoaded } = useAppOpenAd(TestIds.APP_OPEN, {
@@ -91,7 +93,7 @@ export default function Root() {
                             <NavigationContainer>
                                 <MediaViewerProvider>
                                     <PostFormProvider>
-                                        {isAuthenticated ? UserRoutes : GuestRoutes}
+                                        {auth?.person === 'isAuthenticated' ? UserRoutes : GuestRoutes}
                                     </PostFormProvider>
                                 </MediaViewerProvider>
                             </NavigationContainer>

@@ -1,9 +1,9 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground, Dimensions } from 'react-native'
 import { IPostItem } from '../../../../../Interfaces'
 import useThemeColors from '../../../../../Hooks/useThemeColors'
 import { HeadLine, SpanText } from '../../../../../Components/Texts'
 import { REQUESTS_API } from '@env'
-import { getMediaType } from '../../../../../Helpers'
+import { formatNumber, getMediaType } from '../../../../../Helpers'
 import { useRef, useState } from 'react'
 import { ResizeMode, Video } from 'expo-av'
 import { AntDesign, FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons'
@@ -11,9 +11,11 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ShareContent from '../../../ShareFile'
 import { IconButton } from '../../../../../Components/Buttons'
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { useMediaPlaybackContext } from '../../../../Statics/MediaViewer/Context'
 dayjs.extend(relativeTime)
+
+const { width, height } = Dimensions.get('window')
 
 
 const StatusPostListItem = (post: IPostItem) => {
@@ -80,7 +82,7 @@ const AudioDisplay = ({ uri, duration, cover }) => {
                     <Image
                         style={{ width: 140, aspectRatio: '16/9', borderRadius: 10 }}
                         source={{ uri: cover }} />
-                    <SpanText style={styles.duration}>{mP?.media?.source === uri ? Number(mP?.media?.states?.progress > 0 ? mP?.media?.states?.progress : 0) : 0}% / {duration}</SpanText>
+                    <SpanText >{mP?.media?.source === uri ? Number(mP?.media?.states?.progress > 0 ? mP?.media?.states?.progress : 0) : 0}% / {duration}</SpanText>
                 </View>
                 <TouchableOpacity style={[styles.playButton]} onPress={togglePlayback}>
                     <ImageBackground
@@ -109,11 +111,7 @@ const ImageDisplay = (prop: { uri: string }) => {
 }
 
 const UploadPostListItem = (post: IPostItem) => {
-    const themeColors = useThemeColors()
-
-    const UploadPostListItemHeader = (
-        <View></View>
-    )
+    const themeColors = useThemeColors() 
 
     const DisplayMediaType = () => {
         const fileType = getMediaType(post?.fileUrl)
@@ -168,7 +166,7 @@ const UploadPostListItem = (post: IPostItem) => {
                 </View>
             </View>
             <View style={{ marginBottom: 6 }}>
-                <SpanText hidden={!post?.title} style={styles.title}>{post.title}</SpanText>
+                <SpanText hidden={!post?.title} >{post.title}</SpanText>
                 <SpanText style={{ fontSize: 16 }}
                     numberOfLines={3}
                     ellipsizeMode="tail"
@@ -197,9 +195,21 @@ const UploadPostListItem = (post: IPostItem) => {
                 <SpanText style={{ fontSize: 12, fontWeight: '800', opacity: .4 }} children={dayjs(post?.createdAt).fromNow()} />
                 <View style={{ flex: 1 }} />
                 <View style={[styles.spaceBetween, { padding: 0 }]}>
+                    <TouchableOpacity style={[styles.spaceBetween, { width: 100, borderRadius: 50, overflow: 'hidden' }]}>
+                        <SpanText
+                            children={`${formatNumber(1021)} Comment`}
+                            style={{
+                                height: 20,
+                                paddingHorizontal: 10, width: '100%', fontSize: 11, backgroundColor: themeColors.background2, borderRadius: 50
+                            }} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3, opacity: .4 }]}>
+                        <AntDesign size={14} color={themeColors.text} name='like1' />
+                        <SpanText style={{ fontSize: 14 }}>{formatNumber(post?.views as number)}</SpanText>
+                    </TouchableOpacity>
                     <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3, opacity: .4 }]}>
                         <AntDesign size={14} color={themeColors.text} name='barchart' />
-                        <SpanText style={{ fontSize: 14 }}>120K</SpanText>
+                        <SpanText style={{ fontSize: 14 }}>{formatNumber(post?.views as number)}</SpanText>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={{ opacity: .4 }}
@@ -220,11 +230,14 @@ const UploadPostListItem = (post: IPostItem) => {
     )
 
     return (
-        <View style={{ paddingTop: 10, flexGrow: 1, flex: 1, overflow: 'hidden' }}>
+        <View style={{ paddingTop: 10, flexGrow: 1, flex: 1 }}>
             <View style={[styles.postWrapper]}>
                 {UploadPostListItemLeftRow}
                 {UploadPostListItemContentRow}
             </View>
+            {/* <View style={[styles.singlePostmenu]} >
+
+            </View> */}
         </View>
     )
 }
@@ -302,17 +315,12 @@ const styles = StyleSheet.create({
     infoContainer: {
         flex: 1,
     },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginVertical: 5
-    },
-    description: {
-        fontSize: 14,
-        color: 'gray',
-    },
-    duration: {
-        fontSize: 12,
-        color: 'gray',
-    },
+
+    // singlePostmenu: {
+    //     width,
+    //     backgroundColor: 'red',
+    //     height: 200,
+    //     position: 'absolute',
+    //     bottom:0
+    // }
 })
