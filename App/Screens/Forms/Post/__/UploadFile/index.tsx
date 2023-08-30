@@ -9,8 +9,7 @@ import MusicalLandscape from '../../../../../../assets/muusical-landscape.jpg'
 import { useEffect, useRef, useState } from 'react'
 import Animated, { SlideInDown, SlideOutDown, SlideOutUp, useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { HeadLine, SpanText } from "../../../../../Components/Texts";
-import { usePostFormContext } from "../../../../../Contexts/FormContext";
-import { IPostContext } from "../../../../../Interfaces/IPostContext";
+import { IPostContext, IPostFormComponent } from "../../../../../Interfaces/IPostContext";
 import * as FilePicker from 'expo-document-picker'
 import { Gesture } from "react-native-gesture-handler";
 import { Audio, Video, ResizeMode } from "expo-av";
@@ -21,7 +20,7 @@ import { IMediaPlayable } from '../../../../Statics/MediaViewer/Interface';
 
 const { height, width } = Dimensions.get('window')
 
-export default function UploadFileForm() {
+export default function UploadFileForm(props: IPostFormComponent) {
 
     const videoMediaRef = useRef<Video>(null)
     const richText = useRef()
@@ -32,7 +31,8 @@ export default function UploadFileForm() {
     const [isCaptionInputFocused, setisCaptionInputFocused] = useState(false)
     const [isyKeyboardShown, setisyKeyboardShown] = useState(false)
     const themeColors = useThemeColors()
-    const { methods, states } = usePostFormContext()
+
+    const { createPost } = props
 
     const [sessionValues, setsessionValues] = useState<IPostContext>({ postType: 'UPLOAD' })
 
@@ -111,7 +111,7 @@ export default function UploadFileForm() {
     //Handlers
 
     const handleCreatePost = async () => {
-        const post = await methods?.createPost({
+        const post = await  createPost({
             ...sessionValues, 'postType': "UPLOAD"
         })
         console.log("POSTED: ", post)
@@ -202,7 +202,7 @@ export default function UploadFileForm() {
                     multiline
                     textBreakStrategy="highQuality"
                     autoFocus
-                    
+
                     placeholderTextColor={themeColors.text}
                     returnKeyType="default"
                 />
@@ -212,7 +212,7 @@ export default function UploadFileForm() {
                 !isyKeyboardShown && (
                     <TouchableOpacity
                         onPress={handleCreatePost}
-                        style={[styles.spaceBetween, {   gap: 3, borderRadius: 5, height: 50,marginTop:10, backgroundColor: themeColors.success, justifyContent: 'center' }]}
+                        style={[styles.spaceBetween, { gap: 3, borderRadius: 5, height: 50, marginTop: 10, backgroundColor: themeColors.success, justifyContent: 'center' }]}
                     >
                         <SpanText>
                             Post

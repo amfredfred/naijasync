@@ -6,10 +6,11 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 import { useRef, useState, useEffect } from 'react'
 import { SpanText } from '../../../../../Components/Texts'
+import { IPostFormComponent } from '../../../../../Interfaces/IPostContext'
 
 const { height, width } = Dimensions.get('window')
 
-export default function UploadStatusFrom() {
+export default function UploadStatusFrom(props: IPostFormComponent) {
     const [libpermission, requestLibPermission] = Library.usePermissions()
     const [mediaFiles, setMediaFiles] = useState<Library.AssetInfo[]>([])
 

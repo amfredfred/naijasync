@@ -11,7 +11,7 @@ export interface IPostContext {
         size?: number,
         name?: string,
         uri?: string,
-        type?:string
+        type?: string
     },
     description?: string | null;
     tags?: string[] | null;
@@ -44,6 +44,10 @@ type IPostFormTypesKeys<K extends IPostFormTypes['postTypes']> = IPostFormTypes[
 
 export type IPostFormMethods = {
     setData<K extends keyof IPostContext>(item: K, payload: PayloadTypes<K>): void
-    createPost(props:IPostContext): Promise<IPostContext | null>
+    createPost(props: IPostContext): Promise<IPostContext | null>
     showForm<FT extends IPostFormTypes['postTypes'] | null>(F: FT, payload: IPostFormTypesKeys<FT>): void
+}
+
+export interface IPostFormComponent extends IPostContext, IPostFormMethods {
+    hidden: boolean
 }

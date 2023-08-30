@@ -10,6 +10,7 @@ import React from 'react';
 import { ContainerBlock, ScrollContainer } from "../../../Components/Containers";
 import { Button, IconButton } from "../../../Components/Buttons";
 import { useNavigation } from "@react-navigation/native";
+import PostsList from "../../Partials/PostsList";
 
 export default function Home() {
     const { setData, states: NJS } = useDataContext()
@@ -73,7 +74,7 @@ export default function Home() {
 
     return (
         <ContainerBlock style={{ flex: 1,padding:0 }}>
-            <ContainerBlock style={{ paddingHorizontal:0,   }}>
+            {/* <ContainerBlock style={{ paddingHorizontal:0,   }}>
                 <ScrollContainer
                     horizontal
                     contentContainerStyle={{ gap: 10, }}>
@@ -87,7 +88,9 @@ export default function Home() {
                 </ScrollContainer>
             </ContainerBlock>
 
-            <ContentTables />
+            <ContentTables /> */}
+
+            {/* <PostsList /> */}
 
         </ContainerBlock>
     )

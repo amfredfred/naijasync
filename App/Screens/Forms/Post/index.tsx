@@ -1,21 +1,14 @@
 import useThemeColors from "../../../Hooks/useThemeColors";
 import { useState, useRef, useEffect } from 'react'
-import { Image, ScrollView, TextInput, TouchableOpacity } from 'react-native'
+import { TouchableOpacity } from 'react-native'
 import useKeyboardEvent from "../../../Hooks/useKeyboardEvent";
-import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
-import { StyleSheet, Dimensions, StatusBar, View, KeyboardAvoidingView, Platform, Text, ImageBackground, BackHandler } from 'react-native'
-import { Ionicons, MaterialCommunityIcons, MaterialIcons, Zocial } from "@expo/vector-icons";
-import * as FilePicker from 'expo-document-picker'
+import { StyleSheet, Dimensions, StatusBar, View, KeyboardAvoidingView, Platform, Text, BackHandler } from 'react-native'
+import { Ionicons } from "@expo/vector-icons";
 
 
-
-import Animated, { SlideInDown, SlideInUp, SlideOutDown, SlideOutUp, useSharedValue } from 'react-native-reanimated'
-import PagerView from "react-native-pager-view";
-import { formatFileSize, getMediaType, getTags } from "../../../Helpers";
-import { usePostFormContext } from "../../../Contexts/FormContext";
-import { IPostFormMethods, IPostType } from "../../../Interfaces/IPostContext";
-import { IconButton } from "../../../Components/Buttons";
-import { ProgressBar } from "../../../Components/Inputs";
+import { useSharedValue } from 'react-native-reanimated'
+import { getMediaType, getTags } from "../../../Helpers";
+import { IPostFormComponent, IPostFormMethods, IPostType } from "../../../Interfaces/IPostContext";
 import useLinkPreview from "../../../Hooks/useLinkPreview";
 import useTimeout from "../../../Hooks/useTimeout";
 import { useMediaPlaybackContext } from "../../Statics/MediaViewer/Context";
@@ -24,17 +17,16 @@ import UploadStatusFrom from "./__/UploadStatus";
 import UploadFileForm from "./__/UploadFile";
 
 const { width, height } = Dimensions.get('window')
-export default function PostsForm(props: { hidden: boolean }) {
+export default function PostsForm(props: IPostFormComponent) {
 
     const [activeTab, setactiveTab] = useState<IPostType['types']>('UPLOAD');
-
     const { setMedia } = useMediaPlaybackContext()
+    const { showForm, setData } = props
 
     const [shouldFetchPreview, setshouldFetchPreview] = useState(false)
     const [isShowingKeyboard, setisShowingKeyboard] = useState(false)
     const [isMediaFilesExpanded, setisMediaFilesExpanded] = useState(true)
     const [isEditorFocused, setisEditorFocused] = useState(false)
-    const { methods, states } = usePostFormContext()
     const themeColors = useThemeColors()
 
     const [sessionValues, setsessionValues] = useState<{
@@ -87,7 +79,7 @@ export default function PostsForm(props: { hidden: boolean }) {
 
     const handleOnBackPress = () => {
         if (!props.hidden) {
-            methods?.showForm(null, null)
+            showForm(null, null)
             return true
         }
         return false
@@ -107,10 +99,10 @@ export default function PostsForm(props: { hidden: boolean }) {
     const handleSetFormChanges: IPostFormMethods['setData'] = async (key, payload) => {
         if (key === 'description') {
             let hashTags = getTags(String(payload))
-            methods?.setData('tags', hashTags)
+            setData('tags', hashTags)
         }
         setsessionValues(S => ({ ...S, [key]: payload }))
-        methods?.setData(key, payload)
+        setData(key, payload)
     }
 
     const handleTextEditorContainerScrolled = () => {
@@ -178,8 +170,8 @@ export default function PostsForm(props: { hidden: boolean }) {
             <View style={[styles.containerInner]}>
                 {FormHeader}
                 <View style={[styles.innerContainer]}>
-                    {activeTab === 'STATUS' && <UploadStatusFrom />}
-                    {activeTab === 'UPLOAD' && <UploadFileForm />}
+                    {activeTab === 'STATUS' && <UploadStatusFrom  {...props} />}
+                    {activeTab === 'UPLOAD' && <UploadFileForm {...props} />}
 
                 </View>
                 <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard }} />

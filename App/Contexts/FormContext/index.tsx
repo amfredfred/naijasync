@@ -25,7 +25,6 @@ export default function PostFormProvider({ children }) {
     const [isFormShwon, setisFormShwon] = useState(false)
 
     const mutation = useMutation((info) => {
-        console.log("MUSTATION INFO", info)
         return axios({
             url: `${REQUESTS_API}posts`,
             method: 'POST',
@@ -90,6 +89,7 @@ export default function PostFormProvider({ children }) {
                 uri: props?.thumbnail
             } as any)
         formData.append('description', props?.description)
+        formData.append('type', props.postType)
 
         mutation?.mutate(formData as any)
         return {} as any
@@ -113,7 +113,7 @@ export default function PostFormProvider({ children }) {
     return (
         <FormContext.Provider value={formContextValue}>
             {children}
-            <PostsForm hidden={!isFormShwon} />
+            <PostsForm {...{ ...formContextValue.methods, ...formContextValue.states }} hidden={!isFormShwon} />
         </FormContext.Provider>
     );
 };
