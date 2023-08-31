@@ -1,33 +1,28 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ContainerFlex } from '../../Components/Containers';
 import { SpanText } from '../../Components/Texts';
-import { Keyboard, ScrollView } from "react-native";
+import { Keyboard, ScrollView, StatusBar, View } from "react-native";
 import { useEffect, useState } from 'react'
 import Header from './Header';
+import useKeyboardEvent from '../../Hooks/useKeyboardEvent';
+import useThemeColors from '../../Hooks/useThemeColors';
 
 
 export default function GuestLayout({ children }: { children: React.ReactNode }) {
     const [keyBoardShown, setkeyBoardShown] = useState(false)
-    useEffect(() => {
 
-        const keyboardshown = Keyboard.addListener('keyboardDidShow', () => setkeyBoardShown(s => true))
-        const keyboardhidden = Keyboard.addListener('keyboardDidHide', () => setkeyBoardShown(s => false))
+    const themeColors = useThemeColors()
 
-        return () => {
-            keyboardshown.remove()
-            keyboardhidden.remove()
-        }
-    }, [])
+    useKeyboardEvent({
+        onShow: () => setkeyBoardShown(s => true),
+        onHide: () => setkeyBoardShown(s => false)
+    })
 
     return (
         <ContainerFlex>
-            <Header />
-            <ScrollView>
+            {/* <Header /> */}
+            <View style={[{ backgroundColor: themeColors.background, flex: 1, paddingTop: StatusBar.currentHeight }]}>
                 {children}
-                <SpanText>
-                    HEY FRED FREDD GUEST
-                </SpanText>
-            </ScrollView>
+            </View>
         </ContainerFlex>
     )
 }

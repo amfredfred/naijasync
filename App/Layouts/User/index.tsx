@@ -16,11 +16,13 @@ import TabSelector from "../../Screens/__/TabSelector";
 import IMAGS from '../../../assets/adaptive-icon.png'
 import DigitalClock from "../../Screens/__/DigitalClock";
 import { usePostFormContext } from "../../Contexts/FormContext";
+import { useAuthContext } from "../../Contexts/AuthContext";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
 
     const [keyBoardShown, setkeyBoardShown] = useState(false)
     const formContext = usePostFormContext()
+    const authContext = useAuthContext()
 
     const { background, background2, text } = useThemeColors()
     const { states: { states, user, storage }, setData } = useDataContext()
@@ -73,7 +75,9 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 backgroundColor: states?.isHeaderHidden ? background : background2
             }}   >
             <ContainerSpaceBetween hidden={states?.isHeaderHidden} style={{ padding: 0, gap: 10 }}>
-                <HeadLine hidden={states?.isInSearchMode} style={{ textTransform: 'uppercase' }}>NAIJASYNC</HeadLine>
+                <HeadLine
+                    onPress={()=> (navigate as any)?.("Home")}
+                    hidden={states?.isInSearchMode} style={{ textTransform: 'uppercase' }}>NAIJASYNC</HeadLine>
                 <ContainerSpaceBetween style={{ gap: 10, padding: 0 }}>
                     <ContainerSpaceBetween style={{ padding: 0, overflow: 'hidden' }}>
                         <IconButton
@@ -136,12 +140,15 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                             style={{ backgroundColor: 'transparent' }}
                         >
                             <View style={[styles.container, { backgroundColor: background }]}>
-                                <TouchableOpacity style={styles.accountContainer}>
+                                <TouchableOpacity
+                                    onPress={authContext.skipToOnboard}
+                                    
+                                    style={styles.accountContainer}>
                                     <IconButton
                                         // icon={<Feather name="user" size={100} color="#fff" />}
                                         image={{ source: IMAGS, style: { width: 60, height: 60 } }}
                                     />
-                                    <Text style={styles.accountText}>LOGIN/REGISTER</Text>
+                                    <Text style={styles.accountText}>Login • Register</Text>
                                 </TouchableOpacity>
                             </View>
                             <ScrollContainer style={{ marginTop: -15, padding: 10, backgroundColor: background2, borderTopRightRadius: 15, borderTopLeftRadius: 15 }}>

@@ -1,4 +1,3 @@
-import { Text, Keyboard } from "react-native"
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import UserLayout from "../Layouts/User"
 import GuestLayout from "../Layouts/Guest"
@@ -22,14 +21,15 @@ import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ToastProvider from "../Contexts/ToastContext";
 import PostFormProvider from "../Contexts/FormContext";
-import useAuthStatus from "../Hooks/useAuthStatus";
+import AuthContextProvider, { useAuthContext } from '../Contexts/AuthContext';
 
-export default function Root() {
+function Routes() {
     // const [isAuthenticated, setisAuthenticated] = useState(true)
     const { status } = useAppStatus()
     const Stack = createNativeStackNavigator();
-    const auth = useAuthStatus()
-    const Client = new QueryClient()
+    const auth = useAuthContext()
+
+    console.log("IN ROOT", auth?.user, auth?.user?.person === 'hasSkippedAuthentication', auth?.user?.person === 'isAuthenticated')
 
     // const { load, show, error, isLoaded } = useAppOpenAd(TestIds.APP_OPEN, {
     //     requestNonPersonalizedAdsOnly: true,
@@ -74,30 +74,40 @@ export default function Root() {
 
     const GuestRoutes = (
         <GuestLayout>
-            <Text>Guest</Text>
-            <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+            <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
                 <Stack.Screen name='Landing' component={Landing} />
             </Stack.Navigator>
-            <Text>Guest</Text>
         </GuestLayout>
     )
 
     return (
+        <PostFormProvider>
+            {(auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? UserRoutes : GuestRoutes}
+        </PostFormProvider>
+    )
+}
+
+export default function Root() {
+
+    const Client = new QueryClient()
+
+
+    return (
         <SafeAreaProvider>
             <QueryClientProvider client={Client}>
-                <ToastProvider>
-                    <DataContextProvider>
-                        <GestureHandlerRootView style={{ flex: 1 }}>
-                            <NavigationContainer>
-                                <MediaViewerProvider>
-                                    <PostFormProvider>
-                                        {(auth.person === 'hasSkippedAuthentication' || auth?.person === 'isAuthenticated') ? UserRoutes : GuestRoutes}
-                                    </PostFormProvider>
-                                </MediaViewerProvider>
-                            </NavigationContainer>
-                        </GestureHandlerRootView>
-                    </DataContextProvider>
-                </ToastProvider>
+                <DataContextProvider>
+                    <AuthContextProvider>
+                        <ToastProvider>
+                            <GestureHandlerRootView style={{ flex: 1 }}>
+                                <NavigationContainer>
+                                    <MediaViewerProvider>
+                                        <Routes />
+                                    </MediaViewerProvider>
+                                </NavigationContainer>
+                            </GestureHandlerRootView>
+                        </ToastProvider>
+                    </AuthContextProvider>
+                </DataContextProvider>
             </QueryClientProvider>
         </SafeAreaProvider>
     )

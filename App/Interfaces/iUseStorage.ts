@@ -1,4 +1,5 @@
 import { Asset } from "expo-media-library";
+import { IAuthContextData } from "./iAuthContext";
 
 export interface IAuth {
     stage?: "landing" | "register" | "login" | "confirmPhone" | "confirmPassword";
@@ -14,13 +15,6 @@ export interface IAppStates {
     isHeaderHidden?: boolean
     isInSearchMode?: boolean
 }
-export interface IUser {
-    isAuthenticated?: boolean;
-    accessToken?: string;
-    searchRequestValue?: string
-    hasSkippedAuthentication?: boolean
-}
-
 export interface IUserDownloads {
     audio: string[]
     video: string[]
@@ -36,7 +30,7 @@ export interface IStorageFolder {
 }
 
 export interface IStorageItems {
-    user?: IUser;
+    user?: IAuthContextData['user'];
     states?: IAppStates;
     authing?: IAuth;
     storage?: IStorageFolder
@@ -51,7 +45,11 @@ export interface IStorageMethods {
         key: K,
         item: P,
         payload: IPayloadType<K, P>
-    ): Promise<void>;
+    ): Promise<void>
+    setObjectItem?<K extends IStorageKeys>(
+        key: K,
+        objectPayload: IStorageItems[K]
+    ): void
     delItem?(key: "@NaijaSync"): Promise<void>;
     getItem?(key: "@NaijaSync"): Promise<IStorageItems>;
 }

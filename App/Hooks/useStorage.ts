@@ -34,6 +34,13 @@ export default function useStorage(watch?: "@NaijaSync", deps?: any): IUseStorag
         await fetchStorage('@NaijaSync')
     }
 
+    const setObjectItem: IStorageMethods['setObjectItem'] = async (key, payload) => {
+        const data = { ...NaijaSync, [key as string]: { ...NaijaSync?.[key], ...payload } }
+        await AsyncStorage.setItem("@NaijaSync", JSON.stringify(data))
+        await fetchStorage('@NaijaSync')
+    }
+
+
     useEffect(() => {
         if (watch)
             fetchStorage('@NaijaSync')
@@ -47,7 +54,8 @@ export default function useStorage(watch?: "@NaijaSync", deps?: any): IUseStorag
         method: {
             getItem,
             setItem,
-            delItem
+            delItem,
+            setObjectItem
         },
         NaijaSync,
         isFetching
