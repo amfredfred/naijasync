@@ -3,7 +3,6 @@ import TabSelector from "../../__/TabSelector";
 import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, RefreshControl, Dimensions } from 'react-native';
 import useThemeColors from "../../../Hooks/useThemeColors";
-import ContentTables from "../../Partials/ContentTables";
 import { useDataContext } from "../../../Contexts/DataContext";
 import React from 'react';
 // import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';

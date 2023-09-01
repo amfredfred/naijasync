@@ -12,6 +12,12 @@ export const formatFileSize = (bytes: number): string => {
     return parseFloat((bytes / Math.pow(base, digitGroups)).toFixed(2)) + ' ' + units[digitGroups];
 }
 
+export const isValidEmail = (email: string): boolean => {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    return emailPattern.test(email);
+}
+
 export const convertStringToCase = (inputString: string, caseType?: "snake" | "camel") => {
     const cleanedString = inputString.replace(/\s+/g, '').toLowerCase();
     if (caseType === 'snake') {

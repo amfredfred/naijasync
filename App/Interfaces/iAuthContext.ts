@@ -1,3 +1,5 @@
+import { IAppDataContext } from ".";
+
 export type IAuthContextData = {
     user: {
         isAuthenticated?: boolean,
@@ -9,8 +11,8 @@ export type IAuthContextData = {
     }
 }
 export type IAuthContextMethods = {
-    register?(): Promise<boolean>
-    login?(): Promise<boolean>
+    register?(props:IAppDataContext['authing']): Promise<boolean>
+    login?(props: IAppDataContext['authing']): Promise<boolean>
     logout?(): Promise<boolean>
     confirmNumber?(): Promise<boolean>
     skipAuth?(): void

@@ -22,14 +22,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ToastProvider from "../Contexts/ToastContext";
 import PostFormProvider from "../Contexts/FormContext";
 import AuthContextProvider, { useAuthContext } from '../Contexts/AuthContext';
+import RegisterScreen from '../Screens/Guest/Auth/Register/index,';
+import LoginScreen from '../Screens/Guest/Auth/Login';
 
 function Routes() {
     // const [isAuthenticated, setisAuthenticated] = useState(true)
     const { status } = useAppStatus()
     const Stack = createNativeStackNavigator();
     const auth = useAuthContext()
-
-    console.log("IN ROOT", auth?.user, auth?.user?.person === 'hasSkippedAuthentication', auth?.user?.person === 'isAuthenticated')
 
     // const { load, show, error, isLoaded } = useAppOpenAd(TestIds.APP_OPEN, {
     //     requestNonPersonalizedAdsOnly: true,
@@ -74,8 +74,10 @@ function Routes() {
 
     const GuestRoutes = (
         <GuestLayout>
-            <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
+            <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }}>
                 <Stack.Screen name='Landing' component={Landing} />
+                <Stack.Screen name='RegisterScreen' component={RegisterScreen} />
+                <Stack.Screen name='LoginScreen' component={LoginScreen} />
             </Stack.Navigator>
         </GuestLayout>
     )
@@ -96,8 +98,8 @@ export default function Root() {
         <SafeAreaProvider>
             <QueryClientProvider client={Client}>
                 <DataContextProvider>
-                    <AuthContextProvider>
-                        <ToastProvider>
+                    <ToastProvider>
+                        <AuthContextProvider>
                             <GestureHandlerRootView style={{ flex: 1 }}>
                                 <NavigationContainer>
                                     <MediaViewerProvider>
@@ -105,8 +107,8 @@ export default function Root() {
                                     </MediaViewerProvider>
                                 </NavigationContainer>
                             </GestureHandlerRootView>
-                        </ToastProvider>
-                    </AuthContextProvider>
+                        </AuthContextProvider>
+                    </ToastProvider>
                 </DataContextProvider>
             </QueryClientProvider>
         </SafeAreaProvider>

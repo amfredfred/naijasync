@@ -3,6 +3,10 @@ import useStorage from '../../Hooks/useStorage'
 import { IAuthContextData, IAuthContextMethods } from '../../Interfaces/iAuthContext'
 import * as Cellular from 'expo-cellular'
 import { IStorageMethods } from '../../Interfaces/iUseStorage'
+import { useMutation } from '@tanstack/react-query'
+import axios from 'axios'
+import { REQUESTS_API } from '@env'
+import { useToast } from '../ToastContext'
 
 
 
@@ -10,7 +14,7 @@ const initialState: IAuthContextData = {
     user: {
         isAuthenticated: false,
         person: 'isNew',
-        hasSkippedAuthentication:false
+        hasSkippedAuthentication: false
     },
 }
 
@@ -40,14 +44,60 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         dispatch({ key, payload })
         method.setObjectItem?.(key, payload)
     }
+    const { toast } = useToast()
+
+    const mutation = useMutation((info) => {
+        return axios({
+            url: `${REQUESTS_API}${(info as any)?.path}`,
+            method: 'POST',
+            data: info,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        })
+    })
+
+    console.log((mutation?.data as any)?.data)
+
+    useEffect(() => {
+
+        if (mutation?.status === 'error') {
+            return toast({
+                message: `Error: ${(mutation?.failureReason as any)?.response?.data?.message}`,
+                severnity: 'error',
+            })
+        }
+        else if (mutation?.status === 'success') {
+            const user = {} as IAuthContextData['user']
+            user['accessToken'] = (mutation?.data?.data as any)?.accessToken
+            user['person'] = 'isAuthenticated'
+            user['isAuthenticated'] = true
+            setObjectItem('user', user)
+            return toast({
+                message: `Error: ${(mutation?.data as any)?.data?.message}`,
+                severnity: 'success',
+            })
+        }
+
+    }, [mutation?.status])
+
+
 
     const login: IAuthContextMethods['login'] = async () => {
         setObjectItem('user', { isAuthenticated: true, person: 'isAuthenticated' })
         return true
     }
 
-    const register: IAuthContextMethods['register'] = async () => {
-        console.log("regiter CALLED")
+    const register: IAuthContextMethods['register'] = async (userData) => {
+        const formData = new FormData()
+        formData['path'] = 'register'
+        formData.append('email', userData?.email)
+        formData.append('password', userData?.password)
+        formData.append('password_confirmation', userData?.confirmPassword)
+        formData.append('name', userData?.fullName)
+
+        const user = mutation?.mutate(formData as any)
+        console.log("regiter CALLED", user)
         return true
     }
 
@@ -86,7 +136,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
                     }
                     else {
                         // the person may be new 
-                        setObjectItem('user', { isAuthenticated: false, person: 'isNew', hasSkippedAuthentication:false })
+                        setObjectItem('user', { isAuthenticated: false, person: 'isNew', hasSkippedAuthentication: false })
                     }
                 } else {
                     // else this means the person is offliine or so...

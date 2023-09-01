@@ -18,9 +18,7 @@ const FormContext = createContext<{
 export const usePostFormContext = () => useContext(FormContext);
 
 export default function PostFormProvider({ children }) {
-    const [states, setFormState] = useState({
-
-    });
+    const [states, setFormState] = useState({});
 
     const [isFormShwon, setisFormShwon] = useState(false)
 
@@ -36,6 +34,13 @@ export default function PostFormProvider({ children }) {
     })
 
     const { toast } = useToast()
+
+    const setData: IPostFormMethods['setData'] = (key, payload) => {
+        setFormState(prevState => ({
+            ...prevState,
+            [key]: payload,
+        }));
+    };
 
     useEffect(() => {
         switch (mutation.status) {
@@ -63,12 +68,7 @@ export default function PostFormProvider({ children }) {
 
     }, [mutation.status])
 
-    const setData: IPostFormMethods['setData'] = (key, payload) => {
-        setFormState(prevState => ({
-            ...prevState,
-            [key]: payload,
-        }));
-    };
+
 
     const createPost = async (props: IPostContext) => {
         const formData = new FormData()
