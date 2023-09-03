@@ -13,10 +13,10 @@ import ShareContent from '../../../ShareFile'
 import { IconButton } from '../../../../../Components/Buttons'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { useMediaPlaybackContext } from '../../../../Statics/MediaViewer/Context'
+import LikeButton from './LikeButton'
+import { usePostFormContext } from '../../../../../Contexts/FormContext'
 dayjs.extend(relativeTime)
-
 const { width, height } = Dimensions.get('window')
-
 
 const StatusPostListItem = (post: IPostItem) => {
     const themeStyles = useThemeColors()
@@ -111,7 +111,7 @@ const ImageDisplay = (prop: { uri: string }) => {
 }
 
 const UploadPostListItem = (post: IPostItem) => {
-    const themeColors = useThemeColors() 
+    const themeColors = useThemeColors()
 
     const DisplayMediaType = () => {
         const fileType = getMediaType(post?.fileUrl)
@@ -145,16 +145,11 @@ const UploadPostListItem = (post: IPostItem) => {
 
     const UploadPostListItemContentRow = (
         <View style={[styles.postContentWrapper]}>
-            <View style={[styles.spaceBetween, { width: '100%', padding: 0 }]}>
-                <View style={[styles.spaceBetween, { padding: 0 }]}>
-                    <HeadLine children={'Dev fred'} />
-                    <SpanText>•</SpanText>
-                    <SpanText style={{ fontSize: 13, opacity: .7 }}>
-                        {post.fileType}
-                        {/* /•/ {post.mimeType} */}
-                    </SpanText>
-                </View>
-                <View>
+            <View style={{ marginBottom: 0, }}>
+                <View style={[styles.spaceBetween, { width: '100%', padding: 0 }]}>
+                    <TouchableOpacity>
+                        <HeadLine children={post?.owner?.fullName} />
+                    </TouchableOpacity>
                     <TouchableOpacity
                         onPress={null}
                         children={<MaterialIcons
@@ -164,17 +159,26 @@ const UploadPostListItem = (post: IPostItem) => {
                         />}
                     />
                 </View>
+                <View style={[styles.spaceBetween, { padding: 0, justifyContent: 'flex-start', gap: 3, top: -4 }]}>
+                    <TouchableOpacity>
+                        <SpanText style={{ fontSize: 12, opacity: .6 }}>@{post?.owner?.username}</SpanText>
+                    </TouchableOpacity>
+                    <SpanText>•</SpanText>
+                    <TouchableOpacity>
+                        <SpanText style={{ fontSize: 12, fontWeight: '800', opacity: .4 }} children={dayjs(post?.createdAt).fromNow()} />
+                    </TouchableOpacity>
+                </View>
             </View>
             <View style={{ marginBottom: 6 }}>
                 <SpanText hidden={!post?.title} >{post.title}</SpanText>
-                <SpanText style={{ fontSize: 16 }}
+                <SpanText hidden={!post?.description} style={{ fontSize: 16 }}
                     numberOfLines={3}
                     ellipsizeMode="tail"
                     selectable textBreakStrategy="highQuality">
                     {post?.description}
                 </SpanText>
                 {
-                    post?.tags.length && (
+                    post?.tags && (
                         <ScrollView contentContainerStyle={{ paddingHorizontal: 6, gap: 10 }} style={{ paddingVertical: 6 }} horizontal>
                             {
                                 post?.tags?.map(tag => (
@@ -192,9 +196,16 @@ const UploadPostListItem = (post: IPostItem) => {
                 {DisplayMediaType()}
             </View>
             <View style={[styles.spaceBetween, styles.containerProgress, { padding: 0 }]}>
-                <SpanText style={{ fontSize: 12, fontWeight: '800', opacity: .4 }} children={dayjs(post?.createdAt).fromNow()} />
                 <View style={{ flex: 1 }} />
                 <View style={[styles.spaceBetween, { padding: 0 }]}>
+
+                    <LikeButton post={post} onLikeToggle={() => { }} />
+                    
+                    <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3, opacity: .4 }]}>
+                        <AntDesign size={14} color={themeColors.text} name='barchart' />
+                        <SpanText style={{ fontSize: 14 }}>{formatNumber(post?.views as number)}</SpanText>
+                    </TouchableOpacity>
+
                     <TouchableOpacity style={[styles.spaceBetween, { width: 100, borderRadius: 50, overflow: 'hidden' }]}>
                         <SpanText
                             children={`${formatNumber(1021)} Comment`}
@@ -203,14 +214,7 @@ const UploadPostListItem = (post: IPostItem) => {
                                 paddingHorizontal: 10, width: '100%', fontSize: 11, backgroundColor: themeColors.background2, borderRadius: 50
                             }} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3, opacity: .4 }]}>
-                        <AntDesign size={14} color={themeColors.text} name='like1' />
-                        <SpanText style={{ fontSize: 14 }}>{formatNumber(post?.views as number)}</SpanText>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3, opacity: .4 }]}>
-                        <AntDesign size={14} color={themeColors.text} name='barchart' />
-                        <SpanText style={{ fontSize: 14 }}>{formatNumber(post?.views as number)}</SpanText>
-                    </TouchableOpacity>
+
                     <TouchableOpacity
                         style={{ opacity: .4 }}
                         onPress={() => ShareContent({

@@ -5,6 +5,8 @@ import { useToast } from '../ToastContext';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { REQUESTS_API } from '@env';
+import { useAuthContext } from '../AuthContext';
+import { IPostItem } from '../../Interfaces';
 
 const initialState: IPostContext = {
 
@@ -21,14 +23,24 @@ export default function PostFormProvider({ children }) {
     const [states, setFormState] = useState({});
 
     const [isFormShwon, setisFormShwon] = useState(false)
+    const authContext = useAuthContext()
 
-    const mutation = useMutation((info) => {
-        return axios({
-            url: `${REQUESTS_API}posts`,
-            method: 'POST',
-            data: info,
+    const createPostMutation = useMutation((info) => {
+        return axios.post(`${REQUESTS_API}posts`,
+            info, {
             headers: {
                 'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${authContext?.user?.accessToken}`
+            }
+        })
+    })
+
+    const updatePostMutation = useMutation((info) => {
+        return axios.post(`${REQUESTS_API}posts/${(info as any)?.postId as any}?_method=PUT`,
+           ( info as any)?.data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${authContext?.user?.accessToken}`
             }
         })
     })
@@ -42,16 +54,18 @@ export default function PostFormProvider({ children }) {
         }));
     };
 
+
     useEffect(() => {
-        switch (mutation.status) {
+        switch (createPostMutation.status) {
             case 'error': {
-                mutation.reset()
-                toast({ message: 'Something went wrond, while creating the post 😢', severnity: 'error' })
+                // createPostMutation.reset()
+                console.log(`Error: ${(createPostMutation?.failureReason as any)?.response?.data?.message}`)
+                toast({ message: `Error: ${(createPostMutation?.failureReason as any)?.response?.data?.message}`, severnity: 'error', })
                 break
             }
             case 'success': {
                 toast({ message: 'Your post is online !!', severnity: 'success' })
-                mutation.reset()
+                createPostMutation.reset()
                 break
             }
             case 'idle': {
@@ -63,12 +77,12 @@ export default function PostFormProvider({ children }) {
                 break
             }
         }
+    }, [createPostMutation.status])
 
-        console.log(mutation?.data)
-
-    }, [mutation.status])
-
-
+    useEffect(() => {
+        console.log((updatePostMutation?.failureReason as any)?.response?.data?.message)
+        console.log(updatePostMutation?.data?.data)
+    }, [updatePostMutation?.status])
 
     const createPost = async (props: IPostContext) => {
         const formData = new FormData()
@@ -88,11 +102,11 @@ export default function PostFormProvider({ children }) {
                 name: 'thumbnail.jpg',
                 uri: props?.thumbnail
             } as any)
-        formData.append('description', props?.description)
+        formData.append('description', JSON.stringify(props?.description))
         formData.append('type', props.postType)
-        formData.append('tags', JSON.stringify(["music", 'videos']))
+        formData.append('tags', JSON.stringify(props?.tags))
 
-        mutation?.mutate(formData as any)
+        createPostMutation?.mutate(formData as any)
         return {} as any
     }
 
@@ -101,13 +115,23 @@ export default function PostFormProvider({ children }) {
         setisFormShwon(Boolean(form))
     }
 
+    const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
+        const formData = new FormData()
+        await Promise.all(Object.keys(payload)?.map(d => {
+            formData.append('liked', typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
+        }))
+        formData.append('_method', 'PATCH')
+        updatePostMutation?.mutate({ data: { 'liked': payload?.liked }, postId: payload?.puid } as any)
+    }
+
 
     const formContextValue = {
         states,
         methods: {
             setData,
             createPost,
-            showForm
+            showForm,
+            updatePost
         }
     }
 

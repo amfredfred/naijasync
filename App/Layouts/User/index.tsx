@@ -76,7 +76,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
             }}   >
             <ContainerSpaceBetween hidden={states?.isHeaderHidden} style={{ padding: 0, gap: 10 }}>
                 <HeadLine
-                    onPress={()=> (navigate as any)?.("Home")}
+                    onPress={() => (navigate as any)?.("Home")}
                     hidden={states?.isInSearchMode} style={{ textTransform: 'uppercase' }}>NAIJASYNC</HeadLine>
                 <ContainerSpaceBetween style={{ gap: 10, padding: 0 }}>
                     <ContainerSpaceBetween style={{ padding: 0, overflow: 'hidden' }}>
@@ -142,13 +142,17 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                             <View style={[styles.container, { backgroundColor: background }]}>
                                 <TouchableOpacity
                                     onPress={authContext.skipToOnboard}
-                                    
+
                                     style={styles.accountContainer}>
                                     <IconButton
                                         // icon={<Feather name="user" size={100} color="#fff" />}
-                                        image={{ source: IMAGS, style: { width: 60, height: 60 } }}
+                                        image={{ source: IMAGS, style: { width: 40, height: 40 } }}
                                     />
-                                    <Text style={styles.accountText}>Login • Register</Text>
+                                    {
+                                        <SpanText style={styles.accountText}>
+                                            {authContext?.user?.account?.username ?? "Login • Registe"}
+                                        </SpanText>
+                                    }
                                 </TouchableOpacity>
                             </View>
                             <ScrollContainer style={{ marginTop: -15, padding: 10, backgroundColor: background2, borderTopRightRadius: 15, borderTopLeftRadius: 15 }}>

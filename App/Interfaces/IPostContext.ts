@@ -1,5 +1,7 @@
 'use strict'
 
+import { IPostItem } from ".";
+
 export interface IPostType {
     types: "ARTICLE" | "STATUS" | "GIF" | "UPLOAD" | "IMPORT";
 }
@@ -45,6 +47,7 @@ type IPostFormTypesKeys<K extends IPostFormTypes['postTypes']> = IPostFormTypes[
 export type IPostFormMethods = {
     setData<K extends keyof IPostContext>(item: K, payload: PayloadTypes<K>): void
     createPost(props: IPostContext): Promise<IPostContext | null>
+    updatePost(payload: IPostItem): void
     showForm<FT extends IPostFormTypes['postTypes'] | null>(F: FT, payload: IPostFormTypesKeys<FT>): void
 }
 

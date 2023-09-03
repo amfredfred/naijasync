@@ -1,4 +1,5 @@
 import { IPostType } from './IPostContext'
+import { IAuthContextData } from './iAuthContext'
 import { IStorageItems, IStorageMethods } from './iUseStorage'
 
 // Interface for themed components
@@ -50,14 +51,13 @@ export interface IPostItem {
 
     // Additional post metadata
     id?: string,
-    ownerId?: string,
+    owner?: IAuthContextData['user']['account'],
     title?: string,
     description?: string,
     fileUrl?: string,
     thumbnailUrl?: string,
     views?: string | number,
     downloads?: string,
-    likes?: string,
     duration?: string,
     mimeType?: string,
     sourceQualities?: {
@@ -87,6 +87,9 @@ export interface IPostItem {
     puid?: string 
     type: IMediaType
     postType: IPostType['types']
+
+    likes?: number | string
+    liked?:boolean
 }
 
 // Interface for a list slider component

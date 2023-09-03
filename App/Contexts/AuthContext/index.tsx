@@ -57,10 +57,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         })
     })
 
-    console.log((mutation?.data as any)?.data)
-
     useEffect(() => {
-
         if (mutation?.status === 'error') {
             return toast({
                 message: `Error: ${(mutation?.failureReason as any)?.response?.data?.message}`,
@@ -72,7 +69,11 @@ export default function AuthContextProvider({ children }: { children: React.Reac
             user['accessToken'] = (mutation?.data?.data as any)?.accessToken
             user['person'] = 'isAuthenticated'
             user['isAuthenticated'] = true
-            setObjectItem('user', user)
+            setObjectItem('user', {
+                ...user,
+                ...(mutation?.data?.data as any)?.profile?.user,
+                ...(mutation?.data?.data as any)?.profile
+            })
             return toast({
                 message: `Error: ${(mutation?.data as any)?.data?.message}`,
                 severnity: 'success',
@@ -81,10 +82,13 @@ export default function AuthContextProvider({ children }: { children: React.Reac
 
     }, [mutation?.status])
 
+    const login: IAuthContextMethods['login'] = async (userData) => {
+        const formData = new FormData()
+        formData['path'] = 'login'
+        formData.append('email', userData?.email)
+        formData.append('password', userData?.password)
 
-
-    const login: IAuthContextMethods['login'] = async () => {
-        setObjectItem('user', { isAuthenticated: true, person: 'isAuthenticated' })
+        mutation?.mutate(formData as any)
         return true
     }
 
@@ -96,8 +100,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         formData.append('password_confirmation', userData?.confirmPassword)
         formData.append('name', userData?.fullName)
 
-        const user = mutation?.mutate(formData as any)
-        console.log("regiter CALLED", user)
+        mutation?.mutate(formData as any)
         return true
     }
 
@@ -167,6 +170,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     return (
         <AuthContext.Provider value={data}>
             {children}
+        
         </AuthContext.Provider>
     )
 }

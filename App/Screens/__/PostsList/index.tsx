@@ -9,16 +9,18 @@ import useThemeColors from '../../../Hooks/useThemeColors'
 import TabSelector from '../TabSelector'
 import ContentTables from '../ContentTables'
 import { SpanText } from '../../../Components/Texts'
+import { useAuthContext } from '../../../Contexts/AuthContext'
 
 export default function PostsList() {
 
     const [isRereshing, setIsRereshing] = useState(false)
     const themeColors = useThemeColors()
+    const authContext = useAuthContext()
 
     const posts = useQuery(
         ['posts'],
         async () => await axios<IPostItem[]>({
-            url: `${REQUESTS_API}posts`,
+            url: `${REQUESTS_API}posts?username=${authContext?.user?.account?.username}`,
             method: 'GET',
             headers: {},
             data: {}
@@ -36,7 +38,8 @@ export default function PostsList() {
 
 
     useEffect(() => {
-        console.log(posts.status)
+
+        console.log((posts?.failureReason as any)?.response?.data?.message)
 
         switch (posts?.status) {
             case 'loading':
@@ -53,8 +56,6 @@ export default function PostsList() {
                 setIsRereshing(false)
                 break;
         }
-
-        console.log((posts?.data?.data as any)?.data)
 
         return () => {
             // posts.remove()
