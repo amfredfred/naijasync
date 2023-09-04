@@ -7,6 +7,8 @@ import axios from 'axios';
 import { REQUESTS_API } from '@env';
 import { useAuthContext } from '../AuthContext';
 import { IPostItem } from '../../Interfaces';
+import { useNavigation } from '@react-navigation/native';
+import { useDataContext } from '../DataContext';
 
 const initialState: IPostContext = {
 
@@ -24,6 +26,8 @@ export default function PostFormProvider({ children }) {
 
     const [isFormShwon, setisFormShwon] = useState(false)
     const authContext = useAuthContext()
+    const dataContext = useDataContext()
+    const { navigate } = useNavigation()
 
     const createPostMutation = useMutation((info) => {
         return axios.post(`${REQUESTS_API}posts`,
@@ -37,7 +41,7 @@ export default function PostFormProvider({ children }) {
 
     const updatePostMutation = useMutation((info) => {
         return axios.post(`${REQUESTS_API}posts/${(info as any)?.postId as any}?_method=PUT`,
-           ( info as any)?.data, {
+            (info as any)?.data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${authContext?.user?.accessToken}`
@@ -113,9 +117,14 @@ export default function PostFormProvider({ children }) {
     const showForm: IPostFormMethods['showForm'] = (form, payload) => {
         setFormState(payload)
         setisFormShwon(Boolean(form))
-    }
+    } 
 
     const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
+        if (!authContext?.user?.isAuthenticated) {
+            console.log("ACTUALLY CALLED")
+            dataContext?.setObjectItem('user', { person: 'isNew' })
+            return
+        }
         const formData = new FormData()
         await Promise.all(Object.keys(payload)?.map(d => {
             formData.append('liked', typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])

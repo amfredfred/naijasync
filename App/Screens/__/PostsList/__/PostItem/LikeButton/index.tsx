@@ -38,14 +38,13 @@ export default function LikeButton(props: ILikeButton) {
     const themeColors = useThemeColors()
 
     const handleLikeToggle = () => {
-        if (!authContext?.user?.isAuthenticated) {
-            return 
+        if (authContext?.user?.isAuthenticated) {
+            handlePress()
+            setLikeCount(c => c = liked ? c -= 1 : c += 1)
+            setLiked(!liked);
+            props?.onLikeToggle(props?.post?.id, !liked);
         }
         postContext?.methods?.updatePost({ 'liked': !liked, puid: props?.post?.puid } as IPostItem)
-        handlePress()
-        setLikeCount(c => c = liked ? c -= 1 : c += 1)
-        setLiked(!liked);
-        props?.onLikeToggle(props?.post?.id, !liked);
     };
 
     return (

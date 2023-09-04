@@ -82,6 +82,8 @@ function Routes() {
         </GuestLayout>
     )
 
+    console.log('RERENDERED: ROOOT')
+
     return (
         <PostFormProvider>
             {(auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? UserRoutes : GuestRoutes}

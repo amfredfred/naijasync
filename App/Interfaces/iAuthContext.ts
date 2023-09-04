@@ -1,12 +1,12 @@
 import { IAppDataContext } from ".";
 
 export type IAuthContextData = {
+    isShowingMiniAuthForm?: boolean
     user: {
         isAuthenticated?: boolean,
         profileUri?: string
         accessToken?: string;
         searchRequestValue?: string
-        hasSkippedAuthentication?: boolean
         person: "isAuthenticated" | "isOffline" | "isNew" | "hasSkippedAuthentication",
 
         email?: string
@@ -23,7 +23,7 @@ export type IAuthContextData = {
             gender?: "MALE" | "FEMALE" | "UNKNOWN"
             profileCoverPics?: string[]
             username?: string
-            fullName?:string
+            fullName?: string
         }
     }
 }
@@ -34,4 +34,5 @@ export type IAuthContextMethods = {
     confirmNumber?(): Promise<boolean>
     skipAuth?(): void
     skipToOnboard?(): void
+    showMiniAuthForm?(prop: boolean): void
 }

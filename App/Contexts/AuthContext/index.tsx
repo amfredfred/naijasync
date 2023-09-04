@@ -15,7 +15,6 @@ const initialState: IAuthContextData = {
     user: {
         isAuthenticated: false,
         person: 'isNew',
-        hasSkippedAuthentication: false
     },
 }
 
@@ -45,6 +44,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         dispatch({ key, payload })
         method.setObjectItem?.(key, payload)
     }
+
     const { toast } = useToast()
 
     const mutation = useMutation((info) => {
@@ -73,7 +73,8 @@ export default function AuthContextProvider({ children }: { children: React.Reac
             setObjectItem('user', {
                 ...user,
                 ...(mutation?.data?.data as any)?.profile?.user,
-                ...(mutation?.data?.data as any)?.profile
+                ...(mutation?.data?.data as any)?.profile,
+                person: 'isAuthenticated',
             })
             return toast({
                 message: `Error: ${(mutation?.data as any)?.data?.message}`,
@@ -100,78 +101,78 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         formData.append('password', userData?.password)
         formData.append('password_confirmation', userData?.confirmPassword)
         formData.append('name', userData?.fullName)
-
-        mutation?.mutate(formData as any)
-        return true
+        const auth = await mutation?.mutateAsync(formData as any)
+        if (auth.status === 200)
+            return true
+        return false
     }
 
     const confirmNumber: IAuthContextMethods['confirmNumber'] = async () => {
-        console.log("confirmNumber")
         setObjectItem('user', { isAuthenticated: true, person: 'isAuthenticated' })
         return true
     }
 
     const logout: IAuthContextMethods['logout'] = async () => {
-        console.log("logout CALLED")
         method?.delItem?.('@NaijaSync')
         return true
     }
 
     const skipAuth: IAuthContextMethods['skipAuth'] = () => {
-        setObjectItem('user', { hasSkippedAuthentication: true, person: 'hasSkippedAuthentication' })
+        setObjectItem('user', { person: 'hasSkippedAuthentication' })
     }
 
     const skipToOnboard: IAuthContextMethods['skipToOnboard'] = () => {
-        setObjectItem('user', { hasSkippedAuthentication: false, person: 'isNew' })
+        setObjectItem('user', { person: 'isNew' })
+    }
+
+    const showMiniAuthForm: IAuthContextMethods['showMiniAuthForm'] = (state) => {
+        setObjectItem('user', { person: 'isNew' })
     }
 
 
     useEffect(() => {
-
         const checkAuthStatus = async () => {
+            console.log(NaijaSync?.user?.person, ":  PERSON OF NAIJASYNC")
             try {
-                // More logic goes here or there 🚀💫
                 const netGen = Cellular.CellularGeneration
-
                 if (!netGen.UNKNOWN) {
-                    if (NaijaSync?.user) {
-                        console.log("HAS USER OBJECT")
-                        setObjectItem('user', NaijaSync?.user)
-                    }
-                    else {
-                        // the person may be new 
-                        setObjectItem('user', { isAuthenticated: false, person: 'isNew', hasSkippedAuthentication: false })
+                    if (NaijaSync?.user?.person === 'isAuthenticated') {
+                        setObjectItem('user', { ...NaijaSync?.user, person: 'isAuthenticated', })
+                    } else if (NaijaSync?.user?.person === 'hasSkippedAuthentication') {
+                        setObjectItem('user', { person: 'hasSkippedAuthentication' })
+                    } else if (NaijaSync?.user?.person === 'isNew') {
+                        console.log(NaijaSync?.user?.person, ":  PERSON OF NAIJASYNC HRE HERER HRE RNEW")
+
+                        setObjectItem('user', { person: 'isNew' })
+                    } else if (NaijaSync?.user?.person === 'isOffline') {
+                        console.log("User is offline")
                     }
                 } else {
-                    // else this means the person is offliine or so...
-                    setObjectItem('user', { ...NaijaSync?.user, person: 'isNew', hasSkippedAuthentication: false })
+                    setObjectItem('user', NaijaSync?.user)
                 }
-
             } catch (error) {
                 console.error('Error while checking authentication status:', error)
             }
         }
-
         checkAuthStatus()
-
-        console.log(isFetching, NaijaSync?.user)
-
-        return () => {
-            // logout()
-        }
-
+        return () => { }
     }, [NaijaSync?.user?.person])
 
 
     const data: (IAuthContextData & IAuthContextMethods) = {
-        login, register, logout, confirmNumber, skipAuth, skipToOnboard,
+        login,
+        register,
+        logout,
+        confirmNumber,
+        skipAuth,
+        skipToOnboard,
+        showMiniAuthForm,
         user: states.user,
     }
 
     return (
         <AuthContext.Provider value={data}>
             {children}
-            <MiniAuhForm hidden />
         </AuthContext.Provider>
     )
 }

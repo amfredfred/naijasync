@@ -54,7 +54,6 @@ const useAppStatus = (): IAppStatus => {
 
         return () => {
             appStateSubscription.remove()
-
         }
     }, [fontsLoaded, error])
 
