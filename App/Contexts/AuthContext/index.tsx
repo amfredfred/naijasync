@@ -7,6 +7,7 @@ import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import { REQUESTS_API } from '@env'
 import { useToast } from '../ToastContext'
+import MiniAuhForm from '../../Screens/Guest/Auth/MiniAuthForm'
 
 
 
@@ -170,7 +171,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     return (
         <AuthContext.Provider value={data}>
             {children}
-        
+            <MiniAuhForm hidden />
         </AuthContext.Provider>
     )
 }
