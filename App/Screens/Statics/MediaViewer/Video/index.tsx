@@ -111,7 +111,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
 
     useEffect(() => {
         if (viewMode.value === 'hidden') {
-            console.log("RERENDERED 💫")
+           
         }
     }, [viewMode.value])
 
@@ -166,7 +166,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
             return true
         }
         else if (viewMode.value === 'collapsed') {
-            console.log("COLLAPASED")
+
             if (canGoBack()) {
                 return false
             }
@@ -174,7 +174,6 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
             return true
         }
         else {
-            console.log("HE FRED")
         }
     }
 

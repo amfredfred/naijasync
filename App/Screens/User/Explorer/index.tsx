@@ -17,9 +17,6 @@ export default function Explorer() {
 
     const { params } = useRoute()
     const { exploring, genre } = params as any
-    const __dummy =
-
-        console.log(params)
 
     const {
         setData,

@@ -35,7 +35,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
                 const deleted = await Library.removeAssetsFromAlbumAsync(assetId, album.id);
                 if (deleted)
                     getMydownloads(['audio', 'photo', 'video', 'unknown'])
-                console.log('Asset removed from album successfully');
             }
             Alert.alert(
                 "DELETE ITEM",
@@ -62,7 +61,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
                 const isIOS = Platform.OS === 'ios';
                 if (isIOS) {
                     const album = await Library.createAlbumAsync(albumName);
-                    console.log("ALBUM_CREATED_IOS:", album);
                     return !album;
                 } else {
                     const initialAsset = `${dirname}${itemsToMove?.[0]}`;

@@ -25,8 +25,6 @@ export default function Search() {
     const [shouldQuery, setshouldQuery] = useState(false)
     const [isRefreshing, setisRefreshing] = useState(false)
     const { params } = useRoute()
-    
-    console.log(params)
 
     const colors = useThemeColors()
 
@@ -48,14 +46,13 @@ export default function Search() {
 
     const onClearTimeout = () => {
         setshouldQuery(false)
-        console.log("RELLADED")
     }
 
     const onTimeout = () => {
         if (user?.searchRequestValue || isSelectedTarget)
             setshouldQuery(true)
-        console.log('TIME OUT')
     }
+    
     useEffect(() => {
 
 
@@ -74,7 +71,7 @@ export default function Search() {
 
     return (
         <ContainerBlock style={{ padding: 0, flex: 1 }}>
-            
+
             <ContainerBlock style={{ paddingHorizontal: 0, }}>
                 <ScrollContainer
                     horizontal

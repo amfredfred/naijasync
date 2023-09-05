@@ -45,9 +45,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
     const onSearchInputTextChange = (text: string) => {
         const isLinkchecked = linkChecker(text)
-        console.log(isLinkchecked)
         setData('user', 'searchRequestValue', text)
-        console.log(text)
     }
 
     //Effects 
@@ -137,11 +135,10 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 renderDrawerContent={() => {
                     return (
                         <ContainerFlex
-                            style={{ backgroundColor: 'transparent' }}
-                        >
+                            style={{ backgroundColor: 'transparent' }}     >
                             <View style={[styles.container, { backgroundColor: background }]}>
                                 <TouchableOpacity
-                                    onPress={authContext.skipToOnboard}
+                                    onPress={() => authContext?.user?.person === 'isAuthenticated' ? handleNavigateTo('Account') : authContext.skipToOnboard()}
 
                                     style={styles.accountContainer}>
                                     <IconButton
@@ -210,8 +207,8 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
             >
                 {Header}
                 {children}
-            </Drawer>
-        </ContainerFlex>
+            </Drawer >
+        </ContainerFlex >
     )
 }
 

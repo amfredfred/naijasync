@@ -37,9 +37,7 @@ export default function PostsList() {
     }
 
 
-    useEffect(() => {
-
-        console.log((posts?.failureReason as any)?.response?.data?.message)
+    useEffect(() => { 
 
         switch (posts?.status) {
             case 'loading':

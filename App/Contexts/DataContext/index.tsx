@@ -35,7 +35,6 @@ export default function DataContextProvider({ children }) {
 
     const setObjectItem: IAppDataContextMethods['setObjectItem'] = async (key, payload) => {
         method?.setObjectItem?.(key, payload)
-        console.log("DataContextProvider -> ", key, payload)
     }
 
     return (

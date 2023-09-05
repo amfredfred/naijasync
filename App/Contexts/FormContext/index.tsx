@@ -63,7 +63,6 @@ export default function PostFormProvider({ children }) {
         switch (createPostMutation.status) {
             case 'error': {
                 // createPostMutation.reset()
-                console.log(`Error: ${(createPostMutation?.failureReason as any)?.response?.data?.message}`)
                 toast({ message: `Error: ${(createPostMutation?.failureReason as any)?.response?.data?.message}`, severnity: 'error', })
                 break
             }
@@ -84,8 +83,7 @@ export default function PostFormProvider({ children }) {
     }, [createPostMutation.status])
 
     useEffect(() => {
-        console.log((updatePostMutation?.failureReason as any)?.response?.data?.message)
-        console.log(updatePostMutation?.data?.data)
+    
     }, [updatePostMutation?.status])
 
     const createPost = async (props: IPostContext) => {
@@ -121,7 +119,6 @@ export default function PostFormProvider({ children }) {
 
     const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
         if (!authContext?.user?.isAuthenticated) {
-            console.log("ACTUALLY CALLED")
             dataContext?.setObjectItem('user', { person: 'isNew' })
             return
         }

@@ -77,7 +77,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
                 person: 'isAuthenticated',
             })
             return toast({
-                message: `Error: ${(mutation?.data as any)?.data?.message}`,
+                message: `${(mutation?.data as any)?.data?.message}`,
                 severnity: 'success',
             })
         }
@@ -132,7 +132,6 @@ export default function AuthContextProvider({ children }: { children: React.Reac
 
     useEffect(() => {
         const checkAuthStatus = async () => {
-            console.log(NaijaSync?.user?.person, ":  PERSON OF NAIJASYNC")
             try {
                 const netGen = Cellular.CellularGeneration
                 if (!netGen.UNKNOWN) {
@@ -141,11 +140,8 @@ export default function AuthContextProvider({ children }: { children: React.Reac
                     } else if (NaijaSync?.user?.person === 'hasSkippedAuthentication') {
                         setObjectItem('user', { person: 'hasSkippedAuthentication' })
                     } else if (NaijaSync?.user?.person === 'isNew') {
-                        console.log(NaijaSync?.user?.person, ":  PERSON OF NAIJASYNC HRE HERER HRE RNEW")
-
                         setObjectItem('user', { person: 'isNew' })
                     } else if (NaijaSync?.user?.person === 'isOffline') {
-                        console.log("User is offline")
                     }
                 } else {
                     setObjectItem('user', NaijaSync?.user)

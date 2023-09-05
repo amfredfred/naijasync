@@ -16,7 +16,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import BottomSheet, { useBottomSheet, useBottomSheetDynamicSnapPoints } from '@gorhom/bottom-sheet';
 import ShareContent from "../../__/ShareFile";
 import { FilesBrowser } from "./FilesBrowser";
 
@@ -43,8 +42,6 @@ export default function Downloads() {
     const [BottomSheetDate, setBottomSheetDate] = useState<Library.AssetInfo>()
 
     const [index, setIndex] = useState(0)
-    const bottomSheetRef = useRef<BottomSheet>(null);
-    const handleClosePress = () => bottomSheetRef.current.close()
 
     const {
         libPermision,
@@ -84,7 +81,6 @@ export default function Downloads() {
             setIsRefreshing(false)
         } catch (error) {
             setIsRefreshing(false)
-            console.log("DOWNLOADS: ", error)
         } finally {
             setIsRefreshing(false)
         }
@@ -116,10 +112,7 @@ export default function Downloads() {
 
     const handleDownloadedItemClicked = async (item: Library.AssetInfo) => {
         setBottomSheetDate(item)
-        bottomSheetRef.current.expand()
     }
-
-    console.log(BottomSheetDate)
 
     // const VideosList = () => (
     //     <FlatList
@@ -171,7 +164,7 @@ export default function Downloads() {
 
     const handlebackbuttonPress = () => {
         if ('') {
-            handleClosePress()
+            
             return true
         } else {
 
@@ -197,14 +190,12 @@ export default function Downloads() {
     });
 
     const handlePagerIndexChange = (index: number) => {
-        console.log(index)
         setIndex(index)
     }
 
     const PAGINGS = (
         <PagerView
             style={[styles.pagerView, { backgroundColor: colors.background2 }]}
-            onPageScroll={() => console.log("SCROLLED")}
             initialPage={0}
         >
             <TabView
@@ -294,64 +285,7 @@ export default function Downloads() {
                 </ContainerBlock>
             }
 
-            <BottomSheet
-                ref={bottomSheetRef}
-                enablePanDownToClose
-                overDragResistanceFactor={23}
-                snapPoints={['60%']}
-                handleIndicatorStyle={{ backgroundColor: colors.text, width: 80, height: 8 }}
-                backgroundStyle={[{ 'backgroundColor': colors.background },]}
-                onClose={() => { console.log("REQUESTED CLOSE") }}
-            >
-                <ContainerBlock style={{ padding: 0, flex: 1 }}>
-                    <ImageBackground
-                        style={{ padding: 10 }}
-                        resizeMethod="resize"
-                        blurRadius={100}
-                        resizeMode='cover'
-                        source={{ uri: BottomSheetDate?.uri }}
-                    >
-                        <ContainerSpaceBetween>
-                            <Image
-                                source={{ uri: BottomSheetDate?.uri }}
-                                resizeMethod="resize"
-                                resizeMode='contain'
-                                style={{ aspectRatio: '16/9', width: 200, borderRadius: 10 }}
-                            />
-
-                            <IconButton
-                                onPress={() => handleOpenUrl(BottomSheetDate?.uri)}
-                                icon={<Ionicons name="play" size={70} color={'white'} />}
-                                containerStyle={{ padding: 7, backgroundColor: 'transparent' }}
-                                style={{ minWidth: 70, maxWidth: 70, aspectRatio: 1 }}
-                            />
-                        </ContainerSpaceBetween>
-                    </ImageBackground>
-
-                    <ScrollContainer
-                        horizontal
-                        contentContainerStyle={{ flex: 1, gap: 20, padding: 10, backgroundColor: colors.background2, maxHeight: 70 }}
-                    >
-                        <IconButton
-                            containerStyle={{ padding: 7, backgroundColor: colors.background, }}
-                            style={{ minWidth: 30, maxWidth: 50, aspectRatio: 1 }}
-                            icon={<Ionicons name="share-social" size={36} />}
-                            onPress={() => ShareContent({
-                                url: 'https://townsquare.media/site/442/files/2018/07/green-lantern-elba.jpg?w=980&q=75',
-                                message: "share item",
-                                title: 'share dfdf'
-                            })}
-                        />
-                        <IconButton
-                            containerStyle={{ padding: 7, backgroundColor: colors.background }}
-                            style={{ minWidth: 30, maxWidth: 50, aspectRatio: 1 }}
-                            title={undefined}
-                            icon={<MaterialIcons name="delete-outline" size={36} />}
-                            onPress={() => { }}
-                        />
-                    </ScrollContainer>
-                </ContainerBlock>
-            </BottomSheet>
+            
         </ContainerFlex>
     )
 }

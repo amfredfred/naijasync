@@ -37,13 +37,13 @@ export default function ToastProvider({ children }) {
         onTimeout: () => setToastInfo({ timeout: 3000 }),
         onClearTimeout: () => { },
         seconds: toastInfo?.timeout,
-        deps: [toast]
+        deps: [toastInfo?.message]
     })
 
     return (
         <ToastContext.Provider value={{ toast }} >
             {children}
-            {
+            { 
                 toastInfo.message && (
                     <Animated.View
                         entering={SlideInUp}

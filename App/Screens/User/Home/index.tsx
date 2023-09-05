@@ -1,13 +1,8 @@
-import TabSelector from "../../__/TabSelector";
-
-import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, RefreshControl, Dimensions } from 'react-native';
+import { useState } from 'react';
 import useThemeColors from "../../../Hooks/useThemeColors";
 import { useDataContext } from "../../../Contexts/DataContext";
 import React from 'react';
 // import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import { ContainerBlock, ScrollContainer } from "../../../Components/Containers";
-import { Button, IconButton } from "../../../Components/Buttons";
 import { useNavigation } from "@react-navigation/native";
 import PostsList from "../../__/PostsList";
 
@@ -63,34 +58,5 @@ export default function Home() {
     //     }
     // }
 
-    const expTabs = [
-        { title: 'Home', exploring: "all" },
-        { title: 'Comedy', exploring: "comedy " },
-        { title: 'Action', exploring: "action movies" },
-        { title: 'Sci-Fi', exploring: "sci-fi movies" },
-        { title: 'Nollywood', exploring: "nollywood movies" },
-    ]
-
-    return (
-        <ContainerBlock style={{ flex: 1, padding: 0 }}>
-            {/* <ContainerBlock style={{ paddingHorizontal:0,   }}>
-                <ScrollContainer
-                    horizontal
-                    contentContainerStyle={{ gap: 10, }}>
-                    {expTabs.map((ETab, index) =>
-                        <IconButton
-                            key={index}
-                            onPress={() => handleNavigateexplore(ETab.exploring)}
-                            title={ETab.title}
-                            active={index == 0} />
-                    )}
-                </ScrollContainer>
-            </ContainerBlock>
-
-            <ContentTables /> */}
-
-            <PostsList />
-
-        </ContainerBlock>
-    )
+    return (<PostsList />)
 }

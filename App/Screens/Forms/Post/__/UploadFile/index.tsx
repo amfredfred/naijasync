@@ -56,7 +56,6 @@ export default function UploadFileForm(props: IPostFormComponent) {
 
 
     const playPauseMedia = async () => {
-        console.log(mediaState, fileType)
         try {
             if (fileType === 'audio') {
                 if (!audioMediaRef)
@@ -114,7 +113,6 @@ export default function UploadFileForm(props: IPostFormComponent) {
         const post = await  createPost({
             ...sessionValues, 'postType': "UPLOAD"
         })
-        console.log("POSTED: ", post)
     }
     const handlePickDocument = async () => {
         let [type, multiple] = [['image/*', "video/*", "audio/*"], false]

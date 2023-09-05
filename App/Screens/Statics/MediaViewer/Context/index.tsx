@@ -22,7 +22,6 @@ export function MediaViewerProvider({ children }) {
 
     const [data, dispatch] = useReducer(mediaReducer, { ...initialState })
     const setMedia: IMediaViewerProvider['setMedia'] = ({ sources, thumbnailUri, previewing }) => {
-        console.log(sources)
         dispatch({ payload: { sources, thumbnailUri, previewing } })
     }
 

@@ -121,7 +121,6 @@ const UploadPostListItem = (post: IPostItem) => {
             case 'image':
                 return <ImageDisplay uri={`${REQUESTS_API}${post.fileUrl}`} />
             case 'audio':
-                console.log(post?.sourceQualities?.original?.duration?.formatted, "FORMART")
                 return <AudioDisplay
                     uri={`${REQUESTS_API}${post.fileUrl}`}
                     duration={post?.sourceQualities?.original?.duration?.formatted}
@@ -200,7 +199,7 @@ const UploadPostListItem = (post: IPostItem) => {
                 <View style={[styles.spaceBetween, { padding: 0 }]}>
 
                     <LikeButton post={post} onLikeToggle={() => { }} />
-                    
+
                     <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3, opacity: .4 }]}>
                         <AntDesign size={14} color={themeColors.text} name='barchart' />
                         <SpanText style={{ fontSize: 14 }}>{formatNumber(post?.views as number)}</SpanText>
