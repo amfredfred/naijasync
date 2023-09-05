@@ -7,9 +7,6 @@ import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import { REQUESTS_API } from '@env'
 import { useToast } from '../ToastContext'
-import MiniAuhForm from '../../Screens/Guest/Auth/MiniAuthForm'
-
-
 
 const initialState: IAuthContextData = {
     user: {

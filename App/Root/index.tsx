@@ -26,6 +26,14 @@ import RegisterScreen from '../Screens/Guest/Auth/Register/index,';
 import LoginScreen from '../Screens/Guest/Auth/Login';
 import AccountLayout from '../Layouts/Account';
 import Account from '../Screens/User/Account';
+import AccountTabBar from './__/AccountTabBar';
+
+
+const screenOptions = {
+    headerShown: false,
+    animation: "fade",
+    contentStyle: { backgroundColor: 'red' }
+} as const
 
 function Routes() {
     // const [isAuthenticated, setisAuthenticated] = useState(true)
@@ -65,8 +73,11 @@ function Routes() {
 
     const AccountRoutes = () => (
         <AccountLayout>
-            <Buttom.Navigator screenOptions={{ headerShown: false, }}>
-                <Buttom.Screen name='Prfoile' component={Account} />
+            <Buttom.Navigator tabBar={op => <AccountTabBar {...op} />} screenOptions={screenOptions} >
+                <Buttom.Screen name='Profile' options={{ tabBarBadge: 'account' }} component={Account} />
+                <Buttom.Screen name='Dashboard' options={{ tabBarBadge: 'dashboard' }} component={Account} />
+                <Buttom.Screen name='Finance' options={{ tabBarBadge: 'finance' }} component={Account} />
+                <Buttom.Screen name='Settings' options={{ tabBarBadge: 'settings' }} component={Account} />
             </Buttom.Navigator>
         </AccountLayout>
     )
@@ -84,7 +95,7 @@ function Routes() {
 
     const UserRoutes = (
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
-            <Stack.Screen name='Home' component={PublicRoutes} />
+            <Stack.Screen name='Welcome' component={PublicRoutes} />
             <Stack.Screen name="Account" component={AccountRoutes} />
         </Stack.Navigator>
     )
@@ -99,8 +110,6 @@ function Routes() {
             </Stack.Navigator>
         </GuestLayout>
     )
-
-    console.log('RERENDERED: ROOOT')
 
     return (
         <PostFormProvider>

@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import CoverPicExample from '../../../../assets/welcome-background.jpg'
 import ProfilePicExample from '../../../../assets/upload-image-icon.png'
 import { useState } from 'react'
@@ -12,32 +12,42 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { IPostItem } from '../../../Interfaces';
 import { REQUESTS_API } from '@env';
-import PostsList from '../../__/PostsList';
+import PagerView from 'react-native-pager-view';
+import PostItem from '../../__/PostsList/__/PostItem';
+import { IPostType } from '../../../Interfaces/IPostContext';
+import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
+
+interface IAccount {
+    postTypes: IPostType['types'],
+    screenTabs: "video" | "audio" | "image" | 'article'
+}
 
 export default function Account() {
 
     const themeColors = useThemeColors()
     const authContext = useAuthContext()
     const [isRefreshingPost, setisRefreshingPost] = useState(false)
+    const [ActiveTab, setActiveTab] = useState<IAccount['screenTabs']>('video')
+
+    const tabs: IAccount['screenTabs'][] = [
+        "video", 'audio', 'image', 'article'
+    ]
 
     const posts = useQuery(
         ['user-posts'],
         async () => await axios<IPostItem[]>({
-            url: `${REQUESTS_API}user/posts`,
+            url: `${REQUESTS_API}account-posts`,
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authContext?.user?.accessToken}`
             },
-        }),
-        {
-            getNextPageParam: (lastPage) => (lastPage as any).next_page_url,
-        }
+        })
     )
 
     console.log(posts?.data?.data)
 
     const UserDataDisplay = () => (
-        <View>
+        <View style={{ backgroundColor: themeColors?.background }}>
             {authContext?.user?.account?.profileCoverPics ?? [CoverPicExample]?.map(cover => (
                 <Animated.Image
                     resizeMethod="resize"
@@ -87,19 +97,48 @@ export default function Account() {
         </View>
     )
 
+    const TabNavigation = (
+        <ScrollView
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            style={[{ backgroundColor: themeColors?.background, height: 40, width: '100%', overflow: 'hidden', marginBottom: 5 }]}
+            contentContainerStyle={[styles.spaceBeteen, { minWidth: '100%' }]}>
+            <View style={[styles.spaceBeteen, { gap: 20 }]}>
+                {tabs?.map(tab => (
+                    <TouchableOpacity
+                        onPress={() => setActiveTab(tab)}
+                        style={[styles.spaceBeteen, styles.tabIndexButton]}>
+                        <SpanText style={{ opacity: ActiveTab === tab ? .5 : 1, textTransform: 'uppercase', fontSize: 17 }} >{tab}</SpanText>
+                        {!(ActiveTab === tab) ||
+                            <Animated.View
+                                entering={SlideInDown}
+                                exiting={SlideOutDown}
+                                style={[styles.tabIndexButtonUnderline, { backgroundColor: themeColors.text, }]} />
+                        }
+                    </TouchableOpacity>
+                ))}
+            </View>
+        </ScrollView>
+    )
+
     return (
         <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-            <PostsList
-                ListHeaderComponent={<UserDataDisplay />}
-                isRefrehing={isRefreshingPost}
-                onRefresh={posts?.refetch}
-                list={(posts?.data?.data as any)?.data ?? []} />
+            <ScrollView
+                stickyHeaderHiddenOnScroll
+                stickyHeaderIndices={[1]}
+                style={{ flex: 1, backgroundColor: themeColors?.background2 }}>
+                <UserDataDisplay />
+                {TabNavigation}
+                {
+                    posts?.data?.data?.filter(post => (post.fileType === ActiveTab || post?.fileType.toLocaleLowerCase() === ActiveTab)).map(post => <PostItem {...post} />)
+                }
+            </ScrollView>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { 
+    container: {
         flex: 1,
     },
     profileData: {
@@ -176,5 +215,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 5
+    },
+    tabIndexButton: {
+        height: 40,
+        minWidth: 80,
+        justifyContent: 'center',
+        overflow: 'hidden'
+    },
+    tabIndexButtonUnderline: {
+        height: 6,
+        backgroundColor: 'red'
+        , borderTopLeftRadius: 50
+        , borderTopRightRadius: 50,
+        width: '100%',
+        position: 'absolute',
+        bottom: -1,
+        opacity: .5
     }
 }); 

@@ -28,22 +28,35 @@ const StatusPostListItem = (post: IPostItem) => {
     )
 }
 
-const VideoDisplay = (prop: { uri: string }) => {
+const VideoDisplay = (prop: { uri: string, thumbUri: string }) => {
 
     const videoRef = useRef<Video>(null)
     const themeColors = useThemeColors()
+    const mediaContext = useMediaPlaybackContext()
 
     return (
         <View style={[styles.mediaDisplayWrapper, {}]}>
-            <Video
-                source={{ uri: prop.uri }}
-                resizeMode={ResizeMode.COVER}
-                ref={videoRef}
-                style={{ width: '100%', height: '100%' }}
-            />
+            <View style={{ position: 'relative', height: '100%', width: '100%' }}>
+                <Image
+                    style={{ width: '100%', height: '100%', position: 'absolute', left: 0, top: 0 }}
+                    source={{ uri: prop?.thumbUri ?? prop.uri }}
+                    resizeMethod='resize'
+                    resizeMode='repeat'
+                />
+                {/* <Video
+                    source={{ uri: prop.uri }}
+                    resizeMode={ResizeMode.COVER}
+                    ref={videoRef}
+                    style={{ width: '100%', height: '100%' }}
+                /> */}
+            </View>
             <View style={[styles.spaceBetween, styles.playPauseiconContainer]}>
                 <View style={{ flex: 1 }} />
-                <TouchableOpacity style={[styles.allIconStyle]}>
+                <TouchableOpacity
+                    onPress={() => mediaContext?.setMedia({
+                        sources: [prop?.uri]
+                    })}
+                    style={[styles.allIconStyle]}>
                     <Ionicons
                         name='play-circle'
                         color={'aliceblue'}
@@ -117,7 +130,7 @@ const UploadPostListItem = (post: IPostItem) => {
         const fileType = getMediaType(post?.fileUrl)
         switch (fileType) {
             case 'video':
-                return <VideoDisplay uri={`${REQUESTS_API}${post.fileUrl}`} />
+                return <VideoDisplay uri={`${REQUESTS_API}${post.fileUrl}`} thumbUri={`${REQUESTS_API}${post.thumbnailUrl}`} />
             case 'image':
                 return <ImageDisplay uri={`${REQUESTS_API}${post.fileUrl}`} />
             case 'audio':
@@ -233,7 +246,7 @@ const UploadPostListItem = (post: IPostItem) => {
     )
 
     return (
-        <View style={{ paddingTop: 10, flexGrow: 1, flex: 1 }}>
+        <View style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background, marginBottom: 6 }}>
             <View style={[styles.postWrapper]}>
                 {UploadPostListItemLeftRow}
                 {UploadPostListItemContentRow}
@@ -280,7 +293,8 @@ const styles = StyleSheet.create({
         left: 0,
         bottom: 0,
         padding: 10,
-        position: 'absolute'
+        position: 'absolute',
+        zIndex: 50
     },
     allIconStyle: {
         borderRadius: 50,

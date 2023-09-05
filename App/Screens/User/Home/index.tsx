@@ -101,6 +101,8 @@ export default function Home() {
 
     return (
         <PostsList
+            invertStickyHeaders
+            stickyHeaderHiddenOnScroll
             ListHeaderComponent={<ContentTables />}
             list={(posts?.data?.data as any)?.data ?? []}
             onRefresh={posts?.refetch}

@@ -2,15 +2,41 @@ import { View, FlatList, RefreshControl, StyleSheet } from 'react-native'
 import { IPostItem } from '../../../Interfaces'
 import PostItem from './__/PostItem'
 import useThemeColors from '../../../Hooks/useThemeColors'
+import { SpanText } from '../../../Components/Texts'
 
 interface IPostList {
     list: IPostItem[],
     onRefresh?(): void,
     isRefrehing?: boolean
     ListHeaderComponent?: FlatList['props']['ListHeaderComponent']
+    invertStickyHeaders?: FlatList['props']['invertStickyHeaders']
+    stickyHeaderHiddenOnScroll?: FlatList['props']['stickyHeaderHiddenOnScroll']
+    stickyHeaderIndices?: FlatList['props']['stickyHeaderIndices']
 }
 
-export default function PostsList({ list, onRefresh, isRefrehing, ListHeaderComponent }: IPostList) {
+
+export const Empty = () => {
+    const themeColors = useThemeColors()
+
+    return (
+        <View style={{ height: 340, paddingTop: 10 }}>
+            <View style={[styles.postWrapper]}>
+                <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
+                    <View style={{ width: 40, aspectRatio: 1, borderRadius: 50, backgroundColor: themeColors.background, opacity: .6 }} />
+                </View>
+                <View style={[styles.postContentWrapper, { backgroundColor: themeColors.background, opacity: .6 }]} />
+            </View>
+        </View>
+    )
+}
+
+export default function PostsList({ list,
+    onRefresh, isRefrehing,
+    ListHeaderComponent,
+    invertStickyHeaders,
+    stickyHeaderHiddenOnScroll,
+    stickyHeaderIndices = [0]
+}: IPostList) {
 
     const themeColors = useThemeColors()
 
@@ -20,32 +46,20 @@ export default function PostsList({ list, onRefresh, isRefrehing, ListHeaderComp
 
     }
 
-    const Empty = () => (
-        <View style={{ height: 340, paddingTop: 10 }}>
-            <View style={[styles.postWrapper]}>
-                <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
-                    <View style={{ width: 40, aspectRatio: 1, borderRadius: 50, backgroundColor: themeColors.background2, opacity: .6 }} />
-                </View>
-                <View style={[styles.postContentWrapper, { backgroundColor: themeColors.background2, opacity: .6 }]} >
-
-                </View>
-            </View>
-        </View>
-    )
 
     return (
         <FlatList
-            stickyHeaderIndices={[0]}
-            stickyHeaderHiddenOnScroll
-            invertStickyHeaders
+            stickyHeaderIndices={stickyHeaderIndices}
+            stickyHeaderHiddenOnScroll={stickyHeaderHiddenOnScroll}
+            invertStickyHeaders={invertStickyHeaders}
             ListHeaderComponent={ListHeaderComponent}
-            ItemSeparatorComponent={() => <View style={{ backgroundColor: themeColors.background2, height: 5 }} />}
-            style={{ flex: 1 }}
+            maxToRenderPerBatch={4}
+            // ItemSeparatorComponent={() => <View style={{ backgroundColor: themeColors.background2, height: 5 }} />}
+            style={{ flex: 1, backgroundColor: themeColors.background2 }}
             data={list}
             renderItem={({ item, index }) => (<PostItem {...item} />)}
             ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
             refreshControl={<RefreshControl onRefresh={handleOnRefreshList} refreshing={isRefrehing} />}
-            keyExtractor={(p) => p.puid.trim()}
             {...{}}
         />
     )
