@@ -24,6 +24,8 @@ export type IAuthContextData = {
             profileCoverPics?: string[]
             username?: string
             fullName?: string
+            following?: number
+            followers?: number
         }
     }
 }

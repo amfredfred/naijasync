@@ -1,64 +1,24 @@
-import { REQUESTS_API } from '@env'
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import { View, Text, FlatList, RefreshControl, StyleSheet } from 'react-native'
-import { useEffect, useState } from 'react'
+import { View, FlatList, RefreshControl, StyleSheet } from 'react-native'
 import { IPostItem } from '../../../Interfaces'
 import PostItem from './__/PostItem'
 import useThemeColors from '../../../Hooks/useThemeColors'
-import TabSelector from '../TabSelector'
-import ContentTables from '../ContentTables'
-import { SpanText } from '../../../Components/Texts'
-import { useAuthContext } from '../../../Contexts/AuthContext'
 
-export default function PostsList() {
+interface IPostList {
+    list: IPostItem[],
+    onRefresh?(): void,
+    isRefrehing?: boolean
+    ListHeaderComponent?: FlatList['props']['ListHeaderComponent']
+}
 
-    const [isRereshing, setIsRereshing] = useState(false)
+export default function PostsList({ list, onRefresh, isRefrehing, ListHeaderComponent }: IPostList) {
+
     const themeColors = useThemeColors()
-    const authContext = useAuthContext()
-
-    const posts = useQuery(
-        ['posts'],
-        async () => await axios<IPostItem[]>({
-            url: `${REQUESTS_API}posts?username=${authContext?.user?.account?.username}`,
-            method: 'GET',
-            headers: {},
-            data: {}
-        }),
-        {
-            getNextPageParam: (lastPage) => (lastPage as any).next_page_url,
-        }
-    )
 
     const handleOnRefreshList = () => {
 
-        posts?.refetch()
+        onRefresh?.()
 
     }
-
-
-    useEffect(() => { 
-
-        switch (posts?.status) {
-            case 'loading':
-                setIsRereshing(true)
-                break;
-            case 'success':
-                setIsRereshing(false)
-                break;
-            case 'error':
-                setIsRereshing(false)
-                posts.remove()
-                break;
-            default:
-                setIsRereshing(false)
-                break;
-        }
-
-        return () => {
-            // posts.remove()
-        }
-    }, [posts.status])
 
     const Empty = () => (
         <View style={{ height: 340, paddingTop: 10 }}>
@@ -74,21 +34,20 @@ export default function PostsList() {
     )
 
     return (
-        <View style={{ flex: 1 }}>
-            <FlatList
-                stickyHeaderIndices={[0]}
-                stickyHeaderHiddenOnScroll
-                invertStickyHeaders
-                ListHeaderComponent={<ContentTables />}
-                ItemSeparatorComponent={() => <View style={{ backgroundColor: themeColors.background2, height: 5 }} />}
-                style={{ flex: 1 }}
-                data={(posts?.data?.data as any)?.data ?? []}
-                renderItem={({ item, index }) => (<PostItem {...item} />)}
-                ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
-                refreshControl={<RefreshControl onRefresh={handleOnRefreshList} refreshing={isRereshing} />}
-                {...{}}
-            />
-        </View>
+        <FlatList
+            stickyHeaderIndices={[0]}
+            stickyHeaderHiddenOnScroll
+            invertStickyHeaders
+            ListHeaderComponent={ListHeaderComponent}
+            ItemSeparatorComponent={() => <View style={{ backgroundColor: themeColors.background2, height: 5 }} />}
+            style={{ flex: 1 }}
+            data={list}
+            renderItem={({ item, index }) => (<PostItem {...item} />)}
+            ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
+            refreshControl={<RefreshControl onRefresh={handleOnRefreshList} refreshing={isRefrehing} />}
+            keyExtractor={(p) => p.puid.trim()}
+            {...{}}
+        />
     )
 }
 

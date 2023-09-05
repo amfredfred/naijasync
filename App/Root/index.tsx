@@ -66,7 +66,7 @@ function Routes() {
     const AccountRoutes = () => (
         <AccountLayout>
             <Buttom.Navigator screenOptions={{ headerShown: false, }}>
-                <Buttom.Screen name='Account' component={Account} />
+                <Buttom.Screen name='Prfoile' component={Account} />
             </Buttom.Navigator>
         </AccountLayout>
     )
@@ -83,7 +83,7 @@ function Routes() {
     )
 
     const UserRoutes = (
-        <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
             <Stack.Screen name='Home' component={PublicRoutes} />
             <Stack.Screen name="Account" component={AccountRoutes} />
         </Stack.Navigator>

@@ -5,14 +5,23 @@ import React from 'react';
 // import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useNavigation } from "@react-navigation/native";
 import PostsList from "../../__/PostsList";
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { IPostItem } from '../../../Interfaces';
+import { useAuthContext } from '../../../Contexts/AuthContext';
+import { useEffect } from 'react'
+import { REQUESTS_API } from '@env';
+import ContentTables from '../../__/ContentTables';
 
 export default function Home() {
     const { setData, states: NJS } = useDataContext()
     const colors = useThemeColors()
+    const authContext = useAuthContext()
     const { navigate } = useNavigation()
 
     const [isRewardAdReady, setisRewardAdReady] = useState(false)
     const [hasEarnedRewards, sethasEarnedRewards] = useState(false)
+    const [isRereshing, setIsRereshing] = useState(false)
 
     const handleNavigateexplore = (genre: string) => {
         (navigate as any)?.("Explorer", { genre });
@@ -58,5 +67,43 @@ export default function Home() {
     //     }
     // }
 
-    return (<PostsList />)
+    const posts = useQuery(
+        ['posts'],
+        async () => await axios<IPostItem[]>({
+            url: `${REQUESTS_API}posts?username=${authContext?.user?.account?.username}`,
+            method: 'GET',
+        }),
+        {
+            getNextPageParam: (lastPage) => (lastPage as any).next_page_url,
+        }
+    )
+
+    useEffect(() => {
+        switch (posts?.status) {
+            case 'loading':
+                setIsRereshing(true)
+                break;
+            case 'success':
+                setIsRereshing(false)
+                break;
+            case 'error':
+                setIsRereshing(false)
+                posts.remove()
+                break;
+            default:
+                setIsRereshing(false)
+                break;
+        }
+        return () => {
+            // posts.remove()
+        }
+    }, [posts.status])
+
+    return (
+        <PostsList
+            ListHeaderComponent={<ContentTables />}
+            list={(posts?.data?.data as any)?.data ?? []}
+            onRefresh={posts?.refetch}
+            isRefrehing={posts?.isFetching} />
+    )
 }
