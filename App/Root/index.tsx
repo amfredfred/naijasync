@@ -20,8 +20,7 @@ import { Linking } from 'react-native';
 import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ToastProvider from "../Contexts/ToastContext";
-import PostFormProvider from "../Contexts/FormContext";
-import AuthContextProvider, { useAuthContext } from '../Contexts/AuthContext';
+import { useAuthContext } from '../Contexts/AuthContext';
 import RegisterScreen from '../Screens/Guest/Auth/Register/index,';
 import LoginScreen from '../Screens/Guest/Auth/Login';
 import AccountLayout from '../Layouts/Account';
@@ -65,13 +64,6 @@ function Routes() {
         // Use route to navigate to the appropriate screen
     });
 
-
-    const SearchStack = () => (
-        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
-            <Stack.Screen name="Lookup" component={Search} />
-        </Stack.Navigator>
-    )
-
     const AccountRoutes = () => (
         <AccountLayout>
             <Buttom.Navigator tabBar={op => <AccountTabBar {...op} />} screenOptions={screenOptions} >
@@ -83,27 +75,13 @@ function Routes() {
         </AccountLayout>
     )
 
-    const PublicRoutes = () => (
-        <UserLayout>
-            <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
-                <Stack.Screen name='Index' component={Home} />
-                <Stack.Screen name='Downloads' component={Downloads} />
-                <Stack.Screen name="Explorer" component={Explorer} />
-            </Stack.Navigator>
-        </UserLayout>
-    )
-
-    const Welcome = () => (
-        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
-            <Stack.Screen name='Home' component={PublicRoutes} />
-            <Stack.Screen name="Search" component={SearchStack} />
-            <Stack.Screen name='PostComposer' component={PostComposer} />
-        </Stack.Navigator>
-    )
-
-    const UserRoutes = (
+    const PublicRoutes = (
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
-            <Stack.Screen name='Welcome' component={Welcome} />
+            <Stack.Screen name='Home' component={Home} />
+            <Stack.Screen name='Downloads' component={Downloads} />
+            <Stack.Screen name="Explorer" component={Explorer} />
+            <Stack.Screen name="Search" component={Search} />
+            <Stack.Screen name='PostComposer' component={PostComposer} />
             <Stack.Screen name="Account" component={AccountRoutes} />
         </Stack.Navigator>
     )
@@ -117,9 +95,9 @@ function Routes() {
             </Stack.Navigator>
         </GuestLayout>
     )
+    console.log("MASTER RERENDERED")
 
-
-    return ((auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? UserRoutes : GuestRoutes)
+    return ((auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? PublicRoutes : GuestRoutes)
 
 }
 

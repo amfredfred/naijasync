@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback , useMemo} from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Image, Dimensions, View, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Text } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
@@ -21,7 +21,7 @@ import { useDataContext } from "../../../../Contexts/DataContext";
 
 const { height, width } = Dimensions.get('window')
 
-export default function UploadFileForm() {
+export const UploadFileForm = () => {
 
     const videoMediaRef = useRef<Video>(null)
     const [audioMediaRef, setAudioMediaRef] = useState<Audio.SoundObject>(null)
@@ -40,6 +40,16 @@ export default function UploadFileForm() {
         onShow: () => setIsKeyboardShown(true),
         onHide: () => setIsKeyboardShown(false),
     })
+
+    useEffect(() => {
+        const fileType = getMediaType(sessionValues?.file?.uri)
+        setFileType(fileType)
+
+        return () => {
+            setFileType(null)
+            setMediaState(state => ({ ...state, playState: 'paused' }))
+        }
+    }, [sessionValues?.file?.uri])
 
     const playPauseMedia = async () => {
         try {
@@ -77,36 +87,31 @@ export default function UploadFileForm() {
         })
     }
 
-    const handlePickDocument = useCallback(async () => {
-        const [type, multiple] = [['image/*', "video/*", "audio/*"], false];
+    const handlePickDocument = async () => {
+        const [type, multiple] = [['image/*', "video/*", "audio/*"], false]
         try {
             const pickedItems = await FilePicker.getDocumentAsync({
                 multiple,
                 type,
-            });
+            })
             if (!pickedItems.canceled) {
-                const picked = pickedItems.assets?.[0];
-                console.log("DONE DONE", picked, " PICKED");
+                const picked = pickedItems.assets?.[0]
+                console.log("DOEN DONE", picked, " {ICLED")
                 setSessionValues(state => ({
-                    ...state,
-                    file: {
+                    ...state, file: {
                         uri: picked?.uri,
                         size: picked.size,
                         name: picked.name,
                         type: picked?.mimeType
                     }
-                }));
-                if (['video', 'image'].includes(picked?.mimeType)) {
-                    setSessionValues(state => ({ ...state, thumbnail: picked.uri }));
-                }
+                }))
+                if (['video', 'image'].includes(picked?.mimeType))
+                    setSessionValues(state => ({ ...state, thumbnail: picked.uri }))
             }
         } catch (error) {
-            console.log("ERROR handlePickDocument -> ", error);
+            console.log("ERROR handlePickDocument -> ", error)
         }
-    }, [setSessionValues]);
-
-
-    console.log(sessionValues)
+    }
 
     const handlePlaybackStatusUpdate = (data) => {
         if (data?.isLoaded && !data.isPlaying && data.didJustFinish) {
@@ -350,15 +355,17 @@ export default function UploadFileForm() {
         </View>
     )
 
-    return useMemo(() => (
+    return (
         <Animated.View
             entering={SlideInDown}
             exiting={SlideOutUp}
             style={[styles.container, {}]}>
             {sessionValues?.file ? previewUploadedFile : fileExplorer}
         </Animated.View>
-    ), [])
-} 
+    )
+}
+
+export default UploadFileForm
 
 const styles = StyleSheet.create({
     container: {

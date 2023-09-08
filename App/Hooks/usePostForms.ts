@@ -6,12 +6,14 @@ import { useToast } from "../Contexts/ToastContext";
 import { useAuthContext } from "../Contexts/AuthContext";
 import { useDataContext } from "../Contexts/DataContext";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 export default function usePostForm(): { states: IPostContext, methods: IPostFormMethods } {
     const [states, setFormState] = useState({});
 
     const authContext = useAuthContext()
     const dataContext = useDataContext()
+    const navigation = useNavigation()
 
     const createPostMutation = useMutation((info) => {
         return axios.post(`${REQUESTS_API}posts`,
@@ -59,13 +61,14 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         formData.append('description', JSON.stringify(props?.description))
         formData.append('type', props.postType)
         formData.append('tags', JSON.stringify(props?.tags))
-
+        if (navigation?.canGoBack()) {
+            navigation?.goBack()
+        }
         const post = await createPostMutation?.mutateAsync(formData as any)
         if (post?.status == 201 || post?.status == 200) {
             toast({ message: 'Nice !!', severnity: 'success' })
             createPostMutation.reset()
         }
-        console.log(post)
         return {} as any
     }
 

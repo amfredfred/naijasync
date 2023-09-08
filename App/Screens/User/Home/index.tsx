@@ -13,6 +13,7 @@ import { useEffect } from 'react'
 import { REQUESTS_API } from '@env';
 import SlideCarousel from '../../../Components/SlideCarousel';
 import { Videos } from "../../../dummy-data";
+import UserLayout from '../../../Layouts/User';
 
 export default function Home() {
     const { setData, states: NJS } = useDataContext()
@@ -106,14 +107,16 @@ export default function Home() {
             headline='Hollywood'
             items={Videos} />
     )
-    
+
     return (
-        <PostsList
-            invertStickyHeaders
-            stickyHeaderHiddenOnScroll
-            ListHeaderComponent={Post}
-            list={(posts?.data?.data as any)?.data ?? []}
-            onRefresh={posts?.refetch}
-            isRefrehing={posts?.isFetching} />
+        <UserLayout>
+            <PostsList
+                invertStickyHeaders
+                stickyHeaderHiddenOnScroll
+                ListHeaderComponent={Post}
+                list={(posts?.data?.data as any)?.data ?? []}
+                onRefresh={posts?.refetch}
+                isRefrehing={posts?.isFetching} />
+        </UserLayout>
     )
 }
