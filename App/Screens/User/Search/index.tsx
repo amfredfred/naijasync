@@ -10,7 +10,7 @@ import { REQUESTS_API } from "@env"
 import { useEffect, useState } from 'react'
 import { IPostItem } from "../../../Interfaces";
 import useTimeout from "../../../Hooks/useTimeout";
-import ListSlideItem from "../../Partials/ListSlider/ListSliderItem";
+import ListSlideItem from "../../../Components/SlideCarousel/ListSliderItem";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -52,7 +52,7 @@ export default function Search() {
         if (user?.searchRequestValue || isSelectedTarget)
             setshouldQuery(true)
     }
-    
+
     useEffect(() => {
 
 

@@ -12,7 +12,7 @@ import { IPostFormComponent, IPostFormMethods, IPostType } from "../../../Interf
 import useLinkPreview from "../../../Hooks/useLinkPreview";
 import useTimeout from "../../../Hooks/useTimeout";
 import { useMediaPlaybackContext } from "../../Statics/MediaViewer/Context";
-import FormBottomTabs from "./__/BottomForTabs";
+import FormBottomTabs from "./BottomForTabs";
 import UploadStatusFrom from "./__/UploadStatus";
 import UploadFileForm from "./__/UploadFile";
 

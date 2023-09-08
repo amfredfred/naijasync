@@ -2,6 +2,8 @@ import { Linking } from 'react-native'
 import { IMediaType } from '../Interfaces';
 import { Notifications } from 'react-native-notifications';
 
+export const wait = /*@devfred*/ async (seconds?: number) => new Promise((resolved) => setTimeout(() => resolved('continue'), Number(seconds) * 1000 || 1000))
+
 export const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
 

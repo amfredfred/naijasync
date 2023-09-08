@@ -12,7 +12,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import useTimeout from "../../../../Hooks/useTimeout";
 import { formatDuration, formatPlaytimeDuration } from "../../../../Helpers";
 import { useNavigation } from "@react-navigation/native";
-import ShareContent from "../../../__/ShareFile";
+import ShareContent from "../../../../Components/ShareFile";
 import { Videos } from "../../../../dummy-data";
 import { ProgressBar } from "../../../../Components/Inputs";
 import { HeadLine } from "../../../../Components/Texts";
@@ -111,7 +111,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
 
     useEffect(() => {
         if (viewMode.value === 'hidden') {
-           
+
         }
     }, [viewMode.value])
 

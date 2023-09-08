@@ -2,19 +2,18 @@ import { ContainerFlex, ContainerBlock, ContainerSpaceBetween, ScrollContainer }
 import { Keyboard, StatusBar, BackHandler } from "react-native";
 import { SpanText } from "../../Components/Texts";
 import { useEffect, useState } from 'react'
-import { Button, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import useThemeColors from "../../Hooks/useThemeColors";
 import { IconButton } from "../../Components/Buttons";
-import { AntDesign, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5, Ionicons, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { InputText } from "../../Components/Inputs";
 import { useDataContext } from "../../Contexts/DataContext";
 import { useNavigation } from "@react-navigation/native";
 import { HeadLine } from "../../Components/Texts";
 import { linkChecker } from "../../Helpers";
-import TabSelector from "../../Screens/__/TabSelector";
 import IMAGS from '../../../assets/adaptive-icon.png'
-import DigitalClock from "../../Screens/__/DigitalClock";
+import DigitalClock from "../../Components/DigitalClock";
 import { usePostFormContext } from "../../Contexts/FormContext";
 import { useAuthContext } from "../../Contexts/AuthContext";
 

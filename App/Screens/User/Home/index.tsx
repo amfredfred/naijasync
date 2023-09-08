@@ -11,7 +11,8 @@ import { IPostItem } from '../../../Interfaces';
 import { useAuthContext } from '../../../Contexts/AuthContext';
 import { useEffect } from 'react'
 import { REQUESTS_API } from '@env';
-import ContentTables from '../../__/ContentTables';
+import SlideCarousel from '../../../Components/SlideCarousel';
+import { Videos } from "../../../dummy-data";
 
 export default function Home() {
     const { setData, states: NJS } = useDataContext()
@@ -99,11 +100,18 @@ export default function Home() {
         }
     }, [posts.status])
 
+
+    const Post = (
+        <SlideCarousel
+            headline='Hollywood'
+            items={Videos} />
+    )
+    
     return (
         <PostsList
             invertStickyHeaders
             stickyHeaderHiddenOnScroll
-            ListHeaderComponent={<ContentTables />}
+            ListHeaderComponent={Post}
             list={(posts?.data?.data as any)?.data ?? []}
             onRefresh={posts?.refetch}
             isRefrehing={posts?.isFetching} />

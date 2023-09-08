@@ -16,7 +16,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import ShareContent from "../../__/ShareFile";
+import ShareContent from "../../../Components/ShareFile";
 import { FilesBrowser } from "./FilesBrowser";
 
 
@@ -164,7 +164,7 @@ export default function Downloads() {
 
     const handlebackbuttonPress = () => {
         if ('') {
-            
+
             return true
         } else {
 
@@ -285,7 +285,7 @@ export default function Downloads() {
                 </ContainerBlock>
             }
 
-            
+
         </ContainerFlex>
     )
 }

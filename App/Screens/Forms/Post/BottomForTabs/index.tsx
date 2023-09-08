@@ -1,8 +1,8 @@
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
 import { StyleSheet, ScrollView, TouchableOpacity, Text, useColorScheme } from 'react-native'
 import { MaterialCommunityIcons, MaterialIcons, Zocial } from '@expo/vector-icons'
-import useThemeColors from '../../../../../Hooks/useThemeColors'
-import { IPostType } from '../../../../../Interfaces/IPostContext'
+import useThemeColors from '../../../../Hooks/useThemeColors'
+import { IPostType } from '../../../../Interfaces/IPostContext'
 
 export interface IFormBottomTabs {
     handleOnButtonTabPress(props: IPostType['types']): void,

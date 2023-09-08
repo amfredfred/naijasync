@@ -9,7 +9,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import useThemeColors from "../../../Hooks/useThemeColors";
 import { Videos } from "../../../dummy-data";
 import { IPostItem } from "../../../Interfaces";
-import ListSlideItem from "../../Partials/ListSlider/ListSliderItem";
+import ListSlideItem from "../../../Components/SlideCarousel/ListSliderItem";
 
 
 
