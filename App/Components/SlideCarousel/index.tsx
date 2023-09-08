@@ -12,7 +12,6 @@ import { useMediaPlaybackContext } from "../../Screens/Statics/MediaViewer/Conte
 
 const VideoListItem = (props: IPostItem) => {
     const { width, height } = useWindowDimensions();
-    const { thumb, index, stretched } = props;
     const { navigate } = useNavigation();
     const [isLongPressed, setIsLongPressed] = useState(false);
 
@@ -37,12 +36,11 @@ const VideoListItem = (props: IPostItem) => {
                 overflow: 'hidden',
                 backgroundColor: 'black',
                 flexGrow: 1,
-                aspectRatio: isLongPressed ? 16 / 9 : stretched ? 16 / 9 : 11 / 18,
             }}
             activeOpacity={0.7}
         >
             <Image
-                source={{ uri: thumb }}
+                source={{ uri: props?.thumbnailUrl }}
                 style={{
                     width: '100%',
                     height: '100%',
@@ -83,7 +81,7 @@ export default function SlideCarousel(props: IListSlider) {
     };
 
     const handleOnPressListItem = (itemProps: IPostItem) => {
-        setMedia?.({ sources: [itemProps.src], thumbnailUri: itemProps.thumb });
+        setMedia?.(itemProps);
     };
 
     return (

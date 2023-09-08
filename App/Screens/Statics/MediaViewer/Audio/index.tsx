@@ -1,30 +1,18 @@
 import { View, StyleSheet, Dimensions, Text, Image, TouchableOpacity, FlatList } from 'react-native'
-import Animated, { SlideInDown, SlideInUp, SlideOutDown } from 'react-native-reanimated'
+import Animated, { SlideInDown } from 'react-native-reanimated'
 import { IMediaPlayable } from '../Interface'
-import { IThemedComponent } from '../../../../Interfaces'
 import { Audio } from 'expo-av'
 import { forwardRef, useState } from 'react'
 import { IconButton } from '../../../../Components/Buttons'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import useThemeColors from '../../../../Hooks/useThemeColors'
-import { useMediaPlaybackContext } from '../Context'
-import { Videos } from '../../../../dummy-data'
 import { useToast } from '../../../../Contexts/ToastContext'
 import useKeyboardEvent from '../../../../Hooks/useKeyboardEvent'
 
 const { width, height } = Dimensions.get('window')
 
-export type IAudioPlayer = IThemedComponent & IMediaPlayable & {
-    ref: React.RefObject<Audio.SoundObject>
-    previewing: boolean,
-    thumbnailUri?: string
-    audioList?: [{
-
-    }]
-}
-
-const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => {
-    const { thumbnailUri, previewing, ...AV } = props
+const AudioPlayer = forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) => {
+    const { thumbnailUrl, previewing, ...AV } = props
     const colors = useThemeColors()
     const { toast } = useToast()
 
@@ -76,15 +64,15 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
                 )}
                 showsVerticalScrollIndicator={false}
                 style={{ paddingHorizontal: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10, overflow: 'hidden', backgroundColor: colors.background2 }}
-                data={[...Videos, ...Videos]}
+                data={[]}
                 renderItem={({ item, index }) => {
                     return (
-                        <TouchableOpacity style={[styles.spaceBetween, styles.audioListItem, { opacity: AV.source === item.src ? .5 : 1 }]}>
+                        <TouchableOpacity style={[styles.spaceBetween, styles.audioListItem, { opacity: AV.fileUrl === item.fileUrl ? .5 : 1 }]}>
                             <View style={[styles.spaceBetween, { paddingHorizontal: 0, flex: 1 }]}>
                                 <View style={[styles.spaceBetween, { paddingHorizontal: 0 }]}>
                                     <Image
                                         style={[styles.audiolistItemImage]}
-                                        source={{ uri: item.thumb }}
+                                        source={{ uri: item.thumbnailUrl }}
                                     />
                                     <View style={[styles.audioListItemTextContent]}>
                                         <Text children="Kene Lu Ya" style={{ padding: 0, fontWeight: '800', fontSize: 18, color: colors.text }} />
@@ -94,7 +82,7 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
                                 <View style={[styles.spaceBetween, { paddingHorizontal: 0 }]}>
                                     <TouchableOpacity
                                         style={[styles.iconsButton]}
-                                        onPress={() => AV?.handleDownloadItem(item.src)}  >
+                                        onPress={() => AV?.handleDownloadItem(item.fileUrl)}  >
                                         <MaterialIcons
                                             name='file-download'
                                             color={colors.text}
@@ -103,13 +91,13 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
                                     <TouchableOpacity
                                         style={[styles.iconsButton]}
                                         onPress={() => {
-                                            AV.source !== item.src ? AV?.connect(item?.src, item.thumb) : AV.source === item.src && AV.states?.playState === 'paused' ? AV?.play() : AV.pause()
+                                            AV.fileUrl !== item.fileUrl ? AV?.connect(item) : AV.fileUrl === item.fileUrl && AV.states?.playState === 'paused' ? AV?.play() : AV.pause()
                                         }}     >
-                                        {/* props?.connect(item?.src, item.thumb) */}
+                                        {/* props?.connect(item?.fileUrl, item.thumbnailUrl) */}
                                         <Ionicons
                                             size={25}
                                             color={colors.text}
-                                            name={AV.source !== item.src ? "play" : AV.source === item.src && AV.states?.playState === 'paused' ? 'play' : AV.source === item.src && AV.states?.playState === 'canPlay' ? 'play' : 'pause'} />
+                                            name={AV.fileUrl !== item.fileUrl ? "play" : AV.fileUrl === item.fileUrl && AV.states?.playState === 'paused' ? 'play' : AV.fileUrl === item.fileUrl && AV.states?.playState === 'canPlay' ? 'play' : 'pause'} />
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -123,6 +111,8 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
     )
 
     if (isKeyboadVisible) return null
+
+    console.log(AV?.fileUrl)
 
     return (
         <Animated.View
@@ -139,7 +129,7 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
                         onPress={AV?.remove}
                         style={{ borderRadius: 50, backgroundColor: colors.background, overflow: 'hidden' }}>
                         <Image
-                            source={{ uri: thumbnailUri }}
+                            source={{ uri: thumbnailUrl }}
                             style={{ width: 40, aspectRatio: 1 }}
                             resizeMethod='resize'
                             resizeMode='contain'
@@ -149,8 +139,8 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IAudioPlayer>((props, ref) => 
                     <View
                         style={{ padding: 0, flex: 1 }} >
                         <TouchableOpacity  >
-                            <Text children="Kene Lu Ya" style={{ padding: 0, fontWeight: '800', fontSize: 18, color: colors.text }} />
-                            <Text children="ADA Ehi" style={{ fontSize: 11, fontWeight: '300', color: colors.text }} />
+                            <Text children={AV?.title} style={{ padding: 0, fontWeight: '800', fontSize: 18, color: colors.text }} />
+                            <Text children={AV?.description} style={{ fontSize: 11, fontWeight: '300', color: colors.text }} />
                         </TouchableOpacity>
                     </View>
 
@@ -200,7 +190,7 @@ const styles = StyleSheet.create({
     audioListContainer: {
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
-        height: height / 2,
+        maxHeight: height / 2,
         width: '100%',
     },
     audioListItem: {

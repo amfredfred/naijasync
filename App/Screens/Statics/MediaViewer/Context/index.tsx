@@ -6,11 +6,10 @@ import MediaViewer from '..'
 import { getMediaType } from '../../../../Helpers'
 
 const initialState: IMediaViewer = {
-    previewing:false
+    previewing: false
 }
 const MediaPlaybackContext = createContext<IMediaViewerProvider | null>(null)
 export const useMediaPlaybackContext = () => useContext(MediaPlaybackContext)
-
 
 export function MediaViewerProvider({ children }) {
 
@@ -21,8 +20,10 @@ export function MediaViewerProvider({ children }) {
     }
 
     const [data, dispatch] = useReducer(mediaReducer, { ...initialState })
-    const setMedia: IMediaViewerProvider['setMedia'] = ({ sources, thumbnailUri, previewing }) => {
-        dispatch({ payload: { sources, thumbnailUri, previewing } })
+
+    const setMedia: IMediaViewerProvider['setMedia'] = (props) => {
+        console.log(props)
+        dispatch({ payload: props })
     }
 
     const removeMedia: IMediaViewerProvider['removeMedia'] = () => {
@@ -33,7 +34,7 @@ export function MediaViewerProvider({ children }) {
     const audioObjectRef = useRef<Audio.SoundObject>(null);
 
     const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({});
-    let mediaType: IMediaType = getMediaType(data.sources?.[0]);
+    let mediaType: IMediaType = getMediaType(data.fileUrl);
 
     const handlePlaybackStatusUpdate = (data) => {
         if (data?.isLoaded && !data.isPlaying && data.didJustFinish) {
@@ -76,7 +77,7 @@ export function MediaViewerProvider({ children }) {
         try {
             if (mediaType === 'audio') {
                 const playbackObject = await Audio.Sound.createAsync?.(
-                    { uri: data?.sources?.[0] },
+                    { uri: data?.fileUrl },
                     { shouldPlay: shouldPlay },
                     handlePlaybackStatusUpdate
                 );
@@ -90,7 +91,7 @@ export function MediaViewerProvider({ children }) {
                 });
                 audioObjectRef.current = playbackObject;
             } else if (mediaType === 'video') {
-                await mediaRef?.current?.loadAsync?.({ uri: data?.sources?.[0] }, {
+                await mediaRef?.current?.loadAsync?.({ uri: data?.fileUrl }, {
                     'shouldCorrectPitch': true,
                 }, true);
             }
@@ -112,7 +113,7 @@ export function MediaViewerProvider({ children }) {
         return () => {
             clearAllRefs()
         };
-    }, [data.sources?.[0], mediaRef]);
+    }, [data?.fileUrl, mediaRef]);
 
     const play = async () => {
         try {
@@ -159,12 +160,9 @@ export function MediaViewerProvider({ children }) {
         }
     }
 
-    const connect: IMediaPlayable['connect'] = async (mediaLink, thumbnailUri, shouldPlayNow) => {
+    const connect: IMediaPlayable['connect'] = async (props) => {
         try {
-            setMedia({
-                sources: [mediaLink],
-                thumbnailUri,
-            })
+            setMedia(props)
             await play()
         } catch (error) {
             console.log("ERROR: connect-> ", error)
@@ -187,30 +185,24 @@ export function MediaViewerProvider({ children }) {
 
 
     const methodsAndStates = {
-        data: {
-            thumbnailUri: data?.thumbnailUri,
-            sources: data?.sources?.[0],
-        },
-        media: {
-            play,
-            pause,
-            skipNextTo,
-            skipPrevTo,
-            remove,
-            setMediaState,
-            handlePlaybackStatusUpdate,
-            handleDownloadItem,
-            handleSeek,
-            handleLoad,
-            handleLoadStart,
-            handleError,
-            connect,
-            source: data?.sources?.[0],
-            type: mediaType,
-            states: mediaState,
-            mediaRef: mediaRef,
-        },
-        
+        play,
+        pause,
+        skipNextTo,
+        skipPrevTo,
+        remove,
+        setMediaState,
+        handlePlaybackStatusUpdate,
+        handleDownloadItem,
+        handleSeek,
+        handleLoad,
+        handleLoadStart,
+        handleError,
+        connect,
+        source: data?.sources?.[0],
+        type: mediaType,
+        states: mediaState,
+        mediaRef: mediaRef,
+        ...data
     };
 
     return (

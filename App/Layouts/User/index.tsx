@@ -1,13 +1,12 @@
 import { ContainerFlex, ContainerBlock, ContainerSpaceBetween, ScrollContainer } from "../../Components/Containers";
 import { Keyboard, StatusBar, BackHandler } from "react-native";
 import { SpanText } from "../../Components/Texts";
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import useThemeColors from "../../Hooks/useThemeColors";
-import { IconButton } from "../../Components/Buttons";
-import { AntDesign, FontAwesome5, Ionicons, MaterialIcons, Octicons } from "@expo/vector-icons";
-import { InputText } from "../../Components/Inputs";
+import { ButtonGradient, IconButton } from "../../Components/Buttons";
+import { AntDesign, Feather, FontAwesome5, Ionicons, MaterialIcons, Octicons, SimpleLineIcons } from "@expo/vector-icons";
 import { useDataContext } from "../../Contexts/DataContext";
 import { useNavigation } from "@react-navigation/native";
 import { HeadLine } from "../../Components/Texts";
@@ -15,6 +14,9 @@ import { linkChecker } from "../../Helpers";
 import IMAGS from '../../../assets/adaptive-icon.png'
 import DigitalClock from "../../Components/DigitalClock";
 import { useAuthContext } from "../../Contexts/AuthContext";
+import useKeyboardEvent from "../../Hooks/useKeyboardEvent";
+
+import PlayIcon from '../../../assets/icons/play-icon.png'
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
 
@@ -24,61 +26,44 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     const { background, background2, text } = useThemeColors()
     const { states: { states, user, storage }, setData } = useDataContext()
     const { navigate, goBack, canGoBack } = useNavigation()
-
-
-    const onSearchInputTextChange = (text: string) => {
-        const isLinkchecked = linkChecker(text)
-        setData('user', 'searchRequestValue', text)
-    }
-
-    //Effects 
-    useEffect(() => {
-
-        const keyboardshown = Keyboard.addListener('keyboardDidShow', () => setkeyBoardShown(s => true))
-        const keyboardhidden = Keyboard.addListener('keyboardDidHide', () => setkeyBoardShown(s => false))
-
-        return () => {
-            keyboardshown.remove()
-            keyboardhidden.remove()
-        }
-    }, [])
-
     const [open, setOpen] = useState(false);
+    const themeColors = useThemeColors()
+
+    useKeyboardEvent({
+        onHide: () => setkeyBoardShown(s => false),
+        onShow: () => setkeyBoardShown(s => true),
+    })
+
 
     const Header = (
         <ContainerBlock
             style={{
                 paddingTop: StatusBar.currentHeight + (states?.isHeaderHidden ? 0 : 10),
                 paddingHorizontal: 10,
-                paddingBottom: states?.isHeaderHidden ? 0 : 10,
-                backgroundColor: states?.isHeaderHidden ? background : background2
+                borderBottomColor: themeColors?.background2,
+                borderBottomWidth: 1,
             }}   >
             <ContainerSpaceBetween hidden={states?.isHeaderHidden} style={{ padding: 0, gap: 10 }}>
                 <HeadLine
                     onPress={() => (navigate as any)?.("Home")}
                     hidden={states?.isInSearchMode} style={{ textTransform: 'uppercase' }}>NAIJASYNC</HeadLine>
                 <ContainerSpaceBetween style={{ gap: 10, padding: 0 }}>
-                    <ContainerSpaceBetween style={{ padding: 0, overflow: 'hidden' }}>
-                        <InputText
-                            onPressIn={() => (navigate as any)?.("Search")}
-                            // onBlur={handleSearchInputBlur}
-                            placeholder="Search..."
-                            onChangeText={onSearchInputTextChange}
-                            variant="search"
-                            value={user?.searchRequestValue}
-                            containerStyle={{ maxWidth: states?.isInSearchMode ? "91%" : 120, paddingHorizontal: 2, borderColor: text, borderWidth: .1, backgroundColor: background }}
-                        />
-                    </ContainerSpaceBetween>
+
+                    <IconButton
+                        onPressIn={() => (navigate as any)?.("Search")}
+                        hidden={states?.isInSearchMode}
+                        icon={<AntDesign color={themeColors.text} size={25} name={'search1'} />}
+                    />
 
                     <IconButton
                         onPress={() => (navigate as any)?.("PostComposer")}
                         hidden={states?.isInSearchMode}
-                        icon={<Ionicons size={30} name="create" />}
+                        icon={<Ionicons color={themeColors.text} size={25} name="add" />}
                     />
                     <IconButton
                         onPress={() => setOpen((prevOpen) => !prevOpen)}
                         hidden={states?.isInSearchMode}
-                        icon={<AntDesign size={35} name={open ? 'menu-fold' : 'menu-unfold'} />}
+                        icon={<AntDesign color={themeColors.text} size={25} name={open ? 'menu-fold' : 'menu-unfold'} />}
                     />
                     {/* <Button
                         title={`${open ? 'Close' : 'Open'} drawer`}
@@ -89,9 +74,9 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
         </ContainerBlock>
     )
 
-    const handleNavigateTo = (to: string) => {
+    const handleNavigateTo = (to: string, params?: { [key: string]: any }) => {
         setOpen(false);
-        (navigate as any)?.(to)
+        (navigate as any)?.(to, params)
     }
 
     const menuItems = [
@@ -102,6 +87,14 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
         { title: 'Gifts ~ for youuu🪴🎁', onPress: () => console.log('Settings pressed'), icon: <Octicons size={30} name="gift" /> },
     ];
 
+    const meniItemBlock = [
+        { title: `Video`, onPress: () => handleNavigateTo("Explorer", { screen: 'video' }), icon: <MaterialIcons size={30} name="ondemand-video" /> },
+        { title: 'Audio', onPress: () => handleNavigateTo("Explorer", { screen: 'audio' }), icon: <MaterialIcons size={30} name="music-note" /> },
+        { title: 'Tools', onPress: () => console.log('Home pressed'), icon: <Octicons size={30} name='tools' /> },
+        { title: 'Earn 🔥', onPress: () => console.log('Home pressed'), icon: <Ionicons size={30} name="wallet-outline" /> },
+        { title: 'Create new Post', onPress: () => console.log('Settings pressed'), icon: <SimpleLineIcons size={30} name="pencil" /> },
+    ]
+
     return (
         <ContainerFlex>
             <Drawer
@@ -111,25 +104,34 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 renderDrawerContent={() => {
                     return (
                         <ContainerFlex
-                            style={{ backgroundColor: 'transparent' }}     >
-                            <View style={[styles.container, { backgroundColor: background }]}>
+                            style={{}}     >
+                            <View style={[styles.container, { borderBottomWidth: StyleSheet.hairlineWidth, borderTopColor: themeColors.background2 }]}>
                                 <TouchableOpacity
                                     onPress={() => authContext?.user?.person === 'isAuthenticated' ? handleNavigateTo('Account') : authContext.skipToOnboard()}
-
-                                    style={styles.accountContainer}>
+                                    style={[styles.accountContainer, { backgroundColor: background2, }]}>
                                     <IconButton
-                                        // icon={<Feather name="user" size={100} color="#fff" />}
-                                        image={{ source: IMAGS, style: { width: 40, height: 40 } }}
-                                    />
-                                    {
-                                        <SpanText style={styles.accountText}>
-                                            {authContext?.user?.account?.username ?? "Login • Registe"}
-                                        </SpanText>
-                                    }
+                                        image={{ source: IMAGS, style: { width: 40, height: 40 } }} />
+                                    <SpanText style={styles.accountText}>
+                                        {authContext?.user?.account?.username ?? "Login • Registe"}
+                                    </SpanText>
                                 </TouchableOpacity>
                             </View>
-                            <ScrollContainer style={{ marginTop: -15, padding: 10, backgroundColor: background2, borderTopRightRadius: 15, borderTopLeftRadius: 15 }}>
-                                <ContainerBlock style={{ padding: 0, backgroundColor: 'transparent', borderBottomColor: 'rgba(255,255,255,0.2)', borderBottomWidth: 1 }}>
+                            <ScrollContainer style={{ padding: 10, backgroundColor: background }}>
+                                <ContainerBlock style={{ padding: 0, backgroundColor: 'transparent', flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                                    {
+                                        meniItemBlock.map((item, index) => (
+                                            <IconButton
+                                                onPress={item.onPress}
+                                                style={{ flexGrow: 1, borderRadius: 7, width: '45%' }}
+                                                containerStyle={{ justifyContent: 'space-between', paddingVertical: 10 }}
+                                                title={item.title}
+                                                icon={item.icon}
+                                            />
+                                        ))
+                                    }
+                                </ContainerBlock>
+
+                                <ContainerBlock style={{ padding: 0, backgroundColor: 'transparent' }}>
                                     {
                                         menuItems.map((item, index) => (
                                             <ContainerBlock key={index} style={{ backgroundColor: 'transparent', paddingHorizontal: 0 }}>
@@ -155,7 +157,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                                     }
                                 </ContainerBlock>
                             </ScrollContainer>
-                            <ContainerSpaceBetween style={{ paddingVertical: 0 }} justify="flex-start">
+                            {/* <ContainerSpaceBetween style={{ paddingVertical: 0 }} justify="flex-start">
                                 <IconButton
                                     textStyle={{ textTransform: 'uppercase' }}
                                     title={`PPolicy • Terms`}
@@ -166,8 +168,8 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                                     title="report • support"
                                     icon={<Ionicons name='exit' />}
                                 />
-                            </ContainerSpaceBetween>
-                            <ContainerSpaceBetween>
+                            </ContainerSpaceBetween> */}
+                            <ContainerSpaceBetween style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: themeColors.background2 }}>
                                 <DigitalClock />
                                 <IconButton
                                     textStyle={{ textTransform: 'uppercase' }}
@@ -201,14 +203,14 @@ const styles = StyleSheet.create({
     },
     container: {
         // backgroundColor: '#1976D2',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
+        padding: 10,
         paddingTop: StatusBar.currentHeight,
     },
     accountContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
+        padding: 10,
+        borderRadius: 10
     },
     accountText: {
         fontSize: 18,

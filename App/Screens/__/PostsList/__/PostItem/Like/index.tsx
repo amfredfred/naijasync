@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState } from 'react'
 import { TouchableOpacity } from 'react-native'
 import { SpanText } from '../../../../../../Components/Texts';
@@ -25,13 +25,13 @@ export default function LikeButton(props: ILikeButton) {
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ scale: scale.value }],
+            transform: [{ rotate:`${scale.value}deg`}],
         };
     });
 
     const handlePress = () => {
-        scale.value = withSpring(1.7, {}, () => {
-            scale.value = withSpring(!liked ? 1.3 : 1);
+        scale.value = withSpring(1, {}, () => {
+            scale.value = withSpring(!liked ? 45 : 1);
         });
     };
 
@@ -51,15 +51,15 @@ export default function LikeButton(props: ILikeButton) {
 
         <TouchableOpacity onPress={handleLikeToggle} style={{
             flexDirection: 'row',
-            justifyContent: 'space-between',
             alignItems: 'center',
             gap: 3,
-            opacity: .5
         }}>
-            <Animated.View style={animatedStyle}>
-                <Ionicons size={14} color={liked ? themeColors?.secondary : themeColors.text} name='heart' />
+            <Animated.View style={[{ width: 20, height: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }, animatedStyle]}>
+                <AntDesign
+                    style={{}}
+                    size={20} color={liked ? themeColors?.error : themeColors.text} name={liked ? 'heart' : 'hearto'} />
             </Animated.View>
-            <SpanText style={{ color: liked ? themeColors?.secondary : themeColors.text, fontSize: 14 }}>{formatNumber(likeCount)}</SpanText>
+            <SpanText style={{ color: liked ? themeColors?.error : themeColors.text, fontSize: 18 }}>{formatNumber(likeCount)}</SpanText>
         </TouchableOpacity>
     );
 };

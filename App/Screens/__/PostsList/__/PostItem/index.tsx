@@ -13,8 +13,7 @@ import ShareContent from '../../../../../Components/ShareFile'
 import { IconButton } from '../../../../../Components/Buttons'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { useMediaPlaybackContext } from '../../../../Statics/MediaViewer/Context'
-import LikeButton from './LikeButton'
-import { usePostFormContext } from '../../../../../Contexts/FormContext'
+import LikeButton from './Like'
 dayjs.extend(relativeTime)
 const { width, height } = Dimensions.get('window')
 
@@ -28,7 +27,7 @@ const StatusPostListItem = (post: IPostItem) => {
     )
 }
 
-const VideoDisplay = (prop: { uri: string, thumbUri: string }) => {
+const VideoDisplay = (prop: IPostItem) => {
 
     const videoRef = useRef<Video>(null)
     const themeColors = useThemeColors()
@@ -39,7 +38,7 @@ const VideoDisplay = (prop: { uri: string, thumbUri: string }) => {
             <View style={{ position: 'relative', height: '100%', width: '100%' }}>
                 <Image
                     style={{ width: '100%', height: '100%', position: 'absolute', left: 0, top: 0 }}
-                    source={{ uri: prop?.thumbUri ?? prop.uri }}
+                    source={{ uri: prop?.thumbnailUrl ?? prop.fileUrl }}
                     resizeMethod='resize'
                     resizeMode='repeat'
                 />
@@ -53,9 +52,7 @@ const VideoDisplay = (prop: { uri: string, thumbUri: string }) => {
             <View style={[styles.spaceBetween, styles.playPauseiconContainer]}>
                 <View style={{ flex: 1 }} />
                 <TouchableOpacity
-                    onPress={() => mediaContext?.setMedia({
-                        sources: [prop?.uri]
-                    })}
+                    onPress={() => mediaContext?.setMedia(prop)}
                     style={[styles.allIconStyle]}>
                     <Ionicons
                         name='play-circle'
@@ -74,17 +71,14 @@ const AudioDisplay = ({ uri, duration, cover }) => {
 
     const togglePlayback = () => {
         // setIsPlaying(!isPlaying);
-        if (mP?.media?.source === uri) {
-            if (mP?.media?.states?.playState === 'playing') {
-                mP?.media?.pause()
+        if (mP?.fileUrl === uri) {
+            if (mP?.states?.playState === 'playing') {
+                mP?.pause()
             } else {
-                mP?.media?.play()
+                mP?.play()
             }
         } else
-            mP.setMedia({
-                'sources': [uri],
-                previewing: true
-            })
+            mP.setMedia({ fileUrl: uri })
     };
 
     return (
@@ -95,14 +89,14 @@ const AudioDisplay = ({ uri, duration, cover }) => {
                     <Image
                         style={{ width: 140, aspectRatio: '16/9', borderRadius: 10 }}
                         source={{ uri: cover }} />
-                    <SpanText >{mP?.media?.source === uri ? Number(mP?.media?.states?.progress > 0 ? mP?.media?.states?.progress : 0) : 0}% / {duration}</SpanText>
+                    <SpanText >{mP?.fileUrl === uri ? Number(mP?.states?.progress > 0 ? mP?.states?.progress : 0) : 0}% / {duration}</SpanText>
                 </View>
                 <TouchableOpacity style={[styles.playButton]} onPress={togglePlayback}>
                     <ImageBackground
                         blurRadius={100}
                         style={{ width: 80, aspectRatio: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                         source={{ uri: cover }}>
-                        <Ionicons name={mP?.media?.source === uri ? (mP.media?.states?.playState === 'playing' ? 'pause-circle' : 'play-circle') : 'play-circle'} size={50} color="white" />
+                        <Ionicons name={mP?.fileUrl === uri ? (mP.states?.playState === 'playing' ? 'pause-circle' : 'play-circle') : 'play-circle'} size={50} color="white" />
                     </ImageBackground>
                 </TouchableOpacity>
             </View>
@@ -130,7 +124,7 @@ const UploadPostListItem = (post: IPostItem) => {
         const fileType = getMediaType(post?.fileUrl)
         switch (fileType) {
             case 'video':
-                return <VideoDisplay uri={`${REQUESTS_API}${post.fileUrl}`} thumbUri={`${REQUESTS_API}${post.thumbnailUrl}`} />
+                return <VideoDisplay {...post} />
             case 'image':
                 return <ImageDisplay uri={`${REQUESTS_API}${post.fileUrl}`} />
             case 'audio':
@@ -208,14 +202,13 @@ const UploadPostListItem = (post: IPostItem) => {
                 {DisplayMediaType()}
             </View>
             <View style={[styles.spaceBetween, styles.containerProgress, { padding: 0 }]}>
-                <View style={{ flex: 1 }} />
-                <View style={[styles.spaceBetween, { padding: 0 }]}>
+                <View style={[styles.spaceBetween, { flexGrow: 1 }]}>
 
                     <LikeButton post={post} onLikeToggle={() => { }} />
 
-                    <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3, opacity: .4 }]}>
-                        <AntDesign size={14} color={themeColors.text} name='barchart' />
-                        <SpanText style={{ fontSize: 14 }}>{formatNumber(post?.views as number)}</SpanText>
+                    <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3 }]}>
+                        <AntDesign size={15} color={themeColors.text} name='barchart' />
+                        <SpanText style={{ fontSize: 18 }}>{formatNumber(post?.views as number)}</SpanText>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={[styles.spaceBetween, { width: 100, borderRadius: 50, overflow: 'hidden' }]}>

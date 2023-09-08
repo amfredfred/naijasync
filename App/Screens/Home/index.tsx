@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import useThemeColors from "../../../Hooks/useThemeColors";
-import { useDataContext } from "../../../Contexts/DataContext";
+import useThemeColors from "../../Hooks/useThemeColors";
+import { useDataContext } from "../../Contexts/DataContext";
 import React from 'react';
 // import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useNavigation } from "@react-navigation/native";
-import PostsList from "../../__/PostsList";
+import PostsList from "../__/PostsList";
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { IPostItem } from '../../../Interfaces';
-import { useAuthContext } from '../../../Contexts/AuthContext';
+import { IPostItem } from '../../Interfaces';
+import { useAuthContext } from '../../Contexts/AuthContext';
 import { useEffect } from 'react'
 import { REQUESTS_API } from '@env';
-import SlideCarousel from '../../../Components/SlideCarousel';
-import { Videos } from "../../../dummy-data";
-import UserLayout from '../../../Layouts/User';
+import SlideCarousel from '../../Components/SlideCarousel';
+import { Videos } from "../../dummy-data";
+import UserLayout from '../../Layouts/User';
 
 export default function Home() {
     const { setData, states: NJS } = useDataContext()

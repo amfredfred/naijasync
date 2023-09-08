@@ -19,16 +19,12 @@ import { HeadLine } from "../../../../Components/Texts";
 import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
 
 
-export type IVideoPlayer = IThemedComponent & IMediaPlayable & {
-    ref: React.RefObject<Video>
-    thumbnailUri?: string
-}
 
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
 
-const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
+const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
 
     const colors = useThemeColors()
     const [isShwoingControls, setisShwoingControls] = useState(false)
@@ -36,10 +32,10 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
     const [keyBoardShown, setkeyBoardShown] = useState(false)
 
     const progressRef = useRef(null);
-    const viewMode = useSharedValue<IVideoPlayer['mode']>('fullscreen')
+    const viewMode = useSharedValue<IMediaPlayable['mode']>('fullscreen')
     const { canGoBack } = useNavigation()
 
-    const { hidden, ...VP } = props
+    const { ...VP } = props
 
     const conH = useSharedValue(0);
     const draggingVideo = useSharedValue(false)
@@ -288,7 +284,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
                         onPress={() => ShareContent({
                             title: 'sahre',
                             message: 'message',
-                            url: VP?.source?.[0]
+                            url: VP?.fileUrl
                         })}
                         containerStyle={styles.iconsButton}
                         icon={<MaterialCommunityIcons size={25} name="share" />}
@@ -344,7 +340,7 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
                 style={[{ flex: 1 }, listReanimated]}
                 data={Videos}
                 renderItem={({ item, index }) => {
-                    return <Text style={{ color: 'white', height: 40, width: '100%', backgroundColor: 'pink', marginBottom: 10 }}>{item.src}</Text>
+                    return <Text style={{ color: 'white', height: 40, width: '100%', backgroundColor: 'pink', marginBottom: 10 }}>{item.fileUrl}</Text>
                 }}
                 keyExtractor={(item) => item.id}
             />
@@ -362,10 +358,10 @@ const VideoPlayer = forwardRef<Video, IVideoPlayer>((props, ref) => {
                     style={[styles.videoContainer]}>
                     <Overlay
                         hidden={(!isVideoLoading)}
-                        imageSource={VP?.thumbnailUri}
+                        imageSource={VP?.thumbnailUrl}
                     />
                     <Video
-                        posterSource={{ uri: VP?.thumbnailUri }}
+                        posterSource={{ uri: VP?.thumbnailUrl }}
                         style={[styles.video]}
                         resizeMode={ResizeMode.CONTAIN}
                         onLoad={handleOnLoad}

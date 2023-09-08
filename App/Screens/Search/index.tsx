@@ -1,20 +1,22 @@
-import { ContainerBlock, ContainerSpaceBetween, ScrollContainer } from "../../../Components/Containers";
-import { FlatList, RefreshControl, Image, Pressable } from 'react-native'
-import { useDataContext } from "../../../Contexts/DataContext";
+import { ContainerBlock, ContainerFlex, ContainerSpaceBetween, ScrollContainer } from "../../Components/Containers";
+import { FlatList, RefreshControl, Image, Pressable , StatusBar} from 'react-native'
+import { useDataContext } from "../../Contexts/DataContext";
 import { useQueries } from "@tanstack/react-query";
-import { IconButton } from "../../../Components/Buttons";
-import useThemeColors from "../../../Hooks/useThemeColors";
-import { SpanText } from "../../../Components/Texts";
+import { IconButton } from "../../Components/Buttons";
+import useThemeColors from "../../Hooks/useThemeColors";
+import { SpanText } from "../../Components/Texts";
 import axios from 'axios'
 import { REQUESTS_API } from "@env"
 import { useEffect, useState } from 'react'
-import { IPostItem } from "../../../Interfaces";
-import useTimeout from "../../../Hooks/useTimeout";
-import {ListSlideItem} from "../../../Components/SlideCarousel";
+import { IPostItem } from "../../Interfaces";
+import useTimeout from "../../Hooks/useTimeout";
+import { ListSlideItem } from "../../Components/SlideCarousel";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRoute } from "@react-navigation/native";
+import { InputText } from "../../Components/Inputs";
+import { linkChecker } from "../../Helpers";
 dayjs.extend(relativeTime);
 
 export default function Search() {
@@ -26,7 +28,7 @@ export default function Search() {
     const [isRefreshing, setisRefreshing] = useState(false)
     const { params } = useRoute()
 
-    const colors = useThemeColors()
+    const themeColors = useThemeColors()
 
     // const [$movies,] = useQueries({
     //     'queries': [
@@ -64,8 +66,22 @@ export default function Search() {
 
     }
 
+    const onSearchInputTextChange = (text: string) => {
+        const isLinkchecked = linkChecker(text)
+    }
+
     return (
-        <ContainerBlock style={{ padding: 0, flex: 1 }}>
+        <ContainerFlex style={{ padding: 0, flex: 1 ,paddingTop:StatusBar.currentHeight+10}}>
+
+            <InputText
+                // onBlur={handleSearchInputBlur}
+                placeholder="Search..."
+                onChangeText={onSearchInputTextChange}
+                variant="search"
+                value={user?.searchRequestValue}
+                autoFocus
+                containerStyle={{   paddingHorizontal: 2, borderColor: themeColors.text, borderWidth: .1, backgroundColor: themeColors.background2, marginHorizontal:10 }}
+            />
 
             <ContainerBlock style={{ paddingHorizontal: 0, }}>
                 <ScrollContainer
@@ -122,6 +138,6 @@ export default function Search() {
                 />
             </ContainerBlock> */}
 
-        </ContainerBlock>
+        </ContainerFlex>
     )
 }

@@ -65,8 +65,7 @@ export const IconButton = (props: IIconButton) => {
     }
 
     const styledContainer: IButton['style'] = {
-        minHeight: (props as any)?.size ?? 30,
-        borderRadius: 10,
+        minHeight: (props as any)?.size ?? 35,
         padding: title ? 2 : 3,
         backgroundColor: active ? color : background2,
         aspectRatio: !title ? 1 : undefined,
@@ -95,7 +94,7 @@ export const IconButton = (props: IIconButton) => {
         onPress={handlePress}
         {...otherProps} >
         <ContainerSpaceBetween justify="center" style={[styledContainer, containerStyle]}>
-            <SpanText hidden={!(props as any)?.icon} style={{ color }} children={(props as any)?.icon} />
+            <SpanText hidden={!(props as any)?.icon} style={{ opacity:.7 }} children={(props as any)?.icon} />
             {
                 (otherProps as any)?.image?.source && (
                     <Image
@@ -123,7 +122,6 @@ export const ButtonGradient = (props: IButtonGradient) => {
         minWidth: width / 3.36,
         maxHeight: width / 5
     }
-
 
     return (
         <LinearGradient

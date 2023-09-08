@@ -1,21 +1,16 @@
 import { Video, } from 'expo-av'
-import { useRef, useEffect, useState, forwardRef } from 'react'
-import { View, Image, StyleSheet, Dimensions } from 'react-native'
-import { ContainerBlock, ContainerSpaceBetween } from '../../../Components/Containers'
-import { HeadLine, SpanText } from '../../../Components/Texts'
-import { Button, IconButton } from '../../../Components/Buttons'
-import { Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { forwardRef } from 'react'
+import { StyleSheet, Dimensions } from 'react-native'
 import useThemeColors from '../../../Hooks/useThemeColors'
 import { IMediaPlayable, IMediaViewer } from './Interface'
 import VideoPlayer from './Video'
-import Animated, { useSharedValue } from 'react-native-reanimated'
 import AudioPlayer from './Audio'
 import useMediaLibrary from '../../../Hooks/useMediaLibrary'
 
 
 const { width, height } = Dimensions.get('window')
 
-export const MediaViewer = forwardRef<Video, IMediaViewer>(({ data, media, previewing }, videoRef) => {
+export const MediaViewer = forwardRef<Video, IMediaPlayable>((props, videoRef) => {
 
     const handleLoad = () => {
         console.log("VIDEO LAODIED")
@@ -34,7 +29,6 @@ export const MediaViewer = forwardRef<Video, IMediaViewer>(({ data, media, previ
 
     const handlePlaybackStatusUpdate = (status) => {
         // Handle onPlaybackStatusUpdate logic here
-        media.handlePlaybackStatusUpdate?.(status)
     };
 
     const colors = useThemeColors()
@@ -57,27 +51,16 @@ export const MediaViewer = forwardRef<Video, IMediaViewer>(({ data, media, previ
         console.log("DONLAOD_LINK: ", uri)
     }
 
-
-    const UsePlayerProps = {
-        ...data,
-        ...media,
-        previewing
-    }
-
     let Component = <></>
 
-    if (media.type === 'video')
+    if (props?.type === 'video')
         Component = <VideoPlayer
-            {...UsePlayerProps}
-            play={media.play}
-            pause={media.pause}
+            {...props}
             ref={videoRef}
         />
-    else if (media.type === 'audio')
+    else if (props?.type === 'audio')
         Component = <AudioPlayer
-            {...UsePlayerProps}
-            play={media?.play}
-            pause={media?.pause}
+            {...props}
         // ref={}
         />
 

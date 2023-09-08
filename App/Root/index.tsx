@@ -1,5 +1,4 @@
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import UserLayout from "../Layouts/User"
 import GuestLayout from "../Layouts/Guest"
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
@@ -7,15 +6,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import Landing from "../Screens/Guest/Landing";
-import Home from "../Screens/User/Home";
-import { useCallback, useEffect, useState } from 'react';
+import Home from "../Screens/Home";
 import DataContextProvider from "../Contexts/DataContext";
 import Downloads from "../Screens/User/Downloads";
 import useAppStatus from "../Hooks/useAppStatus";
 // import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
 import "expo-dev-client"
 import Explorer from "../Screens/Explorer";
-import Search from "../Screens/User/Search";
+import Search from "../Screens/Search";
 import { Linking } from 'react-native';
 import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -79,7 +77,7 @@ function Routes() {
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
             <Stack.Screen name='Home' component={Home} />
             <Stack.Screen name='Downloads' component={Downloads} />
-            <Stack.Screen name="Explorer" component={Explorer} />
+            <Stack.Screen name="Explorer" component={Explorer} initialParams={{ screen: 'videos' }} />
             <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name='PostComposer' component={PostComposer} />
             <Stack.Screen name="Account" component={AccountRoutes} />
@@ -95,7 +93,6 @@ function Routes() {
             </Stack.Navigator>
         </GuestLayout>
     )
-    console.log("MASTER RERENDERED")
 
     return ((auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? PublicRoutes : GuestRoutes)
 

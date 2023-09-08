@@ -1,5 +1,6 @@
 import { RefObject } from 'react';
 import { Video, Audio } from 'expo-av';
+import { IPostItem } from '../../../../Interfaces';
 
 // Enumeration for different types of media
 export enum IMediaType {
@@ -11,13 +12,13 @@ export enum IMediaType {
     Other = 'other',
 }
 
-export interface IMediaPlayable {
+export interface IMediaPlayable extends IPostItem {
     play(): void
     pause(): void,
     skipNextTo(props: number | 5): void
     skipPrevTo(props: number | 5): void
     remove(): void
-    connect?(mediaLnk: string, thumbnailUri?: string, shoupdPlay?: boolean): void
+    connect?(props: IPostItem): void
     setMediaState(props: (props: this['states']) => this['states']): void
     handleSeek(props: any): void
     handleLoad(props: any): void;
@@ -26,7 +27,6 @@ export interface IMediaPlayable {
     handlePlaybackStatusUpdate(status: any): void;
     handleDownloadItem(uri: string): void
     mediaRef?: React.RefObject<Video>
-    source?: string
     mediaPlayableAudioRef?: Audio.SoundObject
     states: {
         playState?: "paused" | "stopped" | "errored" | "ended" | "playing" | 'loading' | 'canPlay' | "seeking" | "shouldPlay"
@@ -40,15 +40,9 @@ export interface IMediaPlayable {
 
 
 
-export interface IMediaViewerProvider {
-    setMedia(props: { sources: string[], thumbnailUri?: string, previewing?: boolean }): void;
+export interface IMediaViewerProvider extends IMediaPlayable {
+    setMedia(props: IPostItem): void;
     removeMedia: IMediaPlayable['remove']
-    data: {
-        sources: string[],
-        thumbnailUri: string
-    },
-    mediaRef: IMediaViewer['media']['mediaRef'];
-    media?: IMediaPlayable;
 }
 
 // Define a common type for image media
@@ -57,11 +51,7 @@ export type IImageMedia = {
 }
 
 // Define a common interface for media viewer
-export type IMediaViewer = {
-    data?: {
-        sources: string[];
-        thumbnailUri?: string;
-    };
+export type IMediaViewer = IPostItem & {
     media?: IMediaPlayable;
     previewing: boolean
 };

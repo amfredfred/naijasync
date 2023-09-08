@@ -40,14 +40,8 @@ export interface ITheme {
 
 // Interface for individual post items
 export interface IPostItem {
-    caption: string
-    thumb: string
-    src: string
-    index?: number
-    empty?: boolean
-    stretched?: boolean
-    explorer?: boolean
-    onPress(props: this): void
+    caption?: string
+    onPress?(props: this): void
 
     // Additional post metadata
     id?: string,
@@ -84,12 +78,12 @@ export interface IPostItem {
     postSlug?: string
     updatedAt?: string
     createdAt?: string
-    puid?: string 
-    type: IMediaType
-    postType: IPostType['types']
+    puid?: string
+    type?: IMediaType
+    postType?: IPostType['types']
 
     likes?: number | string
-    liked?:boolean
+    liked?: boolean
 }
 
 // Interface for a list slider component
