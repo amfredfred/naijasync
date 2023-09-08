@@ -14,7 +14,7 @@ import Downloads from "../Screens/User/Downloads";
 import useAppStatus from "../Hooks/useAppStatus";
 // import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
 import "expo-dev-client"
-import Explorer from "../Screens/User/Explorer";
+import Explorer from "../Screens/Explorer";
 import Search from "../Screens/User/Search";
 import { Linking } from 'react-native';
 import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
@@ -27,6 +27,7 @@ import LoginScreen from '../Screens/Guest/Auth/Login';
 import AccountLayout from '../Layouts/Account';
 import Account from '../Screens/User/Account';
 import AccountTabBar from './__/AccountTabBar';
+import PostComposer from '../Screens/Forms/Post';
 
 
 const screenOptions = {
@@ -67,7 +68,7 @@ function Routes() {
 
     const SearchStack = () => (
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
-            <Stack.Screen name="Search" component={Search} />
+            <Stack.Screen name="Lookup" component={Search} />
         </Stack.Navigator>
     )
 
@@ -85,21 +86,27 @@ function Routes() {
     const PublicRoutes = () => (
         <UserLayout>
             <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
-                <Stack.Screen name='Home' component={Home} />
+                <Stack.Screen name='Index' component={Home} />
                 <Stack.Screen name='Downloads' component={Downloads} />
                 <Stack.Screen name="Explorer" component={Explorer} />
-                <Stack.Screen name="Search" component={SearchStack} />
             </Stack.Navigator>
         </UserLayout>
     )
 
-    const UserRoutes = (
-        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
-            <Stack.Screen name='Welcome' component={PublicRoutes} />
-            <Stack.Screen name="Account" component={AccountRoutes} />
+    const Welcome = () => (
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }}>
+            <Stack.Screen name='Home' component={PublicRoutes} />
+            <Stack.Screen name="Search" component={SearchStack} />
+            <Stack.Screen name='PostComposer' component={PostComposer} />
         </Stack.Navigator>
     )
 
+    const UserRoutes = (
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+            <Stack.Screen name='Welcome' component={Welcome} />
+            <Stack.Screen name="Account" component={AccountRoutes} />
+        </Stack.Navigator>
+    )
 
     const GuestRoutes = (
         <GuestLayout>
@@ -111,11 +118,9 @@ function Routes() {
         </GuestLayout>
     )
 
-    return (
-        <PostFormProvider>
-            {(auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? UserRoutes : GuestRoutes}
-        </PostFormProvider>
-    )
+
+    return ((auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? UserRoutes : GuestRoutes)
+
 }
 
 export default function Root() {
@@ -124,21 +129,19 @@ export default function Root() {
 
     return (
         <SafeAreaProvider>
-            <QueryClientProvider client={Client}>
-                <DataContextProvider>
-                    <ToastProvider>
-                        <AuthContextProvider>
-                            <GestureHandlerRootView style={{ flex: 1 }}>
-                                <NavigationContainer>
-                                    <MediaViewerProvider>
-                                        <Routes />
-                                    </MediaViewerProvider>
-                                </NavigationContainer>
-                            </GestureHandlerRootView>
-                        </AuthContextProvider>
-                    </ToastProvider>
-                </DataContextProvider>
-            </QueryClientProvider>
+            <NavigationContainer>
+                <QueryClientProvider client={Client}>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <ToastProvider>
+                            <MediaViewerProvider>
+                                <DataContextProvider>
+                                    <Routes />
+                                </DataContextProvider>
+                            </MediaViewerProvider>
+                        </ToastProvider>
+                    </GestureHandlerRootView>
+                </QueryClientProvider>
+            </NavigationContainer>
         </SafeAreaProvider>
     )
 }

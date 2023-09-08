@@ -5,9 +5,9 @@ import { SpanText } from '../../../../../../Components/Texts';
 import useThemeColors from '../../../../../../Hooks/useThemeColors';
 import { formatNumber } from '../../../../../../Helpers';
 import { IPostItem } from '../../../../../../Interfaces';
-import Animated, { Easing, useSharedValue, withSpring, withTiming, useAnimatedStyle, withRepeat } from 'react-native-reanimated';
-import { usePostFormContext } from '../../../../../../Contexts/FormContext';
+import Animated, { useSharedValue, withSpring, useAnimatedStyle } from 'react-native-reanimated';
 import { useAuthContext } from '../../../../../../Contexts/AuthContext';
+import usePostForm from '../../../../../../Hooks/usePostForms';
 
 interface ILikeButton {
     post: IPostItem,
@@ -18,7 +18,7 @@ export default function LikeButton(props: ILikeButton) {
     const [liked, setLiked] = useState(props?.post?.liked);
     const [likeCount, setLikeCount] = useState<number>(props?.post?.likes as number);
 
-    const postContext = usePostFormContext()
+    const postContext = usePostForm()
     const authContext = useAuthContext()
 
     const scale = useSharedValue(1);

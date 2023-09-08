@@ -46,7 +46,6 @@ export default function PostsList({ list,
 
     }
 
-
     return (
         <FlatList
             stickyHeaderIndices={stickyHeaderIndices}

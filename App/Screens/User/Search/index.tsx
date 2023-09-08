@@ -10,7 +10,7 @@ import { REQUESTS_API } from "@env"
 import { useEffect, useState } from 'react'
 import { IPostItem } from "../../../Interfaces";
 import useTimeout from "../../../Hooks/useTimeout";
-import ListSlideItem from "../../../Components/SlideCarousel/ListSliderItem";
+import {ListSlideItem} from "../../../Components/SlideCarousel";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -28,15 +28,15 @@ export default function Search() {
 
     const colors = useThemeColors()
 
-    const [$movies,] = useQueries({
-        'queries': [
-            {
-                queryFn: async () => await axios.get<{ results: IPostItem[] }>(`${REQUESTS_API}search?query=${user?.searchRequestValue}&target=${isSelectedTarget}&limit=${fetchLimit}`),
-                enabled: (states?.isInSearchMode || isSelectedTarget) && shouldQuery,
-                queryKey: [String(user?.searchRequestValue).trim()]
-            }
-        ]
-    })
+    // const [$movies,] = useQueries({
+    //     'queries': [
+    //         {
+    //             queryFn: async () => await axios.get<{ results: IPostItem[] }>(`${REQUESTS_API}search?query=${user?.searchRequestValue}&target=${isSelectedTarget}&limit=${fetchLimit}`),
+    //             enabled: (states?.isInSearchMode || isSelectedTarget) && shouldQuery,
+    //             queryKey: [String(user?.searchRequestValue).trim()]
+    //         }
+    //     ]
+    // })
 
     const expTabs = [
         { title: 'movies', },
@@ -52,11 +52,6 @@ export default function Search() {
         if (user?.searchRequestValue || isSelectedTarget)
             setshouldQuery(true)
     }
-
-    useEffect(() => {
-
-
-    }, [])
 
     useTimeout({
         deps: [user?.searchRequestValue, isSelectedTarget],
@@ -87,7 +82,7 @@ export default function Search() {
                 </ScrollContainer>
             </ContainerBlock>
 
-            <ContainerBlock style={{ backgroundColor: colors.background2, flex: 1, padding: 0 }}>
+            {/* <ContainerBlock style={{ backgroundColor: colors.background2, flex: 1, padding: 0 }}>
                 <FlatList
                     style={{}}
                     data={$movies?.data?.data?.results}
@@ -125,7 +120,7 @@ export default function Search() {
 
 
                 />
-            </ContainerBlock>
+            </ContainerBlock> */}
 
         </ContainerBlock>
     )

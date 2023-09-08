@@ -1,59 +1,45 @@
-import { Image, TouchableOpacity, View, Text, Dimensions, StyleSheet, TextInput, ImageBackground } from 'react-native'
+import React, { useEffect, useRef, useState, useCallback , useMemo} from "react";
+import { Image, Dimensions, View, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Text } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import useThemeColors from "../../../../../Hooks/useThemeColors";
+import useThemeColors from "../../../../Hooks/useThemeColors";
 
-import UploadIcon from '../../../../../../assets/upload-icon.png'
-import UploadBackground from '../../../../../../assets/autumn-leaves-background.jpg'
-import MusicalLandscape from '../../../../../../assets/muusical-landscape.jpg'
+import UploadIcon from '../../../../../assets/upload-icon.png'
+import UploadBackground from '../../../../../assets/autumn-leaves-background.jpg'
+import MusicalLandscape from '../../../../../assets/muusical-landscape.jpg'
 
-import { useEffect, useRef, useState } from 'react'
-import Animated, { SlideInDown, SlideOutDown, SlideOutUp, useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
-import { HeadLine, SpanText } from "../../../../../Components/Texts";
-import { IPostContext, IPostFormComponent } from "../../../../../Interfaces/IPostContext";
+import Animated, { SlideInDown, SlideOutUp, SlideOutDown } from 'react-native-reanimated'
+import { HeadLine, SpanText } from "../../../../Components/Texts";
+import { IPostContext } from "../../../../Interfaces/IPostContext";
 import * as FilePicker from 'expo-document-picker'
-import { Gesture } from "react-native-gesture-handler";
 import { Audio, Video, ResizeMode } from "expo-av";
-import { getMediaType } from "../../../../../Helpers";
-import useKeyboardEvent from "../../../../../Hooks/useKeyboardEvent";
-import { IMediaType } from '../../../../../Interfaces';
-import { IMediaPlayable } from '../../../../Statics/MediaViewer/Interface';
+import { getMediaType } from '../../../../Helpers';
+import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
+import { IMediaType } from '../../../../Interfaces';
+import { IMediaPlayable } from '../../../Statics/MediaViewer/Interface';
+import usePostForm from "../../../../Hooks/usePostForms";
+import { useDataContext } from "../../../../Contexts/DataContext";
 
 const { height, width } = Dimensions.get('window')
 
-export default function UploadFileForm(props: IPostFormComponent) {
+export default function UploadFileForm() {
 
     const videoMediaRef = useRef<Video>(null)
-    const richText = useRef()
-    const imageMediaRef = useRef<Image>(null)
     const [audioMediaRef, setAudioMediaRef] = useState<Audio.SoundObject>(null)
     const [fileType, setFileType] = useState<IMediaType>(null)
     const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({})
-    const [isCaptionInputFocused, setisCaptionInputFocused] = useState(false)
-    const [isyKeyboardShown, setisyKeyboardShown] = useState(false)
+    const [isCaptionInputFocused, setIsCaptionInputFocused] = useState(false)
+    const [isKeyboardShown, setIsKeyboardShown] = useState(false)
     const themeColors = useThemeColors()
 
-    const { createPost } = props
+    const { methods: { createPost } } = usePostForm()
+    const dataContext = useDataContext()
 
-    const [sessionValues, setsessionValues] = useState<IPostContext>({ postType: 'UPLOAD' })
+    const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD' })
 
     useKeyboardEvent({
-        onShow: () => setisyKeyboardShown(true),
-        onHide: () => setisyKeyboardShown(false),
+        onShow: () => setIsKeyboardShown(true),
+        onHide: () => setIsKeyboardShown(false),
     })
-
-
-    useEffect(() => {
-
-        const FT = getMediaType(sessionValues?.file?.uri)
-        setFileType(FT)
-
-        return () => {
-            setFileType(null)
-            setMediaState(s => ({ ...s, playState: 'paused' }))
-        }
-
-    }, [sessionValues?.file?.uri])
-
 
     const playPauseMedia = async () => {
         try {
@@ -63,22 +49,19 @@ export default function UploadFileForm(props: IPostFormComponent) {
                         uri: sessionValues?.file?.uri,
                     }, {}, handlePlaybackStatusUpdate))
                 if (mediaState.playState !== 'playing') {
-                    setMediaState(s => ({ ...s, playState: 'playing' }))
+                    setMediaState(state => ({ ...state, playState: 'playing' }))
                     await audioMediaRef?.sound?.playAsync()
-                }
-                else {
-                    setMediaState(s => ({ ...s, playState: 'paused' }))
+                } else {
+                    setMediaState(state => ({ ...state, playState: 'paused' }))
                     await audioMediaRef?.sound?.pauseAsync()
                 }
-            }
-            else if (fileType === 'video') {
+            } else if (fileType === 'video') {
                 if (videoMediaRef?.current) {
                     if (mediaState.playState !== 'playing') {
-                        setMediaState(s => ({ ...s, playState: 'playing' }))
+                        setMediaState(state => ({ ...state, playState: 'playing' }))
                         await videoMediaRef?.current?.playAsync()
-                    }
-                    else {
-                        setMediaState(s => ({ ...s, playState: 'paused' }))
+                    } else {
+                        setMediaState(state => ({ ...state, playState: 'paused' }))
                         await videoMediaRef?.current?.pauseAsync()
                     }
                 }
@@ -88,102 +71,88 @@ export default function UploadFileForm(props: IPostFormComponent) {
         }
     }
 
-    // Gesture
-    const eContinerHeight = useSharedValue(height / 1.7)
-    const lasDragPostion = useSharedValue(0)
-    const eContinerReanimated = useAnimatedStyle(() => ({
-        height: eContinerHeight.value
-    }))
-
-    const gesture = Gesture
-        .Pan()
-        .onBegin(() => { })
-        .onStart(() => { })
-        .onUpdate(e => {
-            eContinerHeight.value = Math.max(120, Math.min(e.translationY + lasDragPostion.value, height / 1.7))
-            console.log(eContinerHeight.value)
-        })
-        .onEnd(e => {
-            lasDragPostion.value = Math.max(50, e.translationY)
-        })
-
-    //Handlers
-
     const handleCreatePost = async () => {
-        const post = await  createPost({
+        const post = await createPost({
             ...sessionValues, 'postType': "UPLOAD"
         })
     }
-    const handlePickDocument = async () => {
-        let [type, multiple] = [['image/*', "video/*", "audio/*"], false]
+
+    const handlePickDocument = useCallback(async () => {
+        const [type, multiple] = [['image/*', "video/*", "audio/*"], false];
         try {
             const pickedItems = await FilePicker.getDocumentAsync({
                 multiple,
                 type,
-            })
+            });
             if (!pickedItems.canceled) {
-                const picked = pickedItems.assets?.[0]
-                setsessionValues(S => ({
-                    ...S, file: {
+                const picked = pickedItems.assets?.[0];
+                console.log("DONE DONE", picked, " PICKED");
+                setSessionValues(state => ({
+                    ...state,
+                    file: {
                         uri: picked?.uri,
                         size: picked.size,
                         name: picked.name,
                         type: picked?.mimeType
                     }
-                }))
-                if (['video', 'image'].includes(picked?.mimeType))
-                    setsessionValues(S => ({ ...S, thumbnail: picked.uri }))
+                }));
+                if (['video', 'image'].includes(picked?.mimeType)) {
+                    setSessionValues(state => ({ ...state, thumbnail: picked.uri }));
+                }
             }
         } catch (error) {
-            console.log("ERROR handlePickDocument -> ", error)
+            console.log("ERROR handlePickDocument -> ", error);
         }
-    }
+    }, [setSessionValues]);
+
+
+    console.log(sessionValues)
 
     const handlePlaybackStatusUpdate = (data) => {
         if (data?.isLoaded && !data.isPlaying && data.didJustFinish) {
             console.log('Media playback has ended.');
-            setMediaState(s => s = ({ playState: 'ended' }));
+            setMediaState(state => ({ playState: 'ended' }));
             videoMediaRef?.current?.setPositionAsync(0)
             audioMediaRef?.sound?.setPositionAsync(0)
         }
         const { positionMillis, playableDurationMillis, durationMillis } = data;
         const calculatedProgress = (positionMillis / playableDurationMillis) * 100;
-        setMediaState((prevState) => ({
+        setMediaState(prevState => ({
             ...prevState,
             progress: Number((calculatedProgress ?? 0).toFixed(0)),
             duration: durationMillis / 1000
         }));
     };
 
-    const handlePickThumb = async () => {
+    const handlePickThumbnail = async () => {
         try {
             const pickedItems = await FilePicker.getDocumentAsync({
                 type: ['image/jpg', 'image/png', 'image/jpeg']
             })
             if (!pickedItems.canceled)
-                setsessionValues(S => ({ ...S, thumbnail: pickedItems.assets?.[0]?.uri }))
+                setSessionValues(state => ({ ...state, thumbnail: pickedItems.assets?.[0]?.uri }))
         } catch (error) {
             console.log("ERROR handlePickThumb -> ", error)
         }
     }
 
-    const handelRemoveMediaFromSelection = () => {
-        setsessionValues(S => ({ ...S, files: null }))
+    const handleRemoveMediaFromSelection = () => {
+        setSessionValues(state => ({ ...state, file: null }))
     }
 
-    const handleOnChangetext = (text: string) => {
-        setsessionValues(s => ({ ...s, description: text }))
+    const handleOnChangeText = (text: string) => {
+        setSessionValues(state => ({ ...state, description: text }))
     }
 
-    const PostCaption = (
-        <View style={[styles.textInputContainner, { height: isyKeyboardShown ? 'auto' : 'auto' }]}>
+    const postCaption = (
+        <View style={[styles.textInputContainer, { height: isKeyboardShown ? 'auto' : 'auto' }]}>
             <HeadLine
                 style={{ padding: 10, opacity: .7 }}
-                hidden={!isyKeyboardShown}
+                hidden={!isKeyboardShown}
                 children={'📢 Attention You! 📢'} />
             <SpanText
                 style={{ fontSize: 12, padding: 10, opacity: .5 }}
-                hidden={!isyKeyboardShown}
+                hidden={!isKeyboardShown}
             >
                 Adding captions to your posts can make a world of difference! It's more than just text
                 - it's a chance to share your story, your thoughts, and your personality.{'\n'}{'\n'}
@@ -191,23 +160,21 @@ export default function UploadFileForm(props: IPostFormComponent) {
             </SpanText>
             <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-end', }]}>
                 <TextInput
-                    onFocus={() => setisCaptionInputFocused(true)}
-                    onBlur={() => setisCaptionInputFocused(false)}
+                    onFocus={() => setIsCaptionInputFocused(true)}
+                    onBlur={() => setIsCaptionInputFocused(false)}
                     style={[styles.textInput, { color: themeColors.text, flexGrow: 1 }]}
-                    placeholder={isyKeyboardShown ? "Type your caption here..." : "What's up? caption 🖋️"}
+                    placeholder={isKeyboardShown ? "Type your caption here..." : "What's up? caption 🖋️"}
                     value={sessionValues?.description}
-                    onChangeText={handleOnChangetext}
+                    onChangeText={handleOnChangeText}
                     multiline
                     textBreakStrategy="highQuality"
                     autoFocus
-
                     placeholderTextColor={themeColors.text}
                     returnKeyType="default"
                 />
-
             </View>
             {
-                !isyKeyboardShown && (
+                !isKeyboardShown && (
                     <TouchableOpacity
                         onPress={handleCreatePost}
                         style={[styles.spaceBetween, { gap: 3, borderRadius: 5, height: 50, marginTop: 10, backgroundColor: themeColors.success, justifyContent: 'center' }]}
@@ -258,18 +225,16 @@ export default function UploadFileForm(props: IPostFormComponent) {
                         blurRadius={10}
                         style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red' }}>
                         <Ionicons
-
                             name='musical-note'
                             color={themeColors.text}
                             size={100}
-
                         />
                     </ImageBackground>
                 )
         }
     }
 
-    const ThumbPreviewer = (
+    const thumbPreviewer = (
         <View style={[styles.thumbPreviewBackgroundImage]}>
             <ImageBackground
                 source={{ uri: sessionValues?.thumbnail }}
@@ -278,7 +243,7 @@ export default function UploadFileForm(props: IPostFormComponent) {
                 resizeMode="cover"
                 style={{ width: '100%', height: '100%' }}   >
                 <TouchableOpacity
-                    onPress={handlePickThumb}
+                    onPress={handlePickThumbnail}
                     style={[styles.spaceBetween, {
                         position: 'absolute',
                         width: '100%',
@@ -304,13 +269,13 @@ export default function UploadFileForm(props: IPostFormComponent) {
                             />
                             <View style={[styles.spaceBetween, { position: 'absolute', right: 10, top: 10, padding: 0 }]}>
                                 <MaterialIcons
-                                    onPress={() => setsessionValues(S => ({ ...S, thumbnail: null }))}
+                                    onPress={() => setSessionValues(state => ({ ...state, thumbnail: null }))}
                                     style={[styles.iconsStyle]}
                                     size={20}
                                     color={themeColors.text}
                                     name="delete" />
                                 <MaterialIcons
-                                    onPress={handlePickThumb}
+                                    onPress={handlePickThumbnail}
                                     style={[styles.iconsStyle]}
                                     size={20}
                                     color={themeColors.text}
@@ -323,7 +288,7 @@ export default function UploadFileForm(props: IPostFormComponent) {
         </View>
     )
 
-    const FileExplorer = (
+    const fileExplorer = (
         <View style={[{ flex: 1 }]}>
             <ImageBackground
                 source={UploadBackground}
@@ -336,23 +301,14 @@ export default function UploadFileForm(props: IPostFormComponent) {
                     onPress={handlePickDocument}   >
                     <Image source={UploadIcon} />
                 </TouchableOpacity>
-
-                {/* <GestureDetector gesture={gesture}>
-                    <Animated.View style={[styles.fileExplorerContainer, eContinerReanimated]}>
-                        <View style={[styles.spaceBetween, { height: 20, justifyContent: 'center' }]}>
-                            <View style={[styles.contentDescriptionContainerBar, { backgroundColor: themeColors.text }]} />
-                        </View>
-
-                    </Animated.View>
-                </GestureDetector> */}
             </ImageBackground>
         </View>
     )
 
-    const PreviewUploadedFile = (
-        <View style={[styles.uploadededFilePreviewContainer, { padding: isyKeyboardShown ? 0 : 10 }]}>
+    const previewUploadedFile = (
+        <View style={[styles.uploadedFilePreviewContainer, { padding: isKeyboardShown ? 0 : 10 }]}>
             {
-                isyKeyboardShown || (
+                isKeyboardShown || (
                     <View style={[styles.spaceBetween, styles.uploadedFileContainer]}>
                         <View style={{ borderRadius: 10, overflow: 'hidden', flex: 1 }}>
                             <ImageBackground
@@ -360,13 +316,13 @@ export default function UploadFileForm(props: IPostFormComponent) {
                                 source={{ uri: sessionValues?.file?.uri }}
                                 style={[styles.uploadedFilePreviewInnerContainer]}>
                                 {displayType()}
-                                {mediaState?.playState !== 'playing' && ThumbPreviewer}
+                                {mediaState?.playState !== 'playing' && thumbPreviewer}
                             </ImageBackground>
                         </View>
                         <View style={[{ zIndex: 5, right: 0, height: '100%', padding: 6, justifyContent: 'space-between', backgroundColor: themeColors.background }]}>
                             <View style={[{ gap: 10 }]}>
                                 <MaterialIcons
-                                    onPress={() => setsessionValues(S => ({ ...S, file: null }))}
+                                    onPress={() => setSessionValues(state => ({ ...state, file: null }))}
                                     style={[styles.iconsStyle, { height: 40 }]}
                                     size={30}
                                     color={themeColors.text}
@@ -390,43 +346,38 @@ export default function UploadFileForm(props: IPostFormComponent) {
                     </View>
                 )
             }
-
-            {PostCaption}
+            {postCaption}
         </View>
     )
 
-    return (
+    return useMemo(() => (
         <Animated.View
             entering={SlideInDown}
             exiting={SlideOutUp}
-            style={[styles.constainer, {}]}>
-            {sessionValues?.file ? PreviewUploadedFile : FileExplorer}
+            style={[styles.container, {}]}>
+            {sessionValues?.file ? previewUploadedFile : fileExplorer}
         </Animated.View>
-    )
-}
-
-
+    ), [])
+} 
 
 const styles = StyleSheet.create({
-    constainer: {
+    container: {
         height: '100%',
-        // padding: 10
     },
-    textInputContainner: {
+    textInputContainer: {
         width: '100%',
         paddingVertical: 10,
         justifyContent: 'flex-end',
         marginTop: 30,
-        overflow: 'hidden'
-    }
-    ,
-    textEditoContainer: {
+        overflow: 'hidden',
+    },
+    textEditorContainer: {
         borderRadius: 5,
         overflow: 'hidden',
         minHeight: 100,
         justifyContent: 'center',
         flexGrow: 1,
-        maxHeight: 'auto'
+        maxHeight: 'auto',
     },
     fileExplorerContainer: {
         height: height / 2.3,
@@ -435,24 +386,23 @@ const styles = StyleSheet.create({
         borderTopEndRadius: 20,
         borderTopLeftRadius: 20,
         bottom: 0,
-        // position: 'absolute',
     },
     textInput: {
         paddingHorizontal: 10,
         fontWeight: '300',
-        fontSize: 17
+        fontSize: 17,
     },
     spaceBetween: {
         flexDirection: 'row',
         alignItems: 'center',
-        'justifyContent': 'space-between',
+        justifyContent: 'space-between',
         padding: 6,
         gap: 10,
-        position: 'relative'
+        position: 'relative',
     },
     textStyle: {
         fontSize: 18,
-        fontWeight: '500'
+        fontWeight: '500',
     },
     thumbPreviewBackgroundImage: {
         height: 110,
@@ -461,31 +411,31 @@ const styles = StyleSheet.create({
         bottom: 10,
         aspectRatio: '16/9',
         borderRadius: 10,
-        overflow: 'hidden'
+        overflow: 'hidden',
     },
-    uploadededFilePreviewContainer: {
+    uploadedFilePreviewContainer: {
         width: '100%',
         height: '100%',
         padding: 10,
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
     },
     uploadedFilePreviewInnerContainer: {
         borderRadius: 20,
         overflow: 'hidden',
         flex: 1,
         width: '100%',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
     },
     uploadedFileContainer: {
         flex: 1,
         position: 'relative',
-        padding: 0
+        padding: 0,
     },
     contentDescriptionContainerBar: {
         width: 60,
         height: 5,
         borderRadius: 50,
-        backgroundColor: 'red'
+        backgroundColor: 'red',
     },
     iconsStyle: {
         borderRadius: 50,
@@ -494,9 +444,7 @@ const styles = StyleSheet.create({
         padding: 3,
         aspectRatio: 1,
         textAlign: 'center',
-        textAlignVertical: 'center'
+        textAlignVertical: 'center',
     },
-    textEditor: {
-
-    }
-})
+    textEditor: {},
+});

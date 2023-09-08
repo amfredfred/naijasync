@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import useLinkPreview from '../../../Hooks/useLinkPreview';
+import useLinkPreview from '../../Hooks/useLinkPreview';
 
 const PreViewLink = ({ url, enabled }: { url: string, enabled: boolean }) => {
     const previewData = useLinkPreview({

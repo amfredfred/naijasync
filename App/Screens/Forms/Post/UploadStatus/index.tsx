@@ -1,16 +1,15 @@
 import * as Library from 'expo-media-library'
 import Animated, { SlideInDown, SlideInLeft, SlideOutLeft, SlideOutUp } from 'react-native-reanimated'
 import { View, Text, StyleSheet, Dimensions } from 'react-native'
-import useThemeColors from '../../../../../Hooks/useThemeColors'
+import useThemeColors from '../../../../Hooks/useThemeColors'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 import { useRef, useState, useEffect } from 'react'
-import { SpanText } from '../../../../../Components/Texts'
-import { IPostFormComponent } from '../../../../../Interfaces/IPostContext'
+import { SpanText } from '../../../../Components/Texts'
 
 const { height, width } = Dimensions.get('window')
 
-export default function UploadStatusFrom(props: IPostFormComponent) {
+export default function UploadStatusFrom() {
     const [libpermission, requestLibPermission] = Library.usePermissions()
     const [mediaFiles, setMediaFiles] = useState<Library.AssetInfo[]>([])
 

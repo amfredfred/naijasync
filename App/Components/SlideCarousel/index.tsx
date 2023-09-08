@@ -56,7 +56,7 @@ const VideoListItem = (props: IPostItem) => {
 
 const AudioListItem = () => <SpanText>audio list type</SpanText>;
 
-function ListSlideItem(props: IPostItem) {
+export function ListSlideItem(props: IPostItem) {
     const { type } = props;
     switch (type) {
         case 'audio':

@@ -1,33 +1,17 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import PostsForm from '../../Screens/Forms/Post';
-import { IPostContext, IPostFormMethods } from '../../Interfaces/IPostContext';
-import { useToast } from '../ToastContext';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { REQUESTS_API } from '@env';
-import { useAuthContext } from '../AuthContext';
-import { IPostItem } from '../../Interfaces';
-import { useNavigation } from '@react-navigation/native';
-import { useDataContext } from '../DataContext';
+import { REQUESTS_API } from "@env";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { IPostContext, IPostFormMethods } from "../Interfaces/IPostContext";
+import { useToast } from "../Contexts/ToastContext";
+import { useAuthContext } from "../Contexts/AuthContext";
+import { useDataContext } from "../Contexts/DataContext";
+import { useState } from "react";
 
-const initialState: IPostContext = {
-
-}
-
-const FormContext = createContext<{
-    states?: IPostContext,
-    methods?: IPostFormMethods
-}>({ states: initialState });
-
-export const usePostFormContext = () => useContext(FormContext);
-
-export default function PostFormProvider({ children }) {
+export default function usePostForm(): { states: IPostContext, methods: IPostFormMethods } {
     const [states, setFormState] = useState({});
 
-    const [isFormShwon, setisFormShwon] = useState(false)
     const authContext = useAuthContext()
     const dataContext = useDataContext()
-    const { navigate } = useNavigation()
 
     const createPostMutation = useMutation((info) => {
         return axios.post(`${REQUESTS_API}posts`,
@@ -58,40 +42,8 @@ export default function PostFormProvider({ children }) {
         }));
     };
 
-
-    useEffect(() => {
-        switch (createPostMutation.status) {
-            case 'error': {
-                // createPostMutation.reset()
-                toast({ message: `Error: ${(createPostMutation?.failureReason as any)?.response?.data?.message}`, severnity: 'error', })
-                break
-            }
-            case 'success': {
-                toast({ message: 'Your post is online !!', severnity: 'success' })
-                createPostMutation.reset()
-                break
-            }
-            case 'idle': {
-                // toast({ message: 'Your post is online !!', })
-                break
-            }
-            case 'loading': {
-                toast({ message: 'creating post !!' })
-                break
-            }
-        }
-    }, [createPostMutation.status])
-
-    useEffect(() => {
-    
-    }, [updatePostMutation?.status])
-
     const createPost = async (props: IPostContext) => {
         const formData = new FormData()
-        toast({
-            message: 'Your post is being created',
-        })
-        showForm(null, null)
         if (props?.file)
             formData.append('upload', {
                 type: props.file.type,
@@ -108,14 +60,14 @@ export default function PostFormProvider({ children }) {
         formData.append('type', props.postType)
         formData.append('tags', JSON.stringify(props?.tags))
 
-        createPostMutation?.mutate(formData as any)
+        const post = await createPostMutation?.mutateAsync(formData as any)
+        if (post?.status == 201 || post?.status == 200) {
+            toast({ message: 'Nice !!', severnity: 'success' })
+            createPostMutation.reset()
+        }
+        console.log(post)
         return {} as any
     }
-
-    const showForm: IPostFormMethods['showForm'] = (form, payload) => {
-        setFormState(payload)
-        setisFormShwon(Boolean(form))
-    } 
 
     const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
         if (!authContext?.user?.isAuthenticated) {
@@ -130,22 +82,14 @@ export default function PostFormProvider({ children }) {
         updatePostMutation?.mutate({ data: { 'liked': payload?.liked }, postId: payload?.puid } as any)
     }
 
-
     const formContextValue = {
         states,
         methods: {
             setData,
             createPost,
-            showForm,
             updatePost
         }
     }
 
-    return (
-        <FormContext.Provider value={formContextValue}>
-            {children}
-            <PostsForm {...{ ...formContextValue.methods, ...formContextValue.states }} hidden={!isFormShwon} />
-        </FormContext.Provider>
-    );
-};
-
+    return formContextValue
+}; 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { SpanText } from '../../../Components/Texts';
+import { SpanText } from '../Texts';
 
 const DigitalClock = () => {
     const [currentTime, setCurrentTime] = useState(new Date());

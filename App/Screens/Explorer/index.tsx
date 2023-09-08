@@ -1,17 +1,15 @@
-import { ContainerBlock, ContainerFlex, ContainerSpaceBetween } from "../../../Components/Containers";
-import { SpanText } from "../../../Components/Texts";
+import { ContainerBlock, ContainerFlex, ContainerSpaceBetween } from "../../Components/Containers";
+import { SpanText } from "../../Components/Texts";
 import { useEffect } from 'react'
 import { BackHandler, FlatList } from 'react-native'
-import { useDataContext } from "../../../Contexts/DataContext";
-import { IconButton } from "../../../Components/Buttons";
+import { useDataContext } from "../../Contexts/DataContext";
+import { IconButton } from "../../Components/Buttons";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import useThemeColors from "../../../Hooks/useThemeColors";
-import { Videos } from "../../../dummy-data";
-import { IPostItem } from "../../../Interfaces";
-import ListSlideItem from "../../../Components/SlideCarousel/ListSliderItem";
-
-
+import useThemeColors from "../../Hooks/useThemeColors";
+import { Videos } from "../../dummy-data";
+import { IPostItem } from "../../Interfaces";
+import { ListSlideItem } from "../../Components/SlideCarousel";
 
 export default function Explorer() {
 

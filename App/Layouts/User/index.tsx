@@ -14,33 +14,17 @@ import { HeadLine } from "../../Components/Texts";
 import { linkChecker } from "../../Helpers";
 import IMAGS from '../../../assets/adaptive-icon.png'
 import DigitalClock from "../../Components/DigitalClock";
-import { usePostFormContext } from "../../Contexts/FormContext";
 import { useAuthContext } from "../../Contexts/AuthContext";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
 
     const [keyBoardShown, setkeyBoardShown] = useState(false)
-    const formContext = usePostFormContext()
     const authContext = useAuthContext()
 
     const { background, background2, text } = useThemeColors()
     const { states: { states, user, storage }, setData } = useDataContext()
     const { navigate, goBack, canGoBack } = useNavigation()
 
-    const handleToSearchhandle = () => {
-        (navigate as any)?.("Search")
-        setData('states', 'isInSearchMode', true)
-    }
-    const handleCancelSearchSection = () => {
-        if (canGoBack()) {
-            setData('states', 'isInSearchMode', false)
-            goBack()
-            return true
-        } else {
-            setData('states', 'isInSearchMode', false)
-        }
-        return false
-    }
 
     const onSearchInputTextChange = (text: string) => {
         const isLinkchecked = linkChecker(text)
@@ -50,14 +34,12 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     //Effects 
     useEffect(() => {
 
-        const BHND = BackHandler.addEventListener('hardwareBackPress', handleCancelSearchSection)
         const keyboardshown = Keyboard.addListener('keyboardDidShow', () => setkeyBoardShown(s => true))
         const keyboardhidden = Keyboard.addListener('keyboardDidHide', () => setkeyBoardShown(s => false))
 
         return () => {
             keyboardshown.remove()
             keyboardhidden.remove()
-            BHND.remove()
         }
     }, [])
 
@@ -77,13 +59,8 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                     hidden={states?.isInSearchMode} style={{ textTransform: 'uppercase' }}>NAIJASYNC</HeadLine>
                 <ContainerSpaceBetween style={{ gap: 10, padding: 0 }}>
                     <ContainerSpaceBetween style={{ padding: 0, overflow: 'hidden' }}>
-                        <IconButton
-                            icon={<Ionicons size={30} name="arrow-back" />}
-                            hidden={!states?.isInSearchMode}
-                            onPress={handleCancelSearchSection}
-                        />
                         <InputText
-                            onPressIn={handleToSearchhandle}
+                            onPressIn={() => (navigate as any)?.("Search")}
                             // onBlur={handleSearchInputBlur}
                             placeholder="Search..."
                             onChangeText={onSearchInputTextChange}
@@ -94,7 +71,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                     </ContainerSpaceBetween>
 
                     <IconButton
-                        onPress={() => formContext.methods?.showForm('upload', {})}
+                        onPress={() => (navigate as any)?.("PostComposer")}
                         hidden={states?.isInSearchMode}
                         icon={<Ionicons size={30} name="create" />}
                     />

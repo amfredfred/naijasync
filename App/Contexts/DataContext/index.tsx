@@ -1,6 +1,7 @@
 import React, { useReducer, createContext, useContext, useEffect } from 'react'
 import { IAppDataContext, IAppDataContextMethods } from '../../Interfaces'
-import useStorage from '../../Hooks/useStorage'
+import useStorage from '../../Hooks/useStorage' 
+import AuthContextProvider from '../AuthContext' 
 
 const initialState: IAppDataContext = {
 }
@@ -14,7 +15,7 @@ const DataContext = createContext<{
 export const useDataContext = () => useContext(DataContext)
 
 export default function DataContextProvider({ children }) {
-    const { method, NaijaSync } = useStorage("@NaijaSync")
+    const { method } = useStorage("@NaijaSync")
 
     const dataReducer = (state, { key, item, payload }: { key: string, item?: any, payload: any }): IAppDataContext => {
         let data = null;
@@ -39,7 +40,9 @@ export default function DataContextProvider({ children }) {
 
     return (
         <DataContext.Provider value={{ states, setData, setObjectItem }}>
-            {children}
+            <AuthContextProvider>
+                {children}
+            </AuthContextProvider>
         </DataContext.Provider>
     )
 }
