@@ -351,6 +351,7 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
             <GestureDetector gesture={gesture}>
                 <Animated.View
                     style={[styles.videoContainer]}>
+
                     <Overlay
                         hidden={(!isVideoLoading)}
                         imageSource={VP?.thumbnailUrl}
@@ -365,7 +366,13 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
                         ref={ref}
                         onPlaybackStatusUpdate={VP.handlePlaybackStatusUpdate}  // Can be a URL or a local file.
                     />
+
                     {MediaControls}
+                    <TouchableOpacity
+                        onPress={VP?.remove}
+                        style={[styles.closeButton]}>
+                        <Ionicons size={30} color={colors.text} name="close" />
+                    </TouchableOpacity>
                 </Animated.View>
             </GestureDetector>
             {MediaDefinition}
@@ -374,6 +381,13 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
 });
 
 const styles = StyleSheet.create({
+    closeButton: {
+        position: 'absolute',
+        padding: 2,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        zIndex: 10,
+        borderBottomRightRadius: 20
+    },
     container: {
         // overflow: 'hidden',
         backgroundColor: 'red',

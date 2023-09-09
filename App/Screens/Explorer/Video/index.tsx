@@ -86,7 +86,6 @@ export default function VideoExplorer() {
 
         return (
             <ExplorerPostItemWrapper post={props} >
-
                 <View style={[styles.vieoContainer]}>
                     <View style={[styles.overlay]}
                         children={<Ionicons onPress={() => mediaPlayer.setMedia(props)}
@@ -160,7 +159,8 @@ const styles = StyleSheet.create({
         width: '100%',
         zIndex: 2,
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center'
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end', 
+        padding:20
     }
 })

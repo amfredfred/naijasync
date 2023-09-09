@@ -57,7 +57,7 @@ export default function LikeButton(props: ILikeButton) {
             <Animated.View style={[{ width: 20, height: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }, animatedStyle]}>
                 <AntDesign
                     style={{}}
-                    size={20} color={liked ? themeColors?.error : themeColors.text} name={liked ? 'like1' : 'hearto'} />
+                    size={20} color={liked ? themeColors?.error : themeColors.text} name={liked ? 'heart' : 'hearto'} />
             </Animated.View>
             <SpanText style={{ color: liked ? themeColors?.error : themeColors.text, fontSize: 18 }}>{formatNumber(likeCount)}</SpanText>
         </TouchableOpacity>

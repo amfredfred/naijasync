@@ -65,7 +65,7 @@ export default function ExplorerPostItemWrapper({ post, children }: { post: IPos
 
                 <TouchableOpacity style={[styles.spaceBetween, { width: 150, borderRadius: 50, overflow: 'hidden' }]}>
                     <SpanText
-                        children={`${formatNumber(1021)} Comment`}
+                        children={`${formatNumber(0)} Comming soon`}
                         style={{
                             height: 25,
                             paddingHorizontal: 10, width: '100%', fontSize: 11, backgroundColor: themeColors.background, borderRadius: 50

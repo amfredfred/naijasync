@@ -1,6 +1,6 @@
 'use strict'
 
-import { BackHandler, FlatList, RefreshControl, View, useWindowDimensions } from "react-native"
+import { BackHandler, FlatList, RefreshControl, View, useWindowDimensions, StyleSheet, Image } from "react-native"
 import { SpanText } from "../../../Components/Texts"
 import { ContainerSpaceBetween } from "../../../Components/Containers"
 import { IconButton } from "../../../Components/Buttons"
@@ -13,6 +13,8 @@ import axios from "axios"
 import { REQUESTS_API } from "@env"
 import { useAuthContext } from "../../../Contexts/AuthContext"
 import { IPostItem } from "../../../Interfaces"
+import { useMediaPlaybackContext } from "../../Statics/MediaViewer/Context"
+import ExplorerPostItemWrapper from "../Wrapper"
 
 export default function AudioExplorer() {
 
@@ -74,6 +76,23 @@ export default function AudioExplorer() {
         </ContainerSpaceBetween>
     )
 
+    const AudioComponent = (props: IPostItem) => {
+
+        const mediaPlayer = useMediaPlaybackContext()
+
+        return (
+            <ExplorerPostItemWrapper post={props} >
+                <View style={[styles.spaceBetween, { padding: 6 }]}>
+                    <Image
+                        source={{ uri: `${REQUESTS_API}${props?.thumbnailUrl}` }}
+                        style={{ width: 100, aspectRatio: 1 / 1, borderRadius: 10 }}
+                    />
+
+                </View>
+            </ExplorerPostItemWrapper>
+        )
+    }
+
     return (
         <View>
             <FlatList
@@ -82,8 +101,22 @@ export default function AudioExplorer() {
                 ListHeaderComponent={Heading}
                 data={Videos}
                 refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
-                renderItem={({ index, item }) => <SpanText style={{ height: height - 140, backgroundColor: 'red', marginBottom: 10 }}>HEY FREDFRED {index} {item.fileUrl}</SpanText>}
+                renderItem={({ index, item }) => <AudioComponent {...item} />}
             />
         </View>
     )
 }
+
+
+const styles = StyleSheet.create({
+    spaceBetween: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        'justifyContent': 'space-between',
+        gap: 10
+    }, blockContainer: {
+        marginBottom: 5,
+        marginHorizontal: 5,
+        borderRadius: 5
+    },
+})

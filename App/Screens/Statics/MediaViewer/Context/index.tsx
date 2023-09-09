@@ -27,15 +27,16 @@ export function MediaViewerProvider({ children }) {
         dispatch({ payload: props })
     }
 
-    const removeMedia: IMediaViewerProvider['removeMedia'] = () => {
-        dispatch({ payload: {} })
-    }
+
 
     const mediaRef = useRef<Video>(null)
     const audioObjectRef = useRef<Audio.SoundObject>(null);
 
     const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({});
     let mediaType: IMediaType = getMediaType(data.fileUrl);
+    const removeMedia: IMediaViewerProvider['removeMedia'] = () => {
+        dispatch({ payload: { fileUrl: '' } })
+    }
 
     const handlePlaybackStatusUpdate = (data) => {
         if (data?.isLoaded && !data.isPlaying && data.didJustFinish) {
