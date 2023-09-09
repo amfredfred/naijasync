@@ -111,9 +111,6 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) =
     )
 
     if (isKeyboadVisible) return null
-
-    console.log(AV?.fileUrl)
-
     return (
         <Animated.View
             style={[styles.container, { backgroundColor: colors.background, position: isShwoingList ? 'absolute' : 'relative' }]}>
@@ -139,8 +136,8 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) =
                     <View
                         style={{ padding: 0, flex: 1 }} >
                         <TouchableOpacity  >
-                            <Text children={AV?.title} style={{ padding: 0, fontWeight: '800', fontSize: 18, color: colors.text }} />
-                            <Text children={AV?.description} style={{ fontSize: 11, fontWeight: '300', color: colors.text }} />
+                            {AV?.title && <Text children={AV?.title} style={{ padding: 0, fontWeight: '800', fontSize: 18, color: colors.text }} />}
+                            <Text numberOfLines={1} children={AV?.description} style={{ fontSize: 11, fontWeight: '300', color: colors.text }} />
                         </TouchableOpacity>
                     </View>
 

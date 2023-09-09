@@ -29,8 +29,6 @@ const StatusPostListItem = (post: IPostItem) => {
 
 const VideoDisplay = (prop: IPostItem) => {
 
-    const videoRef = useRef<Video>(null)
-    const themeColors = useThemeColors()
     const mediaContext = useMediaPlaybackContext()
 
     return (
@@ -66,19 +64,19 @@ const VideoDisplay = (prop: IPostItem) => {
     )
 }
 
-const AudioDisplay = ({ uri, duration, cover }) => {
+const AudioDisplay = (prop: IPostItem) => {
     const mP = useMediaPlaybackContext()
 
     const togglePlayback = () => {
         // setIsPlaying(!isPlaying);
-        if (mP?.fileUrl === uri) {
+        if (mP?.fileUrl === prop?.fileUrl) {
             if (mP?.states?.playState === 'playing') {
                 mP?.pause()
             } else {
                 mP?.play()
             }
         } else
-            mP.setMedia({ fileUrl: uri })
+            mP.setMedia(prop)
     };
 
     return (
@@ -88,15 +86,15 @@ const AudioDisplay = ({ uri, duration, cover }) => {
                 <View style={[styles.spaceBetween, { padding: 0, flex: 1 }]}>
                     <Image
                         style={{ width: 140, aspectRatio: '16/9', borderRadius: 10 }}
-                        source={{ uri: cover }} />
-                    <SpanText >{mP?.fileUrl === uri ? Number(mP?.states?.progress > 0 ? mP?.states?.progress : 0) : 0}% / {duration}</SpanText>
+                        source={{ uri: prop?.thumbnailUrl }} />
+                    <SpanText >{mP?.fileUrl === prop?.fileUrl ? Number(mP?.states?.progress > 0 ? mP?.states?.progress : 0) : 0}% / {prop?.duration}</SpanText>
                 </View>
                 <TouchableOpacity style={[styles.playButton]} onPress={togglePlayback}>
                     <ImageBackground
                         blurRadius={100}
                         style={{ width: 80, aspectRatio: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-                        source={{ uri: cover }}>
-                        <Ionicons name={mP?.fileUrl === uri ? (mP.states?.playState === 'playing' ? 'pause-circle' : 'play-circle') : 'play-circle'} size={50} color="white" />
+                        source={{ uri: prop?.thumbnailUrl }}>
+                        <Ionicons name={mP?.fileUrl === prop?.fileUrl ? (mP.states?.playState === 'playing' ? 'pause-circle' : 'play-circle') : 'play-circle'} size={50} color="white" />
                     </ImageBackground>
                 </TouchableOpacity>
             </View>
@@ -128,11 +126,7 @@ const UploadPostListItem = (post: IPostItem) => {
             case 'image':
                 return <ImageDisplay uri={`${REQUESTS_API}${post.fileUrl}`} />
             case 'audio':
-                return <AudioDisplay
-                    uri={`${REQUESTS_API}${post.fileUrl}`}
-                    duration={post?.sourceQualities?.original?.duration?.formatted}
-                    cover={`${REQUESTS_API}${post?.thumbnailUrl}`}
-                />
+                return <AudioDisplay {...post} />
             default:
                 break;
         }

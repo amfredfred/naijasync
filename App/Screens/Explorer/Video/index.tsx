@@ -1,10 +1,10 @@
 'use strict'
 
-import { BackHandler, FlatList, RefreshControl, View, useWindowDimensions, StyleSheet, Image } from "react-native"
-import { SpanText } from "../../../Components/Texts"
+import { BackHandler, FlatList, RefreshControl, View, useWindowDimensions, StyleSheet, Image, TouchableOpacity } from "react-native"
+import { HeadLine, SpanText } from "../../../Components/Texts"
 import { ContainerSpaceBetween } from "../../../Components/Containers"
 import { IconButton } from "../../../Components/Buttons"
-import { Ionicons } from "@expo/vector-icons"
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import useThemeColors from "../../../Hooks/useThemeColors"
 import { useEffect, useState } from "react"
@@ -15,6 +15,10 @@ import { useAuthContext } from "../../../Contexts/AuthContext"
 import { IPostItem } from "../../../Interfaces"
 import { useMediaPlaybackContext } from "../../Statics/MediaViewer/Context"
 import { ResizeMode, Video } from "expo-av"
+import LikeButton from "../../__/PostsList/__/PostItem/Like"
+import { formatNumber } from "../../../Helpers"
+import ShareContent from "../../../Components/ShareFile"
+import ExplorerPostItemWrapper from "../Wrapper"
 
 export default function VideoExplorer() {
 
@@ -81,13 +85,12 @@ export default function VideoExplorer() {
         const mediaPlayer = useMediaPlaybackContext()
 
         return (
-            <View style={[styles.blockContainer]}>
+            <ExplorerPostItemWrapper post={props} >
+
                 <View style={[styles.vieoContainer]}>
                     <View style={[styles.overlay]}
-                        children={<Ionicons onPress={() => mediaPlayer.setMedia({
-                            fileUrl: `${REQUESTS_API}${props?.fileUrl}`,
-                            thumbnailUrl: `${REQUESTS_API}${props?.thumbnailUrl ?? props?.fileUrl}`
-                        })} name="play-circle" size={40} color={text} />}
+                        children={<Ionicons onPress={() => mediaPlayer.setMedia(props)}
+                            name="play-circle" size={40} color={text} />}
                     />
                     <Image
                         resizeMethod="resize"
@@ -95,9 +98,18 @@ export default function VideoExplorer() {
                         style={[styles.videoThumbImage]}
                         source={{ uri: `${REQUESTS_API}${props?.thumbnailUrl ?? props?.fileUrl}` }}
                     />
-
+                    {
+                        !props?.thumbnailUrl && (
+                            <Video
+                                resizeMode={ResizeMode.CONTAIN}
+                                style={[styles.videoComponent, { backgroundColor: background }]}
+                                ref={mediaPlayer?.mediaRef}
+                                source={{ 'uri': `${REQUESTS_API}${props?.fileUrl}` }}
+                            />
+                        )
+                    }
                 </View>
-            </View>
+            </ExplorerPostItemWrapper>
         )
     }
 
@@ -114,14 +126,8 @@ export default function VideoExplorer() {
 }
 
 const styles = StyleSheet.create({
-    blockContainer: {
-        width: '100%',
-        backgroundColor: 'red',
-        marginBottom: 10
-    },
     vieoContainer: {
         width: '100%',
-        backgroundColor: 'green',
         flexGrow: 1,
         position: 'relative',
         minHeight: 300,
@@ -137,7 +143,14 @@ const styles = StyleSheet.create({
     videoComponent: {
         width: '100%',
         flexGrow: 1,
-        backgroundColor: 'red'
+    },
+    spaceBetween: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        'justifyContent': 'space-between',
+        paddingBottom: 6,
+        paddingHorizontal: 5,
+        gap: 10
     },
     overlay: {
         height: '100%',
@@ -145,7 +158,6 @@ const styles = StyleSheet.create({
         left: 0,
         top: 0,
         width: '100%',
-        backgroundColor: 'red',
         zIndex: 2,
         flexDirection: 'row',
         alignItems: 'center',

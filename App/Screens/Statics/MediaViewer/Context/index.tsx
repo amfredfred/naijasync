@@ -4,6 +4,7 @@ import { IMediaViewer, IMediaViewerProvider, IMediaPlayable, IMediaType, } from 
 import { Audio, Video } from 'expo-av'
 import MediaViewer from '..'
 import { getMediaType } from '../../../../Helpers'
+import { REQUESTS_API } from '@env'
 
 const initialState: IMediaViewer = {
     previewing: false
@@ -19,7 +20,7 @@ export function MediaViewerProvider({ children }) {
         return data
     }
 
-    const [data, dispatch] = useReducer(mediaReducer, { ...initialState })
+    const [data, dispatch] = useReducer(mediaReducer, initialState)
 
     const setMedia: IMediaViewerProvider['setMedia'] = (props) => {
         console.log(props)
@@ -27,7 +28,7 @@ export function MediaViewerProvider({ children }) {
     }
 
     const removeMedia: IMediaViewerProvider['removeMedia'] = () => {
-        dispatch({ payload: { sources: [], thumbnailUri: '' } })
+        dispatch({ payload: {} })
     }
 
     const mediaRef = useRef<Video>(null)
@@ -77,7 +78,7 @@ export function MediaViewerProvider({ children }) {
         try {
             if (mediaType === 'audio') {
                 const playbackObject = await Audio.Sound.createAsync?.(
-                    { uri: data?.fileUrl },
+                    { uri: `${REQUESTS_API}${data?.fileUrl}` },
                     { shouldPlay: shouldPlay },
                     handlePlaybackStatusUpdate
                 );
@@ -91,7 +92,7 @@ export function MediaViewerProvider({ children }) {
                 });
                 audioObjectRef.current = playbackObject;
             } else if (mediaType === 'video') {
-                await mediaRef?.current?.loadAsync?.({ uri: data?.fileUrl }, {
+                await mediaRef?.current?.loadAsync?.({ uri: `${REQUESTS_API}${data?.fileUrl}` }, {
                     'shouldCorrectPitch': true,
                 }, true);
             }
@@ -185,6 +186,7 @@ export function MediaViewerProvider({ children }) {
 
 
     const methodsAndStates = {
+        ...data,
         play,
         pause,
         skipNextTo,
@@ -202,7 +204,6 @@ export function MediaViewerProvider({ children }) {
         type: mediaType,
         states: mediaState,
         mediaRef: mediaRef,
-        ...data
     };
 
     return (

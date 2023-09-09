@@ -17,9 +17,6 @@ import { Videos } from "../../../../dummy-data";
 import { ProgressBar } from "../../../../Components/Inputs";
 import { HeadLine } from "../../../../Components/Texts";
 import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
-
-
-
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
@@ -262,8 +259,7 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
                 <Text
                     numberOfLines={2}
                     style={[{ color: colors.text, maxWidth: '92%', }]}>
-                    Ronaldo Goal - Al Nassr vs Al Shorta 1-0 Highlights & All Goals - 20
-                    Ronaldo Goal - Al Nassr vs Al Shorta 1-0 Highlights & All Goals - 2023
+                    {VP?.title ?? VP?.caption ?? VP?.description ?? VP?.mimeType}
                 </Text>
             </TouchableOpacity>
             <View>
@@ -330,8 +326,7 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
                     <ScrollView style={[styles.contentDescriptionContainerInner]}>
                         <Text
                             style={[{ color: colors.text, maxWidth: '100%', lineHeight: 27, fontSize: 18 }]}>
-                            Ronaldo Goal - Al Nassr vs Al Shorta 1-0 Highlights & All Goals - 20
-                            Ronaldo Goal - Al Nassr vs Al Shorta 1-0 Highlights & All Goals - 2023
+                            {VP?.title ?? VP?.caption ?? VP?.description}
                         </Text>
                     </ScrollView>
                 </Animated.View>
