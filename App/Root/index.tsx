@@ -28,6 +28,7 @@ import PostComposer from '../Screens/Forms/Post';
 import FinanceHome from '../Screens/User/Account/Finance';
 import SettingsHome from '../Screens/User/Account/Settings';
 import DashboardHome from '../Screens/User/Account/Dashboard';
+import UpdateProfile from '../Screens/User/Account/Settings/UpdateProfile';
 
 
 const screenOptions = {
@@ -68,6 +69,19 @@ function Routes() {
     const AccountSettingsRoutes = () => (
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
             <Stack.Screen name='Personalization & Security' component={SettingsHome} />
+            <Stack.Screen name='Personal Info' key={'Public Profile Update'} component={UpdateProfile} />
+        </Stack.Navigator>
+    )
+
+    const AccountDashboardRoutes = () => (
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+            <Stack.Screen name='Account overview 🌟' component={DashboardHome} />
+        </Stack.Navigator>
+    )
+
+    const AccountFundingRoutes = () => (
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+            <Stack.Screen name='Payments & Transfers' component={FinanceHome} />
         </Stack.Navigator>
     )
 
@@ -75,8 +89,8 @@ function Routes() {
         <AccountLayout>
             <Buttom.Navigator tabBar={op => <AccountTabBar {...op} />} screenOptions={screenOptions} >
                 <Buttom.Screen name='Profile' options={{ tabBarBadge: 'account' }} component={Account} />
-                <Buttom.Screen name='Dashboard' options={{ tabBarBadge: 'dashboard' }} component={DashboardHome} />
-                <Buttom.Screen name='Funding' options={{ tabBarBadge: 'wallet' }} component={FinanceHome} />
+                <Buttom.Screen name='Dashboard' options={{ tabBarBadge: 'dashboard' }} component={AccountDashboardRoutes} />
+                <Buttom.Screen name='Payments' options={{ tabBarBadge: 'wallet' }} component={AccountFundingRoutes} />
                 <Buttom.Screen name='Settings' options={{ tabBarBadge: 'settings' }} component={AccountSettingsRoutes} />
             </Buttom.Navigator>
         </AccountLayout>
@@ -129,3 +143,5 @@ export default function Root() {
         </SafeAreaProvider>
     )
 }
+
+

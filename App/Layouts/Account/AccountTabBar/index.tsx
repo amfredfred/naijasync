@@ -7,6 +7,8 @@ import Accounticon from '../../../../assets/icons/color-mode-icon.png'
 import DashboardIcon from '../../../../assets/icons/dashboard-icon.png'
 import SettingIcon from '../../../../assets/icons/settings-icon.png'
 import NairaIcon from '../../../../assets/icons/naira-icon.png'
+import { useState } from 'react'
+import useKeyboardEvent from '../../../Hooks/useKeyboardEvent'
 
 
 export default function AccountTabBar({ state, descriptors, navigation }: { state: any, descriptors: any, navigation: any }) {
@@ -19,6 +21,14 @@ export default function AccountTabBar({ state, descriptors, navigation }: { stat
         { title: 'wallet', inactiveImage: NairaIcon, activeImage: NairaIcon },
         { title: 'settings', inactiveImage: SettingIcon, activeImage: SettingIcon },
     ]
+
+    const [isKeyboadShow, setisKeyboadShow] = useState(false)
+    useKeyboardEvent({
+        onShow: () => setisKeyboadShow(true),
+        onHide: () => setisKeyboadShow(false)
+    })
+
+    if (isKeyboadShow) return null
 
     return (
         <ScrollView

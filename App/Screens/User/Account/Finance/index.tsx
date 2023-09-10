@@ -10,10 +10,10 @@ export default function FinanceHome() {
 
 
     return useMemo(() => (
-        <View style={{ flex: 1 }}>
+        <View style={{  backgroundColor: themeColors.background, flex: 1 }}>
             <AccountHeading />
 
-            <ScrollView style={{ backgroundColor: themeColors.background2, flex: 1 }}>
+            <ScrollView style={{flex: 1 }}>
                 <View style={{}}>
                     <ComingSoonComponent />
                 </View>

@@ -21,14 +21,14 @@ export default function AccountHeading() {
         <Animated.View
             entering={FadeIn}
             exiting={FadeOut}
-            style={{ padding: 0, height: 45, backgroundColor: themeColors.background, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
+            style={{ padding: 0, height: 45, backgroundColor: themeColors.background, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', borderBottomColor: themeColors.background2, borderBottomWidth: 1 }}>
             <IconButton
                 icon={<Ionicons onPress={handleGoBack} name="arrow-back" size={35} />}
                 containerStyle={{ backgroundColor: 'transparent', gap: 10 }}
                 textStyle={{ fontSize: 20 }}
             />
             <View style={{ flexGrow: 1, alignItems: 'center' }}>
-                <SpanText style={{ textTransform: 'uppercase' }}>
+                <SpanText style={{ textTransform: 'capitalize' }}>
                     {route?.name}
                 </SpanText>
             </View>

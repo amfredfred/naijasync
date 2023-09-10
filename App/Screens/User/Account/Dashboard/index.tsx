@@ -9,10 +9,10 @@ export default function DashboardHome() {
     const themeColors = useThemeColors()
 
     return useMemo(() => (
-        <View style={{ flex: 1 }}>
+        <View style={{ backgroundColor: themeColors.background, flex: 1 }}>
             <AccountHeading />
             <ScrollView
-                style={{ backgroundColor: themeColors.background2, flex: 1 }}>
+                style={{ flex: 1 }}>
                 <View style={{}}>
                     <ComingSoonComponent />
                 </View>
