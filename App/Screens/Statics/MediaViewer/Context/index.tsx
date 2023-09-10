@@ -27,8 +27,6 @@ export function MediaViewerProvider({ children }) {
         dispatch({ payload: props })
     }
 
-
-
     const mediaRef = useRef<Video>(null)
     const audioObjectRef = useRef<Audio.SoundObject>(null);
 

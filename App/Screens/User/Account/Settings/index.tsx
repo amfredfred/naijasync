@@ -1,10 +1,9 @@
 import { ScrollView, View } from "react-native";
 import AccountHeading from "../../../../Layouts/Account/Heading";
 import useThemeColors from "../../../../Hooks/useThemeColors";
-import ComingSoonComponent from "../../../../Components/__coming__soon";
 import { useMemo } from "react";
 
-export default function FinanceHome() {
+export default function SettingsHome() {
 
     const themeColors = useThemeColors()
 
@@ -14,8 +13,8 @@ export default function FinanceHome() {
             <AccountHeading />
 
             <ScrollView style={{ backgroundColor: themeColors.background2, flex: 1 }}>
-                <View style={{}}>
-                    <ComingSoonComponent />
+                <View style={{ height: 2000, borderBottomWidth: 50 }}>
+
                 </View>
             </ScrollView>
 

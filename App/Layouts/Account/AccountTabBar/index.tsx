@@ -1,11 +1,12 @@
-import { View, TouchableOpacity, StyleSheet, Image } from 'react-native'
+import { View, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native'
 import useThemeColors from '../../../Hooks/useThemeColors'
 import { Ionicons } from '@expo/vector-icons'
 import { SpanText } from '../../../Components/Texts'
 
-import Accounticon from '../../../../assets/icons/account-icon.png'
+import Accounticon from '../../../../assets/icons/color-mode-icon.png'
 import DashboardIcon from '../../../../assets/icons/dashboard-icon.png'
-import SettingIcon from '../../../../assets/icons/setting-icon.png'
+import SettingIcon from '../../../../assets/icons/settings-icon.png'
+import NairaIcon from '../../../../assets/icons/naira-icon.png'
 
 
 export default function AccountTabBar({ state, descriptors, navigation }: { state: any, descriptors: any, navigation: any }) {
@@ -15,13 +16,15 @@ export default function AccountTabBar({ state, descriptors, navigation }: { stat
     const routeImages = [
         { title: 'account', inactiveImage: Accounticon, activeImage: Accounticon },
         { title: 'dashboard', inactiveImage: DashboardIcon, activeImage: DashboardIcon },
-        { title: 'message-circle', inactiveImage: '', activeImage: '' },
-        { title: 'wallet', inactiveImage: '', activeImage: '' },
-        { title: 'settings', inactiveImage: '', activeImage: '' },
+        { title: 'wallet', inactiveImage: NairaIcon, activeImage: NairaIcon },
+        { title: 'settings', inactiveImage: SettingIcon, activeImage: SettingIcon },
     ]
 
     return (
-        <View style={[styles.spaceBeteen, { backgroundColor: themeColors.background, height: 50, paddingHorizontal: 20 }]}>
+        <ScrollView
+            style={{ maxHeight: 55, borderTopColor: themeColors.background2, borderTopWidth: 1 }}
+            horizontal
+            contentContainerStyle={[styles.spaceBeteen, { backgroundColor: themeColors.background }]}>
             {state.routes.map((route: any, index: any) => {
                 const { options } = descriptors[route.key];
                 const label =
@@ -62,25 +65,31 @@ export default function AccountTabBar({ state, descriptors, navigation }: { stat
                         testID={options.tabBarTestID}
                         onPress={onPress}
                         onLongPress={onLongPress}
-                        style={{ alignItems: 'center', paddingHorizontal: 5, paddingVertical: 7  }}
+                        style={{ alignItems: 'center', paddingHorizontal: 5, paddingVertical: 7 }}
                     >
-
-                        <Image
-                            source={isFocused ? routeImages.find(image => image.title === options.tabBarBadge)?.activeImage
-                                : routeImages.find(image => image.title === options.tabBarBadge)?.inactiveImage
+                        <View style={[styles.spaceBeteen, { borderRadius: 5, padding: 7, backgroundColor: isFocused ? themeColors.accent : themeColors.background2, }]}>
+                            <View >
+                                <Image
+                                    source={isFocused ? routeImages.find(image => image.title === options.tabBarBadge)?.activeImage
+                                        : routeImages.find(image => image.title === options.tabBarBadge)?.inactiveImage
+                                    }
+                                    style={{ height: 25, aspectRatio: 1, padding: 5 }}
+                                    resizeMethod="resize"
+                                    resizeMode="contain"
+                                />
+                            </View>
+                            {
+                                index !== 0 && (
+                                    <SpanText style={{ fontSize: 16 }}>
+                                        {label}
+                                    </SpanText>
+                                )
                             }
-                            style={{ height: 27, aspectRatio: 1 }}
-                            resizeMethod="resize"
-                            resizeMode="contain"
-                        />
-
-                        <SpanText style={{ opacity: isFocused ? .5 : 1, fontSize: 14, marginTop: 2 }}>
-                            {label}
-                        </SpanText>
+                        </View>
                     </TouchableOpacity>
                 );
             })}
-        </View>
+        </ScrollView>
     )
 }
 

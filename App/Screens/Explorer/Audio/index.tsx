@@ -1,7 +1,7 @@
 'use strict'
 
-import { BackHandler, FlatList, RefreshControl, View, useWindowDimensions, StyleSheet, Image } from "react-native"
-import { SpanText } from "../../../Components/Texts"
+import { BackHandler, FlatList, RefreshControl, View, useWindowDimensions, StyleSheet, Image, TouchableOpacity } from "react-native"
+import { HeadLine, SpanText } from "../../../Components/Texts"
 import { ContainerSpaceBetween } from "../../../Components/Containers"
 import { IconButton } from "../../../Components/Buttons"
 import { Ionicons } from "@expo/vector-icons"
@@ -26,7 +26,7 @@ export default function AudioExplorer() {
 
     const [Videos, setVideos] = useState<IPostItem[]>()
 
-    const { background, background2 } = useThemeColors()
+    const { background, background2, text } = useThemeColors()
     const { navigate } = useNavigation()
 
     const $videos = useQuery(
@@ -88,22 +88,30 @@ export default function AudioExplorer() {
                         style={{ width: 100, aspectRatio: 1 / 1, borderRadius: 10 }}
                     />
 
+                    <View style={{ flex: 1, }}>
+                        <HeadLine children={props?.title ?? 'Title of this Song'} />
+                        {props?.description && <SpanText numberOfLines={2} children={props?.description} style={{ fontSize: 12, marginTop: 10 }} />}
+                        <View style={[styles.spaceBetween, { marginTop: 10 }]}>
+                            <TouchableOpacity
+                                onPress={() => mediaPlayer?.setMedia(props)}     >
+                                <Ionicons name={(props?.fileUrl === mediaPlayer?.fileUrl) && mediaPlayer?.states?.playState === 'playing' ? 'pause' : mediaPlayer?.states?.playState === 'loading' ? 'warning' : 'play'} size={30} color={text} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
             </ExplorerPostItemWrapper>
         )
     }
 
     return (
-        <View>
-            <FlatList
-                stickyHeaderHiddenOnScroll
-                stickyHeaderIndices={[0]}
-                ListHeaderComponent={Heading}
-                data={Videos}
-                refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
-                renderItem={({ index, item }) => <AudioComponent {...item} />}
-            />
-        </View>
+        <FlatList
+            stickyHeaderHiddenOnScroll
+            stickyHeaderIndices={[0]}
+            ListHeaderComponent={Heading}
+            data={Videos}
+            refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
+            renderItem={({ index, item }) => <AudioComponent {...item} />}
+        />
     )
 }
 

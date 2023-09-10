@@ -91,6 +91,7 @@ export interface IListSlider {
     children?: React.ReactNode
     items: IPostItem[]
     headline?: React.ReactNode
+    screen: 'video' | 'audio' | 'image'
 }
 
 export interface IAuth {

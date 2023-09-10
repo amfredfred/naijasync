@@ -4,16 +4,15 @@ import useThemeColors from "../../../../Hooks/useThemeColors";
 import ComingSoonComponent from "../../../../Components/__coming__soon";
 import { useMemo } from "react";
 
-export default function FinanceHome() {
+export default function DashboardHome() {
 
     const themeColors = useThemeColors()
-
 
     return useMemo(() => (
         <View style={{ flex: 1 }}>
             <AccountHeading />
-
-            <ScrollView style={{ backgroundColor: themeColors.background2, flex: 1 }}>
+            <ScrollView
+                style={{ backgroundColor: themeColors.background2, flex: 1 }}>
                 <View style={{}}>
                     <ComingSoonComponent />
                 </View>

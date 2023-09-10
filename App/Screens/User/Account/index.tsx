@@ -2,7 +2,6 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'rea
 import CoverPicExample from '../../../../assets/welcome-background.jpg'
 import ProfilePicExample from '../../../../assets/upload-image-icon.png'
 import { useState } from 'react'
-
 import { HeadLine, SpanText } from '../../../Components/Texts'
 import useThemeColors from '../../../Hooks/useThemeColors'
 import { useAuthContext } from '../../../Contexts/AuthContext';
@@ -12,7 +11,6 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { IPostItem } from '../../../Interfaces';
 import { REQUESTS_API } from '@env';
-import PagerView from 'react-native-pager-view';
 import PostItem from '../../__/PostsList/__/PostItem';
 import { IPostType } from '../../../Interfaces/IPostContext';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
@@ -43,8 +41,6 @@ export default function Account() {
             },
         })
     )
-
-    console.log(posts?.data?.data)
 
     const UserDataDisplay = () => (
         <View style={{ backgroundColor: themeColors?.background }}>

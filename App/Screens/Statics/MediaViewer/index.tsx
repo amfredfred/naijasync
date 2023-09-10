@@ -8,7 +8,6 @@ import AudioPlayer from './Audio'
 export const MediaViewer = forwardRef<Video, IMediaPlayable>((props, videoRef) => {
 
     let Component = <></>
-    console.log(props?.thumbnailUrl)
 
     if (props?.type === 'video')
         Component = <VideoPlayer

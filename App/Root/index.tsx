@@ -23,8 +23,11 @@ import RegisterScreen from '../Screens/Guest/Auth/Register/index,';
 import LoginScreen from '../Screens/Guest/Auth/Login';
 import AccountLayout from '../Layouts/Account';
 import Account from '../Screens/User/Account';
-import AccountTabBar from './__/AccountTabBar';
+import AccountTabBar from '../Layouts/Account/AccountTabBar';
 import PostComposer from '../Screens/Forms/Post';
+import FinanceHome from '../Screens/User/Account/Finance';
+import SettingsHome from '../Screens/User/Account/Settings';
+import DashboardHome from '../Screens/User/Account/Dashboard';
 
 
 const screenOptions = {
@@ -62,13 +65,19 @@ function Routes() {
         // Use route to navigate to the appropriate screen
     });
 
+    const AccountSettingsRoutes = () => (
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+            <Stack.Screen name='Personalization & Security' component={SettingsHome} />
+        </Stack.Navigator>
+    )
+
     const AccountRoutes = () => (
         <AccountLayout>
             <Buttom.Navigator tabBar={op => <AccountTabBar {...op} />} screenOptions={screenOptions} >
                 <Buttom.Screen name='Profile' options={{ tabBarBadge: 'account' }} component={Account} />
-                <Buttom.Screen name='Dashboard' options={{ tabBarBadge: 'dashboard' }} component={Account} />
-                <Buttom.Screen name='Finance' options={{ tabBarBadge: 'finance' }} component={Account} />
-                <Buttom.Screen name='Settings' options={{ tabBarBadge: 'settings' }} component={Account} />
+                <Buttom.Screen name='Dashboard' options={{ tabBarBadge: 'dashboard' }} component={DashboardHome} />
+                <Buttom.Screen name='Funding' options={{ tabBarBadge: 'wallet' }} component={FinanceHome} />
+                <Buttom.Screen name='Settings' options={{ tabBarBadge: 'settings' }} component={AccountSettingsRoutes} />
             </Buttom.Navigator>
         </AccountLayout>
     )
