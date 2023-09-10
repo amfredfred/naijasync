@@ -85,7 +85,6 @@ const styles = StyleSheet.create({
     menuItemContainer: {
         borderRadius: 4,
         marginVertical: 2,
-        opacity: .4
     },
     menuItem: {
         height: 45,

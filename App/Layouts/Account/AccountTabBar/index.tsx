@@ -3,10 +3,11 @@ import useThemeColors from '../../../Hooks/useThemeColors'
 import { Ionicons } from '@expo/vector-icons'
 import { SpanText } from '../../../Components/Texts'
 
-import Accounticon from '../../../../assets/icons/color-mode-icon.png'
 import DashboardIcon from '../../../../assets/icons/dashboard-icon.png'
 import SettingIcon from '../../../../assets/icons/settings-icon.png'
 import NairaIcon from '../../../../assets/icons/naira-icon.png'
+import CareTakerIcon from '../../../../assets/icons/care-taker-icon.png'
+
 import { useState } from 'react'
 import useKeyboardEvent from '../../../Hooks/useKeyboardEvent'
 
@@ -16,10 +17,10 @@ export default function AccountTabBar({ state, descriptors, navigation }: { stat
     const themeColors = useThemeColors()
 
     const routeImages = [
-        { title: 'account', inactiveImage: Accounticon, activeImage: Accounticon },
         { title: 'dashboard', inactiveImage: DashboardIcon, activeImage: DashboardIcon },
         { title: 'wallet', inactiveImage: NairaIcon, activeImage: NairaIcon },
         { title: 'settings', inactiveImage: SettingIcon, activeImage: SettingIcon },
+        { title: 'posts', inactiveImage: CareTakerIcon, activeImage: CareTakerIcon }
     ]
 
     const [isKeyboadShow, setisKeyboadShow] = useState(false)

@@ -112,7 +112,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                                     <IconButton
                                         image={{ source: IMAGS, style: { width: 40, height: 40 } }} />
                                     <SpanText style={styles.accountText}>
-                                        {authContext?.user?.account?.username ?? "Login • Registe"}
+                                        {authContext?.user?.account?.username ?? "Login • Register"}
                                     </SpanText>
                                 </TouchableOpacity>
                             </View>

@@ -87,6 +87,9 @@ export const truncate = (value: string | number | unknown, position: "middle" | 
     }
 };
 
+export function areNotEqual(value1: string | number, value2: string | number) {
+    return value1 !== value2;
+}
 
 export function formatDuration(durationInSeconds: number): string {
     const days = Math.floor(durationInSeconds / 86400);

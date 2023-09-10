@@ -2,6 +2,7 @@ import { IAppDataContext } from ".";
 
 export type IAuthContextData = {
     isShowingMiniAuthForm?: boolean
+    isBusy?: boolean
     user: {
         isAuthenticated?: boolean,
         profileUri?: string
@@ -18,10 +19,18 @@ export type IAuthContextData = {
             userId?: number
             points?: number
             bankAccountBalance?: number
-            profilePics?: string[]
+            profilePics?: {
+                name: string,
+                uri: string,
+                type: string
+            }[]
             bio?: string
             gender?: "MALE" | "FEMALE" | "UNKNOWN"
-            profileCoverPics?: string[]
+            profileCoverPics?: {
+                name: string,
+                uri: string,
+                type: string
+            }[]
             username?: string
             fullName?: string
             following?: number
@@ -30,11 +39,12 @@ export type IAuthContextData = {
     }
 }
 export type IAuthContextMethods = {
-    register?(props: IAppDataContext['authing']): Promise<boolean>
-    login?(props: IAppDataContext['authing']): Promise<boolean>
-    logout?(): Promise<boolean>
+    register?(props: IAppDataContext['authing']): void
+    login?(props: IAppDataContext['authing']): void
+    logout?(): void
     confirmNumber?(): Promise<boolean>
     skipAuth?(): void
     skipToOnboard?(): void
     showMiniAuthForm?(prop: boolean): void
+    updateAccount?(props: IAuthContextData['user']['account']): void
 }

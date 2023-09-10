@@ -32,7 +32,6 @@ export const UploadFileForm = () => {
     const themeColors = useThemeColors()
 
     const { methods: { createPost } } = usePostForm()
-    const dataContext = useDataContext()
 
     const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD' })
 

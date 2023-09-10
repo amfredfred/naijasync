@@ -1,4 +1,4 @@
-import React, { useReducer, createContext, useContext, useEffect } from 'react'
+import React, { useReducer, createContext, useContext, useEffect, useState } from 'react'
 import useStorage from '../../Hooks/useStorage'
 import { IAuthContextData, IAuthContextMethods } from '../../Interfaces/iAuthContext'
 import * as Cellular from 'expo-cellular'
@@ -36,6 +36,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     }
 
     const [states, dispatch] = useReducer(dataReducer, initialState)
+    const [isBusy, setisBusy] = useState(false)
 
     const setObjectItem: IStorageMethods['setObjectItem'] = async (key, payload) => {
         dispatch({ key, payload })
@@ -45,51 +46,18 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     const { toast } = useToast()
 
     const mutation = useMutation((info) => {
+        console.log(NaijaSync?.user?.accessToken, ";access token")
         return axios({
             url: `${REQUESTS_API}${(info as any)?.path}`,
             method: 'POST',
             data: info,
             headers: {
                 'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${states?.user?.accessToken}`
             }
         })
     })
 
-    useEffect(() => {
-        if (mutation?.status === 'error') {
-            return toast({
-                message: `Error: ${(mutation?.failureReason as any)?.response?.data?.message}`,
-                severnity: 'error',
-            })
-        }
-        else if (mutation?.status === 'success') {
-            const user = {} as IAuthContextData['user']
-            user['accessToken'] = (mutation?.data?.data as any)?.accessToken
-            user['person'] = 'isAuthenticated'
-            user['isAuthenticated'] = true
-            setObjectItem('user', {
-                ...user,
-                ...(mutation?.data?.data as any)?.profile?.user,
-                ...(mutation?.data?.data as any)?.profile,
-                person: 'isAuthenticated',
-            })
-            return toast({
-                message: `${(mutation?.data as any)?.data?.message}`,
-                severnity: 'success',
-            })
-        }
-
-    }, [mutation?.status])
-
-    const login: IAuthContextMethods['login'] = async (userData) => {
-        const formData = new FormData()
-        formData['path'] = 'login'
-        formData.append('email', userData?.email)
-        formData.append('password', userData?.password)
-
-        mutation?.mutate(formData as any)
-        return true
-    }
 
     const register: IAuthContextMethods['register'] = async (userData) => {
         const formData = new FormData()
@@ -98,19 +66,91 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         formData.append('password', userData?.password)
         formData.append('password_confirmation', userData?.confirmPassword)
         formData.append('name', userData?.fullName)
+        setisBusy(true)
         const auth = await mutation?.mutateAsync(formData as any)
-        if (auth.status === 200)
-            return true
-        return false
+        const user = (auth?.data as any)?.profile as IAuthContextData['user']
+        if (auth?.status == 201 || auth?.status == 200) {
+            user['accessToken'] = (auth?.data as any)?.accessToken
+            user['person'] = 'isAuthenticated'
+            user['isAuthenticated'] = true
+            setObjectItem('user', user)
+        } else {
+            toast({
+                message: `Error: }`,
+                severnity: 'error',
+            })
+        }
+        setisBusy(false)
     }
 
+    const login: IAuthContextMethods['login'] = async (userData) => {
+        const formData = new FormData()
+        formData['path'] = 'login'
+        formData.append('email', userData?.email)
+        formData.append('password', userData?.password)
+        setisBusy(true)
+        const auth = await mutation?.mutateAsync(formData as any)
+        const user = (auth?.data as any)?.profile as IAuthContextData['user']
+        if (auth?.status == 201 || auth?.status == 200) {
+            user['accessToken'] = (auth?.data as any)?.accessToken
+            user['person'] = 'isAuthenticated'
+            user['isAuthenticated'] = true
+            setObjectItem('user', user)
+        } else {
+            toast({
+                message: `Error: }`,
+                severnity: 'error',
+            })
+        }
+        setisBusy(false)
+        mutation?.reset()
+    }
+
+    const updateAccount: IAuthContextMethods['updateAccount'] = async (newAccountInfo) => {
+        const formData = new FormData()
+        formData['path'] = 'account-update'
+        if (!states?.user?.isAuthenticated) {
+             logout()
+            return
+        } 
+        setisBusy(true)
+        await Promise.all(Object.keys(newAccountInfo)?.map(d => {
+            formData.append(d, typeof newAccountInfo?.[d] === 'object' ? JSON.stringify(newAccountInfo?.[d]) : newAccountInfo?.[d])
+        }))
+
+        // formData.append('name', newAccountInfo?.fullName)
+        // formData.append('username', newAccountInfo?.username)
+        // formData.append('bio', newAccountInfo?.bio)
+        // formData.append('gender', newAccountInfo?.gender)
+        if (newAccountInfo?.profileCoverPics)
+            formData.append('profile-image', newAccountInfo?.profileCoverPics as any);
+        if (newAccountInfo?.profilePics)
+            formData.append('cover-image', newAccountInfo?.profilePics as any)
+        const auth = await mutation?.mutateAsync(formData as any)
+        const user = (auth?.data as any)?.profile as IAuthContextData['user']
+        if (auth?.status == 201 || auth?.status == 200) {
+            user['accessToken'] = (auth?.data as any)?.accessToken
+            user['person'] = 'isAuthenticated'
+            user['isAuthenticated'] = true
+            setObjectItem('user', user)
+        } else {
+            toast({
+                message: `Error: }`,
+                severnity: 'error',
+            })
+        }
+        setisBusy(false)
+        mutation.reset()
+        return user
+    }
+
+
     const confirmNumber: IAuthContextMethods['confirmNumber'] = async () => {
-        setObjectItem('user', { isAuthenticated: true, person: 'isAuthenticated' })
         return true
     }
 
     const logout: IAuthContextMethods['logout'] = async () => {
-        method?.delItem?.('@NaijaSync')
+        method?.setObjectItem?.('user', { 'accessToken': null, person: 'isNew' })
         return true
     }
 
@@ -125,6 +165,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     const showMiniAuthForm: IAuthContextMethods['showMiniAuthForm'] = (state) => {
         setObjectItem('user', { person: 'isNew' })
     }
+
 
 
     useEffect(() => {
@@ -160,6 +201,8 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         skipAuth,
         skipToOnboard,
         showMiniAuthForm,
+        updateAccount,
+        isBusy,
         user: states.user,
     }
 

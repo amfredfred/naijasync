@@ -88,7 +88,7 @@ function Routes() {
     const AccountRoutes = () => (
         <AccountLayout>
             <Buttom.Navigator tabBar={op => <AccountTabBar {...op} />} screenOptions={screenOptions} >
-                <Buttom.Screen name='Profile' options={{ tabBarBadge: 'account' }} component={Account} />
+                <Buttom.Screen name='Posts' options={{ tabBarBadge: 'posts' }} component={Account} />
                 <Buttom.Screen name='Dashboard' options={{ tabBarBadge: 'dashboard' }} component={AccountDashboardRoutes} />
                 <Buttom.Screen name='Payments' options={{ tabBarBadge: 'wallet' }} component={AccountFundingRoutes} />
                 <Buttom.Screen name='Settings' options={{ tabBarBadge: 'settings' }} component={AccountSettingsRoutes} />

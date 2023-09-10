@@ -44,7 +44,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         }));
     };
 
-    const createPost = async (props: IPostContext) => {
+    const createPost: IPostFormMethods['createPost'] = async (props: IPostContext) => {
         const formData = new FormData()
         if (props?.file)
             formData.append('upload', {
@@ -64,14 +64,25 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         if (navigation?.canGoBack()) {
             navigation?.goBack()
         }
-        const post = await createPostMutation?.mutateAsync(formData as any)
-        if (post?.status == 201 || post?.status == 200) {
-            toast({ message: 'Nice !!', severnity: 'success' })
-            createPostMutation.reset()
-        }
-        return {} as any
-    }
 
+        try {
+            const post = await createPostMutation?.mutateAsync(formData as any)
+            console.log(post?.status, 'States')
+            if (post?.status == 201 || post?.status == 200) {
+                toast({ message: 'Nice !!', severnity: 'success' })
+                createPostMutation.reset()
+            } else {
+                console.log(post?.data, " : DATA FROM CREATE")
+            }
+            return post?.data
+        } catch (error) {
+            console.log("ERROR: ", error)
+            if (error?.status === 401) {
+                authContext?.logout()
+            } else { }
+        }
+    }
+    
     const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
         if (!authContext?.user?.isAuthenticated) {
             dataContext?.setObjectItem('user', { person: 'isNew' })
@@ -79,10 +90,10 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         }
         const formData = new FormData()
         await Promise.all(Object.keys(payload)?.map(d => {
-            formData.append('liked', typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
+            formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
         }))
         formData.append('_method', 'PATCH')
-        updatePostMutation?.mutate({ data: { 'liked': payload?.liked }, postId: payload?.puid } as any)
+        updatePostMutation?.mutate({ data: formData, postId: payload?.puid } as any)
     }
 
     const formContextValue = {
