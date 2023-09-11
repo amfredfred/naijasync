@@ -26,7 +26,7 @@ export default function Landing() {
     const handleFoward = (goTo: string) => {
         if (!dataContext?.states?.authing?.email.length) {
             return toastContext.toast({
-                message: "The email address filed is required 😢",
+                message: "The email address field is required 😢",
                 severnity: 'error',
                 timeout: 5000
             })

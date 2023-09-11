@@ -20,6 +20,21 @@ interface IAccount {
     screenTabs: "video" | "audio" | "image" | 'article'
 }
 
+export const Empty = () => {
+    const themeColors = useThemeColors()
+
+    return (
+        <View style={{ height: 340, paddingTop: 10 }}>
+            <View style={[styles.postWrapper]}>
+                <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
+                    <View style={{ width: 40, aspectRatio: 1, borderRadius: 50, backgroundColor: themeColors.background, opacity: .6 }} />
+                </View>
+                <View style={[styles.postContentWrapper, { backgroundColor: themeColors.background, opacity: .6 }]} />
+            </View>
+        </View>
+    )
+}
+
 export default function Account() {
 
     const themeColors = useThemeColors()
@@ -45,6 +60,7 @@ export default function Account() {
 
 
 
+
     const [routes] = useState([
         { key: 'video', title: "Video", },
         { key: 'audio', title: 'music', },
@@ -54,29 +70,33 @@ export default function Account() {
 
     const ListItemVideos = () => useMemo(() => (
         <FlatList
+            ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
             data={posts?.data?.data?.filter(post => (post.fileType === 'video'))}
             renderItem={({ item, index }) => <PostItem key={item?.puid} {...item} />}
         />
-    ), [])
+    ), [posts?.data?.data])
 
     const ListItemAudios = () => useMemo(() => (
         <FlatList
+            ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
             data={posts?.data?.data?.filter(post => (post.fileType === 'audio'))}
             renderItem={({ item, index }) => <PostItem key={item?.puid} {...item} />}
         />
-    ), [])
+    ), [posts?.data?.data])
     const ListItemImages = () => useMemo(() => (
         <FlatList
+            ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
             data={posts?.data?.data?.filter(post => (post.fileType === 'image'))}
             renderItem={({ item, index }) => <PostItem key={item?.puid} {...item} />}
         />
-    ), [])
+    ), [posts?.data?.data])
     const ListItemArticles = () => useMemo(() => (
         <FlatList
+            ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
             data={posts?.data?.data?.filter(post => (post.postType === 'ARTICLE'))}
             renderItem={({ item, index }) => <PostItem key={item?.puid} {...item} />}
         />
-    ), [])
+    ), [posts?.data?.data])
 
     const renderScene = SceneMap({
         video: ListItemVideos,
@@ -107,7 +127,7 @@ export default function Account() {
                             activeColor={themeColors.primary}
                             {...props}
                         />} />
-                    , [ActiveTab])}
+                    , [ActiveTab, posts?.data?.data])}
             </PagerView>
         </View>
     );
@@ -159,33 +179,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 8,
     },
-    themeOptions: {
-        // Customize the theme options UI
-    },
-    widgets: {
-        // Customize the widgets UI
-    },
-    timeline: {
-        // Customize the timeline UI
-    },
-    badges: {
-        // Customize the badges UI
-    },
-    visualStorytelling: {
-        // Customize the visual storytelling UI
-    },
-    emotionTracker: {
-        // Customize the emotion tracker UI
-    },
-    profileSong: {
-        // Customize the profile song UI
-    },
-    virtualGoods: {
-        // Customize the virtual goods UI
-    },
-    arVrIntegration: {
-        // Customize the AR and VR integration UI
-    },
+
     spaceBeteen: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -216,4 +210,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    postWrapper: {
+        width: '100%',
+        marginBottom: 10,
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        gap: 10,
+        flexGrow: 1
+    },
+    postContentWrapper: {
+        flex: 1,
+        height: '100%',
+        paddingRight: 10,
+        borderRadius: 10
+    }
 }); 

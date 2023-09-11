@@ -4,18 +4,15 @@ import useThemeColors from '../../../../../Hooks/useThemeColors'
 import { HeadLine, SpanText } from '../../../../../Components/Texts'
 import { REQUESTS_API } from '@env'
 import { formatNumber, getMediaType } from '../../../../../Helpers'
-import { useRef, useState } from 'react'
-import { ResizeMode, Video } from 'expo-av'
-import { AntDesign, FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ShareContent from '../../../../../Components/ShareFile'
 import { IconButton } from '../../../../../Components/Buttons'
-import { ScrollView, TextInput } from 'react-native-gesture-handler'
+import { ScrollView, } from 'react-native-gesture-handler'
 import { useMediaPlaybackContext } from '../../../../Statics/MediaViewer/Context'
 import LikeButton from './Like'
 dayjs.extend(relativeTime)
-const { width, height } = Dimensions.get('window')
 
 const StatusPostListItem = (post: IPostItem) => {
     const themeStyles = useThemeColors()
@@ -36,16 +33,10 @@ const VideoDisplay = (prop: IPostItem) => {
             <View style={{ position: 'relative', height: '100%', width: '100%' }}>
                 <Image
                     style={{ width: '100%', height: '100%', position: 'absolute', left: 0, top: 0 }}
-                    source={{ uri: prop?.thumbnailUrl ?? prop.fileUrl }}
+                    source={{ uri: `${REQUESTS_API}${prop?.thumbnailUrl}` }}
                     resizeMethod='resize'
                     resizeMode='repeat'
                 />
-                {/* <Video
-                    source={{ uri: prop.uri }}
-                    resizeMode={ResizeMode.COVER}
-                    ref={videoRef}
-                    style={{ width: '100%', height: '100%' }}
-                /> */}
             </View>
             <View style={[styles.spaceBetween, styles.playPauseiconContainer]}>
                 <View style={{ flex: 1 }} />

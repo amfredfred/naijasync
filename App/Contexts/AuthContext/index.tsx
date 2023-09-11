@@ -67,18 +67,26 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         formData.append('password_confirmation', userData?.confirmPassword)
         formData.append('name', userData?.fullName)
         setisBusy(true)
-        const auth = await mutation?.mutateAsync(formData as any)
-        const user = (auth?.data as any)?.profile as IAuthContextData['user']
-        if (auth?.status == 201 || auth?.status == 200) {
-            user['accessToken'] = (auth?.data as any)?.accessToken
-            user['person'] = 'isAuthenticated'
-            user['isAuthenticated'] = true
-            setObjectItem('user', user)
-        } else {
-            toast({
-                message: `Error: }`,
-                severnity: 'error',
-            })
+        let user;
+        try {
+            const auth = await mutation?.mutateAsync(formData as any)
+            user = (auth?.data as any)?.profile as IAuthContextData['user']
+            if (auth?.status == 201 || auth?.status == 200) {
+                user['accessToken'] = (auth?.data as any)?.accessToken
+                user['person'] = 'isAuthenticated'
+                user['isAuthenticated'] = true
+                setObjectItem('user', user)
+            } else {
+                toast({
+                    message: `Error: }`,
+                    severnity: 'error',
+                })
+            }
+        } catch (error) {
+            console.log(error?.response?.data)
+            if (error?.response?.status === 422) {
+                setObjectItem('user', user)
+            }
         }
         setisBusy(false)
     }
@@ -110,9 +118,9 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         const formData = new FormData()
         formData['path'] = 'account-update'
         if (!states?.user?.isAuthenticated) {
-             logout()
+            logout()
             return
-        } 
+        }
         setisBusy(true)
         await Promise.all(Object.keys(newAccountInfo)?.map(d => {
             formData.append(d, typeof newAccountInfo?.[d] === 'object' ? JSON.stringify(newAccountInfo?.[d]) : newAccountInfo?.[d])

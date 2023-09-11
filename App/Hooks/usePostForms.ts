@@ -75,14 +75,14 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
                 console.log(post?.data, " : DATA FROM CREATE")
             }
             return post?.data
-        } catch (error) {
-            console.log("ERROR: ", error)
-            if (error?.status === 401) {
-                authContext?.logout()
-            } else { }
+        } catch (error) { 
+            if (error?.response?.status === 401) {
+                toast({ message: error?.response?.data?.message, severnity: 'warning' })
+                return authContext?.logout()
+            }
         }
     }
-    
+
     const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
         if (!authContext?.user?.isAuthenticated) {
             dataContext?.setObjectItem('user', { person: 'isNew' })
