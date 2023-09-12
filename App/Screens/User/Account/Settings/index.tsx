@@ -4,14 +4,15 @@ import useThemeColors from "../../../../Hooks/useThemeColors";
 import { useMemo } from "react";
 import { HeadLine, SpanText } from "../../../../Components/Texts";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ContainerSpaceBetween } from "../../../../Components/Containers";
 import { IconButton } from "../../../../Components/Buttons";
+import { useAuthContext } from "../../../../Contexts/AuthContext";
 
 export default function SettingsHome() {
 
     const themeColors = useThemeColors()
-
+    const authContext = useAuthContext()
     const { navigate } = useNavigation()
 
     const handleNavigateTo = (to: string, params?: { [key: string]: any }) => {
@@ -47,8 +48,8 @@ export default function SettingsHome() {
             description: ''
         },
         {
-            title: "Enable Biometric",
-            onPress: () => handleNavigateTo("Notificaions Preference"),
+            title: "Use Biometrics",
+            onPress: () => handleNavigateTo("Setup Biometrics"),
             icon: <Ionicons size={30} name='finger-print' />,
             description: 'Use finger print for payment & transfers'
         },
@@ -57,13 +58,13 @@ export default function SettingsHome() {
     const menuPaymentAndTranferItems = [
         {
             title: `Fund Requests`,
-            onPress: () => handleNavigateTo("Personal Info"),
+            onPress: () => handleNavigateTo("Payment Requests"),
             icon: <Ionicons size={30} name='arrow-down' />,
-            description: 'Allow/Disallow other accounts to request funds from you'
+            description: 'Allow/Disallow accounts to request funds from you'
         },
         {
             title: `Funds Transfer`,
-            onPress: () => handleNavigateTo("Personal Info"),
+            onPress: () => handleNavigateTo("Funds Transfer"),
             icon: <Ionicons size={30} name='arrow-up' />,
             description: 'Enable/Diasable funds tranfers in your account'
         }
@@ -192,6 +193,13 @@ export default function SettingsHome() {
                             ))
                         }
                     </View>
+                    <SpanText style={{ backgroundColor: 'red', opacity: .09, padding: 10, marginVertical: 20, borderRadius: 5, textAlign: 'center' }} children={'More exciting things is coming soon!!'} />
+                    <IconButton
+                        onPress={authContext?.logout}
+                        containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
+                        icon={<AntDesign name='logout' size={30} />}
+                        // style={[styles.menuItemIcon]}
+                        style={[styles.menuItemContainer, { backgroundColor: themeColors.error, padding: 10, width: 50, borderRadius: 50, aspectRatio: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]} />
                 </View>
             </ScrollView>
         </View>

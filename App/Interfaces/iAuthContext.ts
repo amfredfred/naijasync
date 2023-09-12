@@ -35,6 +35,11 @@ export type IAuthContextData = {
             fullName?: string
             following?: number
             followers?: number
+
+            // 
+            current_password?:string
+            new_password?: string
+            password_confirmation?:string
         }
     }
 }

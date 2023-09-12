@@ -83,7 +83,6 @@ export default function AuthContextProvider({ children }: { children: React.Reac
                 })
             }
         } catch (error) {
-            console.log(error?.response?.data)
             if (error?.response?.status === 422) {
                 setObjectItem('user', user)
             }
@@ -115,43 +114,42 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     }
 
     const updateAccount: IAuthContextMethods['updateAccount'] = async (newAccountInfo) => {
-        const formData = new FormData()
-        formData['path'] = 'account-update'
-        if (!states?.user?.isAuthenticated) {
-            logout()
-            return
-        }
-        setisBusy(true)
-        await Promise.all(Object.keys(newAccountInfo)?.map(d => {
-            formData.append(d, typeof newAccountInfo?.[d] === 'object' ? JSON.stringify(newAccountInfo?.[d]) : newAccountInfo?.[d])
-        }))
-
-        // formData.append('name', newAccountInfo?.fullName)
-        // formData.append('username', newAccountInfo?.username)
-        // formData.append('bio', newAccountInfo?.bio)
-        // formData.append('gender', newAccountInfo?.gender)
-        if (newAccountInfo?.profileCoverPics)
-            formData.append('profile-image', newAccountInfo?.profileCoverPics as any);
-        if (newAccountInfo?.profilePics)
-            formData.append('cover-image', newAccountInfo?.profilePics as any)
-        const auth = await mutation?.mutateAsync(formData as any)
-        const user = (auth?.data as any)?.profile as IAuthContextData['user']
-        if (auth?.status == 201 || auth?.status == 200) {
-            user['accessToken'] = (auth?.data as any)?.accessToken
-            user['person'] = 'isAuthenticated'
-            user['isAuthenticated'] = true
-            setObjectItem('user', user)
-        } else {
+        try {
+            const formData = new FormData()
+            formData['path'] = 'account-update'
+            if (!states?.user?.isAuthenticated) {
+                logout()
+                return
+            }
+            setisBusy(true)
+            await Promise.all(Object.keys(newAccountInfo)?.map(d => {
+                formData.append(d, typeof newAccountInfo?.[d] === 'object' ? JSON.stringify(newAccountInfo?.[d]) : newAccountInfo?.[d])
+            }))
+            if (newAccountInfo?.profileCoverPics)
+                formData.append('profile-image', newAccountInfo?.profileCoverPics as any);
+            if (newAccountInfo?.profilePics)
+                formData.append('cover-image', newAccountInfo?.profilePics as any)
+            const auth = await mutation?.mutateAsync(formData as any)
+            const user = (auth?.data as any)?.profile as IAuthContextData['user']
+            if (auth?.status == 201 || auth?.status == 200) {
+                user['accessToken'] = (auth?.data as any)?.accessToken
+                user['person'] = 'isAuthenticated'
+                user['isAuthenticated'] = true
+                setObjectItem('user', user)
+            } 
+            return user
+        } catch (error) {
+            console.log('ERROR->THE_ERROR->', JSON.stringify(error?.response?.data?.message))
             toast({
-                message: `Error: }`,
+                message: `Error: ${error?.response?.data?.message}`,
                 severnity: 'error',
             })
         }
-        setisBusy(false)
-        mutation.reset()
-        return user
+        finally {
+            setisBusy(false)
+            mutation.reset()
+        }
     }
-
 
     const confirmNumber: IAuthContextMethods['confirmNumber'] = async () => {
         return true

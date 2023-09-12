@@ -64,11 +64,9 @@ export default function UpdateProfile() {
     }
 
     const handleUpdateAccount = async () => {
-        console.log('called')
         authContext?.updateAccount?.(PersonalInfo)
     }
 
-    console.log("GENDER", PersonalInfo?.gender)
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: themeColors.background, padding: 10 }}>

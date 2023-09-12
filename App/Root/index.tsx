@@ -30,7 +30,10 @@ import SettingsHome from '../Screens/User/Account/Settings';
 import DashboardHome from '../Screens/User/Account/Dashboard';
 import UpdateProfile from '../Screens/User/Account/Settings/Profile';
 import UpdateNotification from '../Screens/User/Account/Settings/Notification';
-
+import UpdatePassword from '../Screens/User/Account/Settings/Security/ChangePassword';
+import UpdateFundsRequestsSettings from '../Screens/User/Account/Settings/Payment/FundsRequest';
+import UpdateFundsTranferSettings from '../Screens/User/Account/Settings/Payment/FundsTransfer';
+import UpdateBiometricSettings from '../Screens/User/Account/Settings/Security/SetupBiometrics';
 
 const screenOptions = {
     headerShown: false,
@@ -59,12 +62,9 @@ function Routes() {
     //     }
     // }, [isLoaded, load])
 
-
-    // Listen for deep link events
     Linking.addEventListener('url', ({ url }) => {
         const route = url.replace(/.*?:\/\//g, '');
         console.log(route, " FROM LINKING")
-        // Use route to navigate to the appropriate screen
     });
 
     const AccountSettingsRoutes = () => (
@@ -72,6 +72,10 @@ function Routes() {
             <Stack.Screen name='Personalization & Security' component={SettingsHome} />
             <Stack.Screen name='Personal Info' key={'Public Profile Update'} component={UpdateProfile} />
             <Stack.Screen name='Notificaions Preference' component={UpdateNotification} />
+            <Stack.Screen name='Update Password' component={UpdatePassword} />
+            <Stack.Screen name='Payment Requests' component={UpdateFundsRequestsSettings} />
+            <Stack.Screen name='Funds Transfer' component={UpdateFundsTranferSettings} />
+            <Stack.Screen name='Setup Biometrics' component={UpdateBiometricSettings} />
         </Stack.Navigator>
     )
 
