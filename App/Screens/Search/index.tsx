@@ -1,17 +1,10 @@
-import { ContainerBlock, ContainerFlex, ContainerSpaceBetween, ScrollContainer } from "../../Components/Containers";
-import { FlatList, RefreshControl, Image, Pressable , StatusBar} from 'react-native'
+import { ContainerBlock, ContainerFlex, ScrollContainer } from "../../Components/Containers";
+import { StatusBar } from 'react-native'
 import { useDataContext } from "../../Contexts/DataContext";
-import { useQueries } from "@tanstack/react-query";
 import { IconButton } from "../../Components/Buttons";
 import useThemeColors from "../../Hooks/useThemeColors";
-import { SpanText } from "../../Components/Texts";
-import axios from 'axios'
-import { REQUESTS_API } from "@env"
-import { useEffect, useState } from 'react'
-import { IPostItem } from "../../Interfaces";
+import { useState } from 'react'
 import useTimeout from "../../Hooks/useTimeout";
-import { ListSlideItem } from "../../Components/SlideCarousel";
-import { Ionicons } from "@expo/vector-icons";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRoute } from "@react-navigation/native";
@@ -30,7 +23,7 @@ export default function Search() {
 
     const themeColors = useThemeColors()
 
-    // const [$movies,] = useQueries({
+    // const [$videos,$audios,$photos, $accounts] = useQueries({
     //     'queries': [
     //         {
     //             queryFn: async () => await axios.get<{ results: IPostItem[] }>(`${REQUESTS_API}search?query=${user?.searchRequestValue}&target=${isSelectedTarget}&limit=${fetchLimit}`),
@@ -59,7 +52,7 @@ export default function Search() {
         deps: [user?.searchRequestValue, isSelectedTarget],
         onClearTimeout,
         onTimeout,
-        seconds: 1000
+        seconds: 2000
     })
 
     const handleOnRefresh = () => {
@@ -71,7 +64,7 @@ export default function Search() {
     }
 
     return (
-        <ContainerFlex style={{ padding: 0, flex: 1 ,paddingTop:StatusBar.currentHeight+10}}>
+        <ContainerFlex style={{ padding: 0, flex: 1, paddingTop: StatusBar.currentHeight + 10 }}>
 
             <InputText
                 // onBlur={handleSearchInputBlur}
@@ -80,7 +73,7 @@ export default function Search() {
                 variant="search"
                 value={user?.searchRequestValue}
                 autoFocus
-                containerStyle={{   paddingHorizontal: 2, borderColor: themeColors.text, borderWidth: .1, backgroundColor: themeColors.background2, marginHorizontal:10 }}
+                containerStyle={{ paddingHorizontal: 2, borderColor: themeColors.text, borderWidth: .1, backgroundColor: themeColors.background2, marginHorizontal: 10 }}
             />
 
             <ContainerBlock style={{ paddingHorizontal: 0, }}>

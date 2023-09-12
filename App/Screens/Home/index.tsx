@@ -104,7 +104,7 @@ export default function Home() {
 
     const Post = (
         <SlideCarousel
-            headline='Hollywood'
+            headline='Tranding Now 🔥'
             items={Videos} />
     )
 

@@ -35,13 +35,26 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         })
     })
 
+    const postViewMutation = useMutation((info) => {
+        return axios.post(`${REQUESTS_API}post-viewed`,
+            info,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${authContext?.user?.accessToken}`
+                }
+            }
+        )
+    })
+
     const { toast } = useToast()
 
     const setData: IPostFormMethods['setData'] = (key, payload) => {
         setFormState(prevState => ({
             ...prevState,
             [key]: payload,
-        }));
+        })
+        )
     };
 
     const createPost: IPostFormMethods['createPost'] = async (props: IPostContext) => {
@@ -75,7 +88,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
                 console.log(post?.data, " : DATA FROM CREATE")
             }
             return post?.data
-        } catch (error) { 
+        } catch (error) {
             if (error?.response?.status === 401) {
                 toast({ message: error?.response?.data?.message, severnity: 'warning' })
                 return authContext?.logout()
@@ -83,17 +96,29 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         }
     }
 
-    const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
-        if (!authContext?.user?.isAuthenticated) {
-            dataContext?.setObjectItem('user', { person: 'isNew' })
-            return
-        }
+    console.log("FAILURE REASON", JSON.stringify(postViewMutation?.failureReason))
+
+    const postView: IPostFormMethods['updatePost'] = async (payload) => {
         const formData = new FormData()
         await Promise.all(Object.keys(payload)?.map(d => {
             formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
         }))
-        formData.append('_method', 'PATCH')
-        updatePostMutation?.mutate({ data: formData, postId: payload?.puid } as any)
+        postViewMutation?.mutate(formData as any)
+    }
+
+    const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
+        if (payload?.puid) {
+            if (authContext?.user?.person !== 'isAuthenticated') {
+                authContext?.logout()
+                return
+            }
+            const formData = new FormData()
+            await Promise.all(Object.keys(payload)?.map(d => {
+                formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
+            }))
+            formData.append('_method', 'PATCH')
+            updatePostMutation?.mutate({ data: formData, postId: payload?.puid } as any)
+        }
     }
 
     const formContextValue = {
@@ -101,7 +126,8 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         methods: {
             setData,
             createPost,
-            updatePost
+            updatePost,
+            postView
         }
     }
 

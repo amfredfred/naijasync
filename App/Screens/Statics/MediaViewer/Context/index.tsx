@@ -3,8 +3,9 @@ import { useReducer, createContext, useContext, useEffect, useRef, useState } fr
 import { IMediaViewer, IMediaViewerProvider, IMediaPlayable, IMediaType, } from '../Interface'
 import { Audio, Video } from 'expo-av'
 import MediaViewer from '..'
-import { getMediaType } from '../../../../Helpers'
+import { getMediaType, wait } from '../../../../Helpers'
 import { REQUESTS_API } from '@env'
+import usePostForm from '../../../../Hooks/usePostForms'
 
 const initialState: IMediaViewer = {
     previewing: false
@@ -23,12 +24,11 @@ export function MediaViewerProvider({ children }) {
     const [data, dispatch] = useReducer(mediaReducer, initialState)
 
     const setMedia: IMediaViewerProvider['setMedia'] = (props) => {
-        console.log(props)
         dispatch({ payload: props })
     }
 
     const mediaRef = useRef<Video>(null)
-    const audioObjectRef = useRef<Audio.SoundObject>(null);
+    const audioObjectRef = useRef<Audio.SoundObject>(null); 
 
     const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({});
     let mediaType: IMediaType = getMediaType(data.fileUrl);
@@ -114,6 +114,7 @@ export function MediaViewerProvider({ children }) {
             clearAllRefs()
         };
     }, [data?.fileUrl, mediaRef]);
+
 
     const play = async () => {
         try {

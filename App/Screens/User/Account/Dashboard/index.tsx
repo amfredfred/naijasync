@@ -71,9 +71,7 @@ export default function DashboardHome() {
             {/* <AccountHeading /> */}
             <ScrollView
                 style={{ flex: 1 }}>
-                <View style={{}}>
-                    <ComingSoonComponent />
-                </View>
+                <ComingSoonComponent />
             </ScrollView>
         </View>
     ), [])

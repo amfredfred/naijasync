@@ -10,13 +10,14 @@ import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-ic
 import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import useTimeout from "../../../../Hooks/useTimeout";
-import { formatDuration, formatPlaytimeDuration } from "../../../../Helpers";
+import { formatDuration, formatPlaytimeDuration, wait } from "../../../../Helpers";
 import { useNavigation } from "@react-navigation/native";
 import ShareContent from "../../../../Components/ShareFile";
 import { Videos } from "../../../../dummy-data";
 import { ProgressBar } from "../../../../Components/Inputs";
 import { HeadLine } from "../../../../Components/Texts";
 import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
+import usePostForm from "../../../../Hooks/usePostForms";
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
@@ -31,6 +32,8 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
     const progressRef = useRef(null);
     const viewMode = useSharedValue<IMediaPlayable['mode']>('fullscreen')
     const { canGoBack } = useNavigation()
+
+    const postForm = usePostForm()
 
     const { ...VP } = props
 
@@ -58,6 +61,10 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
     const listReanimated = useAnimatedStyle(() => ({
         opacity: listConOpacity.value
     }))
+
+    useEffect(() => {
+        wait(2).then(R => postForm.methods.postView({ 'views': 1, puid: props?.puid }))
+    }, [])
 
     const gesture = Gesture.Pan()
         .onStart(e => {

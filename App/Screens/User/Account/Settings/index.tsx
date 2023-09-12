@@ -4,7 +4,7 @@ import useThemeColors from "../../../../Hooks/useThemeColors";
 import { useMemo } from "react";
 import { HeadLine, SpanText } from "../../../../Components/Texts";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ContainerSpaceBetween } from "../../../../Components/Containers";
 import { IconButton } from "../../../../Components/Buttons";
 
@@ -20,15 +20,53 @@ export default function SettingsHome() {
 
     const menuItems = [
         {
-            title: `Personal Info`, onPress: () => handleNavigateTo("Personal Info"), icon: <Ionicons size={30} name='person' />,
+            title: `Personal Info`,
+            onPress: () => handleNavigateTo("Personal Info"),
+            icon: <Ionicons size={30} name='person' />,
             description: 'Update  your name, bio, gender, DOB and Etc'
         },
-        { title: `Profile`, onPress: () => handleNavigateTo("Downloads"), icon: <Ionicons size={30} name='person' /> },
-        { title: `Profile`, onPress: () => handleNavigateTo("Downloads"), icon: <Ionicons size={30} name='person' /> },
-        { title: `Profile`, onPress: () => handleNavigateTo("Downloads"), icon: <Ionicons size={30} name='person' /> },
-        { title: `Profile`, onPress: () => handleNavigateTo("Downloads"), icon: <Ionicons size={30} name='person' /> },
-        { title: `Profile`, onPress: () => handleNavigateTo("Downloads"), icon: <Ionicons size={30} name='person' /> },
-        { title: `Profile`, onPress: () => handleNavigateTo("Downloads"), icon: <Ionicons size={30} name='person' /> },
+        {
+            title: `Notifications`,
+            onPress: () => handleNavigateTo("Notificaions Preference"),
+            icon: <Ionicons size={30} name='notifications' />,
+            description: 'Update your notification preference'
+        },
+    ];
+
+    const menuSecurityItems = [
+        {
+            title: `Account Password`,
+            onPress: () => handleNavigateTo("Update Password"),
+            icon: <MaterialIcons size={30} name='security' />,
+            description: 'Manage your account password'
+        },
+        {
+            title: "Manage Account Pin`s`",
+            onPress: () => handleNavigateTo("Notificaions Preference"),
+            icon: <Ionicons size={30} name='lock-closed' />,
+            description: ''
+        },
+        {
+            title: "Enable Biometric",
+            onPress: () => handleNavigateTo("Notificaions Preference"),
+            icon: <Ionicons size={30} name='finger-print' />,
+            description: 'Use finger print for payment & transfers'
+        },
+    ];
+
+    const menuPaymentAndTranferItems = [
+        {
+            title: `Fund Requests`,
+            onPress: () => handleNavigateTo("Personal Info"),
+            icon: <Ionicons size={30} name='arrow-down' />,
+            description: 'Allow/Disallow other accounts to request funds from you'
+        },
+        {
+            title: `Funds Transfer`,
+            onPress: () => handleNavigateTo("Personal Info"),
+            icon: <Ionicons size={30} name='arrow-up' />,
+            description: 'Enable/Diasable funds tranfers in your account'
+        }
     ];
 
     return useMemo(() => (
@@ -75,6 +113,85 @@ export default function SettingsHome() {
                             ))
                         }
                     </View>
+
+                    {/* SECURITY */}
+                    <View style={{ marginTop: 10 }}>
+                        <HeadLine children="Security" />
+                        <SpanText
+                            style={{ fontSize: 14, opacity: .5, fontWeight: '100', marginTop: 6, lineHeight: 21 }}
+                            children={`Use unique, strong passwords for enhanced online security.`}
+                        />
+                    </View>
+                    <View style={{ marginTop: 10 }}>
+                        {
+                            menuSecurityItems.map((item, index) => (
+                                <View key={index} style={[styles.menuItemContainer, { backgroundColor: themeColors.background2 }]}>
+                                    <TouchableOpacity key={item.title.trim()} onPress={item.onPress}>
+                                        <ContainerSpaceBetween style={[styles.menuItem]}>
+                                            <View style={{ flexDirection: 'row', gap: 13, paddingLeft: 0, backgroundColor: 'transparent' }}>
+                                                <IconButton
+                                                    containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
+                                                    icon={item.icon}
+                                                    style={[styles.menuItemIcon]} />
+                                                <View style={{ justifyContent: 'center' }}>
+                                                    <SpanText
+                                                        children={item.title}
+                                                        style={{ fontSize: 17, opacity: .6 }} />
+                                                    {item.description && (<SpanText
+                                                        children={item.description}
+                                                        style={{ fontSize: 12, opacity: .4 }} />
+                                                    )}
+                                                </View>
+                                            </View>
+                                            <IconButton
+                                                containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
+                                                icon={<Ionicons name="chevron-forward" size={30} />}
+                                                style={[styles.menuItemIcon]} />
+                                        </ContainerSpaceBetween>
+                                    </TouchableOpacity>
+                                </View>
+                            ))
+                        }
+                    </View>
+                    {/* PAYMENT AND TRANFERS */}
+                    <View style={{ marginTop: 10 }}>
+                        <HeadLine children="Payment & Transfers" />
+                        <SpanText
+                            style={{ fontSize: 14, opacity: .5, fontWeight: '100', marginTop: 6, lineHeight: 21 }}
+                            children={`Configure payment and tranfers references.`}
+                        />
+                    </View>
+                    <View style={{ marginTop: 10 }}>
+                        {
+                            menuPaymentAndTranferItems.map((item, index) => (
+                                <View key={index} style={[styles.menuItemContainer, { backgroundColor: themeColors.background2 }]}>
+                                    <TouchableOpacity key={item.title.trim()} onPress={item.onPress}>
+                                        <ContainerSpaceBetween style={[styles.menuItem]}>
+                                            <View style={{ flexDirection: 'row', gap: 13, paddingLeft: 0, backgroundColor: 'transparent' }}>
+                                                <IconButton
+                                                    containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
+                                                    icon={item.icon}
+                                                    style={[styles.menuItemIcon]} />
+                                                <View style={{ justifyContent: 'center' }}>
+                                                    <SpanText
+                                                        children={item.title}
+                                                        style={{ fontSize: 17, opacity: .6 }} />
+                                                    {item.description && (<SpanText
+                                                        children={item.description}
+                                                        style={{ fontSize: 12, opacity: .4 }} />
+                                                    )}
+                                                </View>
+                                            </View>
+                                            <IconButton
+                                                containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
+                                                icon={<Ionicons name="chevron-forward" size={30} />}
+                                                style={[styles.menuItemIcon]} />
+                                        </ContainerSpaceBetween>
+                                    </TouchableOpacity>
+                                </View>
+                            ))
+                        }
+                    </View>
                 </View>
             </ScrollView>
         </View>
@@ -83,7 +200,7 @@ export default function SettingsHome() {
 
 const styles = StyleSheet.create({
     menuItemContainer: {
-        borderRadius: 4,
+        borderRadius: 5,
         marginVertical: 2,
     },
     menuItem: {

@@ -1,5 +1,5 @@
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import GuestLayout from "../Layouts/Guest" 
+import GuestLayout from "../Layouts/Guest"
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -28,7 +28,8 @@ import PostComposer from '../Screens/Forms/Post';
 import FinanceHome from '../Screens/User/Account/Finance';
 import SettingsHome from '../Screens/User/Account/Settings';
 import DashboardHome from '../Screens/User/Account/Dashboard';
-import UpdateProfile from '../Screens/User/Account/Settings/UpdateProfile';
+import UpdateProfile from '../Screens/User/Account/Settings/Profile';
+import UpdateNotification from '../Screens/User/Account/Settings/Notification';
 
 
 const screenOptions = {
@@ -70,6 +71,7 @@ function Routes() {
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
             <Stack.Screen name='Personalization & Security' component={SettingsHome} />
             <Stack.Screen name='Personal Info' key={'Public Profile Update'} component={UpdateProfile} />
+            <Stack.Screen name='Notificaions Preference' component={UpdateNotification} />
         </Stack.Navigator>
     )
 

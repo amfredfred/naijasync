@@ -48,4 +48,5 @@ export type IPostFormMethods = {
     setData<K extends keyof IPostContext>(item: K, payload: PayloadTypes<K>): void
     createPost(props: IPostContext): Promise<IPostContext | null>
     updatePost(payload: IPostItem): void
+    postView(payload: IPostItem): void
 }

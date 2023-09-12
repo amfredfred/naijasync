@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { FlatList, Image, useWindowDimensions } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FlatList, Image, StyleSheet, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Button, IconButton } from "../Buttons";
 import { ContainerBlock, ContainerSpaceBetween } from "../Containers";
 import { HeadLine, SpanText } from "../Texts";
@@ -10,57 +10,62 @@ import { useNavigation } from "@react-navigation/native";
 import { useDataContext } from "../../Contexts/DataContext";
 import { useMediaPlaybackContext } from "../../Screens/Statics/MediaViewer/Context";
 
-const VideoListItem = (props: IPostItem) => {
+
+export function ListSlideItem(props: IPostItem) {
     const { width, height } = useWindowDimensions();
     const { navigate } = useNavigation();
     const [isLongPressed, setIsLongPressed] = useState(false);
+    const { type } = props;
+
 
     const handleOnPress = () => {
         console.log("PRESSED");
         props.onPress?.(props);
     };
 
-    return (
-        <Button
-            onLongPress={() => setIsLongPressed(true)}
-            onPressOut={() => setIsLongPressed(false)}
+    const VideoItem = () => (
+        <TouchableOpacity
             onPress={handleOnPress}
-            title={null}
-            style={{ padding: 0 }}
-            key={props.id}
-            containerStyle={{
-                padding: 0,
-                height: 148,
-                maxHeight: 160,
-                borderRadius: 2,
-                overflow: 'hidden',
-                backgroundColor: 'black',
-                flexGrow: 1,
-            }}
-            activeOpacity={0.7}
-        >
+            style={[styles.videoListItem]}  >
             <Image
                 source={{ uri: props?.thumbnailUrl }}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                }}
+                style={[styles.listThumb]}
                 resizeMethod="auto"
-                resizeMode="cover"
-            />
-        </Button>
-    );
-};
+                resizeMode="cover" />
+            <SpanText
+                style={{ paddingHorizontal: 5, fontSize: 12 }}
+                children={props?.caption ?? props?.title ?? props?.description} />
+            <SpanText style={[styles.itemDuration, { color: 'white' }]} />
+            <View style={[styles.playIconContainer]}
+                children={<Ionicons size={25} color={'white'} name="play-circle" />} />
+        </TouchableOpacity>
+    )
 
-const AudioListItem = () => <SpanText>audio list type</SpanText>;
+    const AudioItem = () => (
+        <TouchableOpacity
+            onPress={handleOnPress}
+            style={[styles.videoListItem, { width: 95, aspectRatio: 1 }]}  >
+            <Image
+                source={{ uri: props?.thumbnailUrl }}
+                style={[styles.listThumb]}
+                resizeMethod="auto"
+                resizeMode="cover" />
+            <SpanText
+                style={{ paddingHorizontal: 5, fontSize: 12 }}
+                children={props?.caption ?? props?.title ?? props?.description} />
+            <MaterialIcons name='audiotrack' style={[styles.topRightIcon]} />
 
-export function ListSlideItem(props: IPostItem) {
-    const { type } = props;
+            <View style={[styles.playIconContainer]}
+                children={<Ionicons size={25} color={'white'} name="play-circle" />} />
+        </TouchableOpacity>
+    )
+
+
     switch (type) {
         case 'audio':
-            return <AudioListItem />;
+            return < AudioItem />
         case 'video':
-            return <VideoListItem {...props} />;
+            return <VideoItem />;
         default:
             return null;
     }
@@ -117,3 +122,49 @@ export default function SlideCarousel(props: IListSlider) {
         </ContainerBlock>
     );
 }
+
+const styles = StyleSheet.create({
+    videoListItem: {
+        width: 140,
+        overflow: 'hidden',
+        maxHeight: 95,
+        position: 'relative'
+    },
+    listThumb: {
+        flexGrow: 1,
+        width: '100%',
+        minHeight: 75,
+        borderRadius: 5,
+    },
+    itemDuration: {
+        position: 'absolute',
+        left: 20,
+        bottom: 10,
+        padding: 3,
+        borderRadius: 10,
+        backgroundColor: 'rgba(0,0,0,0.6)'
+    },
+    playIconContainer: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        width: '100%',
+        height: '100%',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+    },
+    topRightIcon: {
+        padding: 3,
+        borderRadius: 50,
+        position: 'absolute',
+        right: 5,
+        top: 5,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        color: 'white'
+    },
+    spaceBetween: {
+        justifyContent: "space-between",
+        alignItems: 'center',
+        flexDirection: 'row'
+    }
+})

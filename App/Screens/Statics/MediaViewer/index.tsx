@@ -4,10 +4,16 @@ import { StyleSheet } from 'react-native'
 import { IMediaPlayable } from './Interface'
 import VideoPlayer from './Video'
 import AudioPlayer from './Audio'
+import useTimeout from '../../../Hooks/useTimeout'
+import usePostForm from '../../../Hooks/usePostForms'
+import { wait } from '../../../Helpers'
 
 export const MediaViewer = forwardRef<Video, IMediaPlayable>((props, videoRef) => {
 
     let Component = <></>
+
+    const postsForm =  usePostForm()
+    
 
     if (props?.type === 'video')
         Component = <VideoPlayer

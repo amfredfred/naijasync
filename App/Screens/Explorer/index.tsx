@@ -1,15 +1,8 @@
-import { ContainerBlock, ContainerFlex, ContainerSpaceBetween } from "../../Components/Containers";
-import { SpanText } from "../../Components/Texts";
+import { ContainerFlex } from "../../Components/Containers";
 import { useEffect, useMemo } from 'react'
-import { BackHandler, FlatList } from 'react-native'
-import { useDataContext } from "../../Contexts/DataContext";
-import { IconButton } from "../../Components/Buttons";
-import { Ionicons } from "@expo/vector-icons";
+import { BackHandler } from 'react-native'
 import { useNavigation, useRoute } from "@react-navigation/native";
 import useThemeColors from "../../Hooks/useThemeColors";
-import { Videos } from "../../dummy-data";
-import { IPostItem } from "../../Interfaces";
-import { ListSlideItem } from "../../Components/SlideCarousel";
 import UserLayout from "../../Layouts/User";
 import VideoExplorer from "./Video";
 import AudioExplorer from "./Audio";
