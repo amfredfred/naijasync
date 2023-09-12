@@ -14,7 +14,7 @@ export type IButton = TouchableOpacity['props'] & IThemedComponent & {
     variant?: "outlined" | "contained"
     severity?: "error" | "success" | "warning" | "info"
     active?: boolean,
-    onSelect?(title:string): void
+    onSelect?(title: string): void
 }
 
 export type IIconButton = IButton & ({ image?: Image['props'], size?: number } | { icon?: React.ReactNode })
@@ -28,7 +28,7 @@ export const Button = (props: IButton & { title: string }) => {
     const { style, title, children, hidden, textStyle, onLongPress, containerStyle, ...otherProps } = props
     const { accent: color, background } = useThemeColors()
     const styled: IButton['style'] = {
-        alignItems: 'flex-start', 
+        alignItems: 'flex-start',
         width: '100%',
         // flex: 1,
     }
@@ -56,7 +56,7 @@ export const Button = (props: IButton & { title: string }) => {
 }
 
 export const IconButton = (props: IIconButton) => {
-    const { style, title, children, hidden, textStyle, onSelect,onPress, active, containerStyle, ...otherProps } = props
+    const { style, title, children, hidden, textStyle, onSelect, onPress, active, containerStyle, ...otherProps } = props
     const { accent: color, background2, primary } = useThemeColors()
 
     const styled: IButton['style'] = {
@@ -84,7 +84,7 @@ export const IconButton = (props: IIconButton) => {
         }),
     };
 
-    const handlePress = (e:any) => {
+    const handlePress = (e: any) => {
         onPress?.(e)
         onSelect?.(String(title))
     }
@@ -94,7 +94,7 @@ export const IconButton = (props: IIconButton) => {
         onPress={handlePress}
         {...otherProps} >
         <ContainerSpaceBetween justify="center" style={[styledContainer, containerStyle]}>
-            <SpanText hidden={!(props as any)?.icon} style={{ opacity:.7 }} children={(props as any)?.icon} />
+            <SpanText hidden={!(props as any)?.icon} style={{ opacity: .7 }} children={(props as any)?.icon} />
             {
                 (otherProps as any)?.image?.source && (
                     <Image
@@ -113,7 +113,7 @@ export const IconButton = (props: IIconButton) => {
 
 export const ButtonGradient = (props: IButtonGradient) => {
     const { background2: color } = useThemeColors()
-    const { gradient, children, title,containerStyle, ...otherProps } = props
+    const { gradient, children, title, containerStyle, ...otherProps } = props
     const { width, height } = Dimensions.get('window')
 
     const containerStyled: LinearGradient['props']['style'] = {
@@ -142,7 +142,7 @@ export const ButtonGradient = (props: IButtonGradient) => {
                     )
                 }
                 <SpanText
-                    style={{ textTransform: 'capitalize', fontSize:20 }}
+                    style={{ textTransform: 'capitalize', fontSize: 20 }}
                     hidden={!title}
                     children={title} />
             </TouchableOpacity>

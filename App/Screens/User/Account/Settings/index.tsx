@@ -8,6 +8,7 @@ import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ContainerSpaceBetween } from "../../../../Components/Containers";
 import { IconButton } from "../../../../Components/Buttons";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
+import MenuItem from "../../../../Components/MenuItem";
 
 export default function SettingsHome() {
 
@@ -23,13 +24,13 @@ export default function SettingsHome() {
         {
             title: `Personal Info`,
             onPress: () => handleNavigateTo("Personal Info"),
-            icon: <Ionicons size={30} name='person' />,
+            icon: <Ionicons size={30} name='person' color={themeColors?.text} />,
             description: 'Update  your name, bio, gender, DOB and Etc'
         },
         {
             title: `Notifications`,
             onPress: () => handleNavigateTo("Notificaions Preference"),
-            icon: <Ionicons size={30} name='notifications' />,
+            icon: <Ionicons size={30} name='notifications' color={themeColors?.text} />,
             description: 'Update your notification preference'
         },
     ];
@@ -38,19 +39,19 @@ export default function SettingsHome() {
         {
             title: `Account Password`,
             onPress: () => handleNavigateTo("Update Password"),
-            icon: <MaterialIcons size={30} name='security' />,
+            icon: <MaterialIcons size={30} name='security' color={themeColors?.text} />,
             description: 'Manage your account password'
         },
         {
             title: "Manage Account Pin`s`",
             onPress: () => handleNavigateTo("Notificaions Preference"),
-            icon: <Ionicons size={30} name='lock-closed' />,
+            icon: <Ionicons size={30} name='lock-closed' color={themeColors?.text} />,
             description: ''
         },
         {
             title: "Use Biometrics",
             onPress: () => handleNavigateTo("Setup Biometrics"),
-            icon: <Ionicons size={30} name='finger-print' />,
+            icon: <Ionicons size={30} name='finger-print'  color={themeColors?.text} />,
             description: 'Use finger print for payment & transfers'
         },
     ];
@@ -59,13 +60,13 @@ export default function SettingsHome() {
         {
             title: `Fund Requests`,
             onPress: () => handleNavigateTo("Payment Requests"),
-            icon: <Ionicons size={30} name='arrow-down' />,
+            icon: <Ionicons size={30} name='arrow-down' color={themeColors?.text} />,
             description: 'Allow/Disallow accounts to request funds from you'
         },
         {
             title: `Funds Transfer`,
             onPress: () => handleNavigateTo("Funds Transfer"),
-            icon: <Ionicons size={30} name='arrow-up' />,
+            icon: <Ionicons size={30} name='arrow-up' color={themeColors?.text} />,
             description: 'Enable/Diasable funds tranfers in your account'
         }
     ];
@@ -83,37 +84,10 @@ export default function SettingsHome() {
                             children={`Settings to manage online profile and content visibility.`}
                         />
                     </View>
-                    <View style={{ marginTop: 10 }}>
-                        {
-                            menuItems.map((item, index) => (
-                                <View key={index} style={[styles.menuItemContainer, { backgroundColor: themeColors.background2 }]}>
-                                    <TouchableOpacity key={item.title.trim()} onPress={item.onPress}>
-                                        <ContainerSpaceBetween style={[styles.menuItem]}>
-                                            <View style={{ flexDirection: 'row', gap: 13, paddingLeft: 0, backgroundColor: 'transparent' }}>
-                                                <IconButton
-                                                    containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
-                                                    icon={item.icon}
-                                                    style={[styles.menuItemIcon]} />
-                                                <View style={{ justifyContent: 'center' }}>
-                                                    <SpanText
-                                                        children={item.title}
-                                                        style={{ fontSize: 17, opacity: .6 }} />
-                                                    {item.description && (<SpanText
-                                                        children={item.description}
-                                                        style={{ fontSize: 12, opacity: .4 }} />
-                                                    )}
-                                                </View>
-                                            </View>
-                                            <IconButton
-                                                containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
-                                                icon={<Ionicons name="chevron-forward" size={30} />}
-                                                style={[styles.menuItemIcon]} />
-                                        </ContainerSpaceBetween>
-                                    </TouchableOpacity>
-                                </View>
-                            ))
-                        }
-                    </View>
+
+                    <View
+                        children={menuItems.map((item, index) => <MenuItem {...item} />)}
+                        style={{ marginTop: 10 }} />
 
                     {/* SECURITY */}
                     <View style={{ marginTop: 10 }}>
@@ -123,37 +97,8 @@ export default function SettingsHome() {
                             children={`Use unique, strong passwords for enhanced online security.`}
                         />
                     </View>
-                    <View style={{ marginTop: 10 }}>
-                        {
-                            menuSecurityItems.map((item, index) => (
-                                <View key={index} style={[styles.menuItemContainer, { backgroundColor: themeColors.background2 }]}>
-                                    <TouchableOpacity key={item.title.trim()} onPress={item.onPress}>
-                                        <ContainerSpaceBetween style={[styles.menuItem]}>
-                                            <View style={{ flexDirection: 'row', gap: 13, paddingLeft: 0, backgroundColor: 'transparent' }}>
-                                                <IconButton
-                                                    containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
-                                                    icon={item.icon}
-                                                    style={[styles.menuItemIcon]} />
-                                                <View style={{ justifyContent: 'center' }}>
-                                                    <SpanText
-                                                        children={item.title}
-                                                        style={{ fontSize: 17, opacity: .6 }} />
-                                                    {item.description && (<SpanText
-                                                        children={item.description}
-                                                        style={{ fontSize: 12, opacity: .4 }} />
-                                                    )}
-                                                </View>
-                                            </View>
-                                            <IconButton
-                                                containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
-                                                icon={<Ionicons name="chevron-forward" size={30} />}
-                                                style={[styles.menuItemIcon]} />
-                                        </ContainerSpaceBetween>
-                                    </TouchableOpacity>
-                                </View>
-                            ))
-                        }
-                    </View>
+
+                    <View children={menuSecurityItems.map((item, index) => <MenuItem {...item} />)} style={{ marginTop: 10 }} />
                     {/* PAYMENT AND TRANFERS */}
                     <View style={{ marginTop: 10 }}>
                         <HeadLine children="Payment & Transfers" />
@@ -162,37 +107,8 @@ export default function SettingsHome() {
                             children={`Configure payment and tranfers references.`}
                         />
                     </View>
-                    <View style={{ marginTop: 10 }}>
-                        {
-                            menuPaymentAndTranferItems.map((item, index) => (
-                                <View key={index} style={[styles.menuItemContainer, { backgroundColor: themeColors.background2 }]}>
-                                    <TouchableOpacity key={item.title.trim()} onPress={item.onPress}>
-                                        <ContainerSpaceBetween style={[styles.menuItem]}>
-                                            <View style={{ flexDirection: 'row', gap: 13, paddingLeft: 0, backgroundColor: 'transparent' }}>
-                                                <IconButton
-                                                    containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
-                                                    icon={item.icon}
-                                                    style={[styles.menuItemIcon]} />
-                                                <View style={{ justifyContent: 'center' }}>
-                                                    <SpanText
-                                                        children={item.title}
-                                                        style={{ fontSize: 17, opacity: .6 }} />
-                                                    {item.description && (<SpanText
-                                                        children={item.description}
-                                                        style={{ fontSize: 12, opacity: .4 }} />
-                                                    )}
-                                                </View>
-                                            </View>
-                                            <IconButton
-                                                containerStyle={{ backgroundColor: 'transparent', padding: 0 }}
-                                                icon={<Ionicons name="chevron-forward" size={30} />}
-                                                style={[styles.menuItemIcon]} />
-                                        </ContainerSpaceBetween>
-                                    </TouchableOpacity>
-                                </View>
-                            ))
-                        }
-                    </View>
+                    <View children={menuPaymentAndTranferItems.map((item, index) => <MenuItem {...item} />)} style={{ marginTop: 10 }} />
+
                     <SpanText style={{ backgroundColor: 'red', opacity: .09, padding: 10, marginVertical: 20, borderRadius: 5, textAlign: 'center' }} children={'More exciting things is coming soon!!'} />
                     <IconButton
                         onPress={authContext?.logout}

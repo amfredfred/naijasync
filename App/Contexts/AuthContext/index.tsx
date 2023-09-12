@@ -139,7 +139,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
             } 
             return user
         } catch (error) {
-            console.log('ERROR->THE_ERROR->', JSON.stringify(error?.response?.data?.message))
+            console.log('ERROR->THE_ERROR->', JSON.stringify(error?.response?.data))
             toast({
                 message: `Error: ${error?.response?.data?.message}`,
                 severnity: 'error',

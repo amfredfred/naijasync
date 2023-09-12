@@ -1,17 +1,24 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground, Dimensions } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground, Dimensions, Modal } from 'react-native'
 import { IPostItem } from '../../../../../Interfaces'
 import useThemeColors from '../../../../../Hooks/useThemeColors'
 import { HeadLine, SpanText } from '../../../../../Components/Texts'
 import { REQUESTS_API } from '@env'
 import { formatNumber, getMediaType } from '../../../../../Helpers'
-import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { AntDesign, Ionicons, MaterialIcons, Octicons } from '@expo/vector-icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ShareContent from '../../../../../Components/ShareFile'
-import { IconButton } from '../../../../../Components/Buttons'
+import { Button, IconButton } from '../../../../../Components/Buttons'
 import { ScrollView, } from 'react-native-gesture-handler'
 import { useMediaPlaybackContext } from '../../../../Statics/MediaViewer/Context'
 import LikeButton from './Like'
+import ThemedModal from '../../../../../Components/Modals'
+import { useState } from 'react'
+import MenuItem from '../../../../../Components/MenuItem'
+import { useAuthContext } from '../../../../../Contexts/AuthContext'
+import { ContainerSpaceBetween } from '../../../../../Components/Containers'
+import FollowButton from './Follow'
+import ProfileAvatar from '../../../../../Components/ProfileAvatar'
 dayjs.extend(relativeTime)
 
 const StatusPostListItem = (post: IPostItem) => {
@@ -25,9 +32,7 @@ const StatusPostListItem = (post: IPostItem) => {
 }
 
 const VideoDisplay = (prop: IPostItem) => {
-
     const mediaContext = useMediaPlaybackContext()
-
     return (
         <View style={[styles.mediaDisplayWrapper, {}]}>
             <View style={{ position: 'relative', height: '100%', width: '100%' }}>
@@ -108,6 +113,9 @@ const ImageDisplay = (prop: { uri: string }) => {
 
 const UploadPostListItem = (post: IPostItem) => {
     const themeColors = useThemeColors()
+    const [isMenuModalVisile, setisMenuModalVisile] = useState(false)
+    const [isVeiwingPost, setisVeiwingPost] = useState(false)
+    const authContext = useAuthContext()
 
     const DisplayMediaType = () => {
         const fileType = getMediaType(post?.fileUrl)
@@ -134,6 +142,61 @@ const UploadPostListItem = (post: IPostItem) => {
         </View>
     )
 
+    const postPrivateMenuItem = [
+        {
+            title: `Edits`,
+            onPress: () => null,
+            icon: <AntDesign size={30} name='edit' color={themeColors?.text} />,
+            description: 'Allow/Disallow accounts to request funds from you'
+        },
+        {
+            title: `Delete`,
+            onPress: () => null,
+            icon: <AntDesign size={30} name='delete' color={themeColors?.error} />,
+            description: 'Allow/Disallow accounts to request funds from you'
+        },
+        {
+            title: `Share`,
+            onPress: () => { },
+            icon: <AntDesign size={30} name='sharealt' color={themeColors?.text} />,
+            description: 'You can report this post if you find it inappropriate.'
+        }
+    ];
+
+    const postPublicMenuItem = [
+        {
+            title: `Copy Link`,
+            hideIconRight: true,
+            onPress: () => null,
+            icon: <Ionicons size={30} name='copy' color={themeColors?.text} />,
+            description: ''
+        },
+        {
+            title: `Report post`,
+            onPress: () => { },
+            icon: <Octicons size={30} name='report' color={themeColors?.text} />,
+            description: 'You can report this post if you find it inappropriate.'
+        }
+    ];
+
+    const postWhenNotownerMenuItem = [
+        {
+            title: `Gifting (Comign soon)`,
+            hideIconRight: true,
+            onPress: () => null,
+            icon: <Ionicons size={30} name='gift' color={themeColors?.text} />,
+            description: `Points empower better content sharing!!`
+        },
+        {
+            title: `Share`,
+            hideIconRight: true,
+            onPress: () => { },
+            icon: <AntDesign size={30} name='sharealt' color={themeColors?.text} />,
+            description: 'You can report this post if you find it inappropriate.'
+        }
+    ];
+
+
     const UploadPostListItemContentRow = (
         <View style={[styles.postContentWrapper]}>
             <View style={{ marginBottom: 0, }}>
@@ -142,7 +205,7 @@ const UploadPostListItem = (post: IPostItem) => {
                         <HeadLine children={post?.owner?.fullName} />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={null}
+                        onPress={() => setisMenuModalVisile(true)}
                         children={<MaterialIcons
                             size={23}
                             name='more-horiz'
@@ -183,9 +246,12 @@ const UploadPostListItem = (post: IPostItem) => {
                     )
                 }
             </View>
-            <View style={{ overflow: 'hidden' }}>
+            <TouchableOpacity
+                onPress={() => setisVeiwingPost(true)}
+                style={{ overflow: 'hidden' }}>
                 {DisplayMediaType()}
-            </View>
+
+            </TouchableOpacity>
             <View style={[styles.spaceBetween, styles.containerProgress, { padding: 0 }]}>
                 <View style={[styles.spaceBetween, { flexGrow: 1 }]}>
 
@@ -220,6 +286,29 @@ const UploadPostListItem = (post: IPostItem) => {
                     />
                 </View>
             </View>
+
+            {/* POSTS MENU */}
+
+            <ThemedModal
+                onRequestClose={() => setisMenuModalVisile(false)}
+                visible={isMenuModalVisile}>
+                <View style={[styles.spaceBetween,]}>
+                    <View />
+                    <ProfileAvatar {...post?.owner} />
+                </View>
+                <View
+                    children={postPublicMenuItem.map((item, index) => <MenuItem {...item} />)}
+                    style={{ padding: 5, backgroundColor: themeColors.background2, margin: 10, borderRadius: 10 }} />
+                {post?.owner?.userId !== authContext?.user?.account?.userId && <View
+                    children={postWhenNotownerMenuItem.map((item, index) => <MenuItem {...item} />)}
+                    style={{ padding: 5, backgroundColor: themeColors.background2, margin: 10, borderRadius: 10 }} />}
+                {
+                    post?.owner?.userId === authContext?.user?.account?.userId && <ContainerSpaceBetween
+                        children={postPrivateMenuItem.map((item, index) => (<IconButton key={index} onPress={() => null} containerStyle={{ padding: 10 }} icon={item.icon} />))}
+                        style={{ margin: 10, borderRadius: 10 }}
+                    />
+                }
+            </ThemedModal>
         </View>
     )
 
@@ -235,6 +324,22 @@ const UploadPostListItem = (post: IPostItem) => {
         </View>
     )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export default function PostItem(post: IPostItem) {
     const RenderPost = () => {
@@ -309,8 +414,7 @@ const styles = StyleSheet.create({
     },
     infoContainer: {
         flex: 1,
-    },
-
+    }
     // singlePostmenu: {
     //     width,
     //     backgroundColor: 'red',

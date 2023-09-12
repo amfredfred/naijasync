@@ -36,10 +36,14 @@ export type IAuthContextData = {
             following?: number
             followers?: number
 
+            //
+
+            followed?: boolean
+
             // 
-            current_password?:string
+            current_password?: string
             new_password?: string
-            password_confirmation?:string
+            password_confirmation?: string
         }
     }
 }
