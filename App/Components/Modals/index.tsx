@@ -17,8 +17,8 @@ export default function ThemedModal(modalprops: IThemedmodal) {
             transparent
             {...otherModalProps}>
             <View style={[styles.mainContainer]}>
-                <View style={[styles.absoluteContainer, { backgroundColor: themeColors.background }]}>
-                    {hideBar || <View style={[styles.spaceBetween, { height: 20, justifyContent: 'center', backgroundColor:themeColors.background2, width:'100%' }]}>
+                <View style={[styles.absoluteContainer, { backgroundColor: themeColors.background, borderTopLeftRadius: hideBar ? 0 : 20, borderTopRightRadius: hideBar ? 0 : 20 }]}>
+                    {hideBar || <View style={[styles.spaceBetween, { height: 20, justifyContent: 'center', backgroundColor: themeColors.background2, width: '100%' }]}>
                         <View style={[styles.contentDescriptionContainerBar, { backgroundColor: themeColors.text }]} />
                     </View>}
                     <ScrollView
@@ -34,12 +34,10 @@ export default function ThemedModal(modalprops: IThemedmodal) {
 
 const styles = StyleSheet.create({
     absoluteContainer: {
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
         width: '100%',
         alignItems: 'center',
         maxHeight: height,
-        overflow:'hidden'
+        overflow: 'hidden'
     },
     mainContainer: {
         flex: 1,

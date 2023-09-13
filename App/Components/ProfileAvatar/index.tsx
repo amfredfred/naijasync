@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     avatarContainer: {
         borderRadius: 50,
         backgroundColor: 'green',
+        maxHeight:50
     },
     spaceBetween: {
         flexDirection: 'row',

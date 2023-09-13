@@ -17,8 +17,8 @@ import { useState } from 'react'
 import MenuItem from '../../../../../Components/MenuItem'
 import { useAuthContext } from '../../../../../Contexts/AuthContext'
 import { ContainerSpaceBetween } from '../../../../../Components/Containers'
-import FollowButton from './Follow'
 import ProfileAvatar from '../../../../../Components/ProfileAvatar'
+import PostViewer from '../../../../Viewer/Post'
 dayjs.extend(relativeTime)
 
 const StatusPostListItem = (post: IPostItem) => {
@@ -115,6 +115,7 @@ const UploadPostListItem = (post: IPostItem) => {
     const themeColors = useThemeColors()
     const [isMenuModalVisile, setisMenuModalVisile] = useState(false)
     const [isVeiwingPost, setisVeiwingPost] = useState(false)
+    const [postOnView, setPostOnView] = useState<IPostItem>()
     const authContext = useAuthContext()
 
     const DisplayMediaType = () => {
@@ -130,17 +131,6 @@ const UploadPostListItem = (post: IPostItem) => {
                 break;
         }
     }
-
-    const UploadPostListItemLeftRow = (
-        <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
-            <Image
-                resizeMethod="resize"
-                resizeMode="contain"
-                style={{ width: 40, aspectRatio: 1, borderRadius: 50, }}
-                source={{ uri: `${REQUESTS_API}${post.thumbnailUrl}` }}
-            />
-        </View>
-    )
 
     const postPrivateMenuItem = [
         {
@@ -287,8 +277,23 @@ const UploadPostListItem = (post: IPostItem) => {
                 </View>
             </View>
 
-            {/* POSTS MENU */}
 
+        </View>
+    )
+
+    return (
+        <View style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background, marginBottom: 6 }}>
+            <View style={[styles.postWrapper]}>
+                <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
+                    <ProfileAvatar  {...post?.owner} avatarOnly />
+                </View>
+                {UploadPostListItemContentRow}
+            </View>
+
+            {/* POSTS VIEWING */}
+            {isVeiwingPost && (<PostViewer onClose={() => setisVeiwingPost(false)}   {...post} />)}
+
+            {/* POSTS MENU */}
             <ThemedModal
                 onRequestClose={() => setisMenuModalVisile(false)}
                 visible={isMenuModalVisile}>
@@ -309,18 +314,6 @@ const UploadPostListItem = (post: IPostItem) => {
                     />
                 }
             </ThemedModal>
-        </View>
-    )
-
-    return (
-        <View style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background, marginBottom: 6 }}>
-            <View style={[styles.postWrapper]}>
-                {UploadPostListItemLeftRow}
-                {UploadPostListItemContentRow}
-            </View>
-            {/* <View style={[styles.singlePostmenu]} >
-
-            </View> */}
         </View>
     )
 }

@@ -42,7 +42,7 @@ export default function LikeButton(props: ILikeButton) {
             handlePress()
             setLikeCount(c => c = liked ? c -= 1 : c += 1)
             setLiked(!liked);
-            props?.onLikeToggle(props?.post?.id, !liked);
+            props?.onLikeToggle?.(props?.post?.id, !liked);
         }
         postContext?.methods?.updatePost({ 'liked': !liked, puid: props?.post?.puid } as IPostItem)
     };
