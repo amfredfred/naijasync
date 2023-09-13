@@ -96,8 +96,6 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         }
     }
 
-    console.log("FAILURE REASON", JSON.stringify(postViewMutation?.failureReason))
-
     const postView: IPostFormMethods['updatePost'] = async (payload) => {
         const formData = new FormData()
         await Promise.all(Object.keys(payload)?.map(d => {

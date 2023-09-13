@@ -121,6 +121,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                                     {
                                         meniItemBlock.map((item, index) => (
                                             <IconButton
+                                                key={index}
                                                 onPress={item.onPress}
                                                 style={{ flexGrow: 1, borderRadius: 7, width: '45%' }}
                                                 containerStyle={{ justifyContent: 'space-between', paddingVertical: 10 }}

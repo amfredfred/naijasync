@@ -302,10 +302,10 @@ const UploadPostListItem = (post: IPostItem) => {
                     <ProfileAvatar {...post?.owner} />
                 </View>
                 <View
-                    children={postPublicMenuItem.map((item, index) => <MenuItem {...item} />)}
+                    children={postPublicMenuItem.map((item, index) => <MenuItem key={index} {...item} />)}
                     style={{ padding: 5, backgroundColor: themeColors.background2, margin: 10, borderRadius: 10 }} />
                 {post?.owner?.userId !== authContext?.user?.account?.userId && <View
-                    children={postWhenNotownerMenuItem.map((item, index) => <MenuItem {...item} />)}
+                    children={postWhenNotownerMenuItem.map((item, index) => <MenuItem key={index} {...item} />)}
                     style={{ padding: 5, backgroundColor: themeColors.background2, margin: 10, borderRadius: 10 }} />}
                 {
                     post?.owner?.userId === authContext?.user?.account?.userId && <ContainerSpaceBetween

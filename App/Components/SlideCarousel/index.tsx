@@ -112,12 +112,9 @@ export default function SlideCarousel(props: IListSlider) {
                 bounces={false}
                 contentContainerStyle={{ paddingHorizontal: 10, gap: 10 }}
                 renderItem={({ item, index }: { item: IPostItem, index: number }) => (
-                    <ListSlideItem onPress={handleOnPressListItem} key={index} {...item} />
+                    <ListSlideItem onPress={handleOnPressListItem}{...item} key={index} />
                 )}
-                keyExtractor={({ id }) => id}
                 horizontal
-                isTVSelectable
-                importantForAccessibility='auto'
             />
         </ContainerBlock>
     );
