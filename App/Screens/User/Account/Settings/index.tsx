@@ -51,7 +51,7 @@ export default function SettingsHome() {
         {
             title: "Use Biometrics",
             onPress: () => handleNavigateTo("Setup Biometrics"),
-            icon: <Ionicons size={30} name='finger-print'  color={themeColors?.text} />,
+            icon: <Ionicons size={30} name='finger-print' color={themeColors?.text} />,
             description: 'Use finger print for payment & transfers'
         },
     ];

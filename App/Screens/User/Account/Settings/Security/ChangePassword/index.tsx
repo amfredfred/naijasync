@@ -69,20 +69,20 @@ export default function UpdatePassword() {
                     textColor={themeColors.text}
                     style={[styles.textinput, { backgroundColor: themeColors.background2 }]}
                 />
-            <TouchableOpacity
-                onPress={handleUpdateAccount}
-                // disabled={!canUpdate || authContext?.isBusy}
-                children={<SpanText children={`Sav${authContext?.isBusy ? 'ing' : 'e'}`} />}
-                style={{
-                    gap: 3,
-                    borderRadius: 5,
-                    height: 50,
-                    marginTop: 10,
-                    backgroundColor: themeColors.accent,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    opacity: canUpdate ? 1 : .4
-                }}
+                <TouchableOpacity
+                    onPress={handleUpdateAccount}
+                    // disabled={!canUpdate || authContext?.isBusy}
+                    children={<SpanText children={`Sav${authContext?.isBusy ? 'ing' : 'e'}`} />}
+                    style={{
+                        gap: 3,
+                        borderRadius: 5,
+                        height: 50,
+                        marginTop: 10,
+                        backgroundColor: themeColors.accent,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        opacity: canUpdate ? 1 : .4
+                    }}
                 />
             </ScrollView>
         </KeyboardAvoidingView>

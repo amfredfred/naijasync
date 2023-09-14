@@ -76,41 +76,43 @@ export default function AuthContextProvider({ children }: { children: React.Reac
                 user['person'] = 'isAuthenticated'
                 user['isAuthenticated'] = true
                 setObjectItem('user', user)
-            } else {
-                toast({
-                    message: `Error: }`,
-                    severnity: 'error',
-                })
             }
         } catch (error) {
-            if (error?.response?.status === 422) {
-                setObjectItem('user', user)
-            }
+            setObjectItem('user', { person: 'isNew' })
+            toast({
+                message: `${error?.response?.data?.message}`,
+                severnity: 'error',
+            })
+        } finally {
+            setisBusy(false)
+            mutation?.reset()
         }
-        setisBusy(false)
     }
 
     const login: IAuthContextMethods['login'] = async (userData) => {
-        const formData = new FormData()
-        formData['path'] = 'login'
-        formData.append('email', userData?.email)
-        formData.append('password', userData?.password)
-        setisBusy(true)
-        const auth = await mutation?.mutateAsync(formData as any)
-        const user = (auth?.data as any)?.profile as IAuthContextData['user']
-        if (auth?.status == 201 || auth?.status == 200) {
-            user['accessToken'] = (auth?.data as any)?.accessToken
-            user['person'] = 'isAuthenticated'
-            user['isAuthenticated'] = true
-            setObjectItem('user', user)
-        } else {
+        try {
+            const formData = new FormData()
+            formData['path'] = 'login'
+            formData.append('email', userData?.email)
+            formData.append('password', userData?.password)
+            setisBusy(true)
+            const auth = await mutation?.mutateAsync(formData as any)
+            const user = (auth?.data as any)?.profile as IAuthContextData['user']
+            if (auth?.status == 201 || auth?.status == 200) {
+                user['accessToken'] = (auth?.data as any)?.accessToken
+                user['person'] = 'isAuthenticated'
+                user['isAuthenticated'] = true
+                setObjectItem('user', user)
+            }
+        } catch (error) {
             toast({
-                message: `Error: }`,
-                severnity: 'error',
+                message: `${error?.response?.data?.message}`,
+                severnity: 'warning',
             })
+        } finally {
+            setisBusy(false)
+            mutation?.reset()
         }
-        setisBusy(false)
-        mutation?.reset()
     }
 
     const updateAccount: IAuthContextMethods['updateAccount'] = async (newAccountInfo) => {
@@ -130,18 +132,17 @@ export default function AuthContextProvider({ children }: { children: React.Reac
             if (newAccountInfo?.profilePics)
                 formData.append('cover-image', newAccountInfo?.profilePics as any)
             const auth = await mutation?.mutateAsync(formData as any)
-            const user = (auth?.data as any)?.profile as IAuthContextData['user']
+            const user = (auth?.data as any)?.profile as IAuthContextData['user']  
             if (auth?.status == 201 || auth?.status == 200) {
                 user['accessToken'] = (auth?.data as any)?.accessToken
                 user['person'] = 'isAuthenticated'
                 user['isAuthenticated'] = true
                 setObjectItem('user', user)
-            } 
+            }
             return user
         } catch (error) {
-            console.log('ERROR->THE_ERROR->', JSON.stringify(error?.response?.data))
             toast({
-                message: `Error: ${error?.response?.data?.message}`,
+                message: ` ${error?.response?.data?.message}`,
                 severnity: 'error',
             })
         }

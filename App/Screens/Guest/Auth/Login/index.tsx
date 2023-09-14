@@ -23,7 +23,7 @@ export default function LoginScreen() {
             </ContainerSpaceBetween>
             <HeadLine children={'Finish Creating Your Account'} />
             <SpanText children={`email -> ${truncate(dataContext?.states?.authing?.email)}`} style={{ marginVertical: 15, opacity: .6, fontSize: 14 }} />
-       
+
             <View style={[styles.textinputContainer, { backgroundColor: themeColors.background2, marginTop: 20 }]}>
                 <TextInput
                     onChangeText={(text) => dataContext?.setData('authing', 'password', text)}

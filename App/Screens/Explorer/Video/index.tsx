@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
         zIndex: 2,
         flexDirection: 'row',
         alignItems: 'flex-end',
-        justifyContent: 'flex-end', 
-        padding:20
+        justifyContent: 'flex-end',
+        padding: 20
     }
 })

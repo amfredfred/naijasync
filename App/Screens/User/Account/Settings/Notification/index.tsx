@@ -14,8 +14,8 @@ export default function UpdateNotification() {
             <ScrollView
                 style={{ paddingTop: 10 }}
                 contentContainerStyle={{ gap: 10 }}>
-                <ComingSoonComponent  />
-                </ScrollView>
+                <ComingSoonComponent />
+            </ScrollView>
         </KeyboardAvoidingView>
     )
 }

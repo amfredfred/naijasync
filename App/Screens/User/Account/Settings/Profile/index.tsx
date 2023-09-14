@@ -121,19 +121,19 @@ export default function UpdateProfile() {
                     <RadioButton.Item
                         labelStyle={{ color: themeColors?.text }}
                         color={themeColors.text}
-                        style={[styles.radioButton, { backgroundColor: themeColors.background2  }]}
+                        style={[styles.radioButton, { backgroundColor: themeColors.background2 }]}
                         status={PersonalInfo?.gender === 'MALE' ? 'checked' : 'unchecked'}
                         label="MALE" value="MALE" onPress={() => handleOnFormInput('gender', 'MALE')} />
                     <RadioButton.Item
                         labelStyle={{ color: themeColors?.text }}
                         color={themeColors.text}
-                        style={[styles.radioButton, { backgroundColor: themeColors.background2  }]}
+                        style={[styles.radioButton, { backgroundColor: themeColors.background2 }]}
                         status={PersonalInfo?.gender === 'FEMALE' ? 'checked' : 'unchecked'}
                         label="FEMALE" value="FEMALE" onPress={() => handleOnFormInput('gender', 'FEMALE')} />
                     <RadioButton.Item
-                        labelStyle={{color:themeColors?.text}}
+                        labelStyle={{ color: themeColors?.text }}
                         color={themeColors.text}
-                        style={[styles.radioButton, { backgroundColor: themeColors.background2  }]}
+                        style={[styles.radioButton, { backgroundColor: themeColors.background2 }]}
                         status={PersonalInfo?.gender === "UNKNOWN" || PersonalInfo?.gender === null ? 'checked' : 'unchecked'}
                         label="NONE" value="UNKNOWN" onPress={() => handleOnFormInput('gender', 'UNKNOWN')} />
                 </View>
@@ -174,6 +174,6 @@ const styles = StyleSheet.create({
     },
     radioButton: {
         borderRadius: 10,
-        paddingRight:5
+        paddingRight: 5
     }
 })

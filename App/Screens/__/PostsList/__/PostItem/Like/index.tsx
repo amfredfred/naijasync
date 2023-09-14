@@ -25,7 +25,7 @@ export default function LikeButton(props: ILikeButton) {
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ rotate:`${scale.value}deg`}],
+            transform: [{ rotate: `${scale.value}deg` }],
         };
     });
 

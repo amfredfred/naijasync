@@ -10,7 +10,7 @@ import Home from "../Screens/Home";
 import DataContextProvider from "../Contexts/DataContext";
 import Downloads from "../Screens/User/Downloads";
 import useAppStatus from "../Hooks/useAppStatus";
-// import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
+import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
 import "expo-dev-client"
 import Explorer from "../Screens/Explorer";
 import Search from "../Screens/Search";
@@ -34,6 +34,7 @@ import UpdatePassword from '../Screens/User/Account/Settings/Security/ChangePass
 import UpdateFundsRequestsSettings from '../Screens/User/Account/Settings/Payment/FundsRequest';
 import UpdateFundsTranferSettings from '../Screens/User/Account/Settings/Payment/FundsTransfer';
 import UpdateBiometricSettings from '../Screens/User/Account/Settings/Security/SetupBiometrics';
+import { useEffect } from 'react';
 
 const screenOptions = {
     headerShown: false,
@@ -62,10 +63,10 @@ function Routes() {
     //     }
     // }, [isLoaded, load])
 
-    Linking.addEventListener('url', ({ url }) => {
-        const route = url.replace(/.*?:\/\//g, '');
-        console.log(route, " FROM LINKING")
-    });
+    // Linking.addEventListener('url', ({ url }) => {
+    //     const route = url.replace(/.*?:\/\//g, '');
+    //     console.log(route, " FROM LINKING")
+    // });
 
     const AccountSettingsRoutes = () => (
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >

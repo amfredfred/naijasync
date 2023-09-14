@@ -62,7 +62,7 @@ export default function ExplorerPostItemWrapper({ post, children }: { post: IPos
                 </SpanText>
             </View>
             {children}
-           <PostExplorerFooting {...post} />
+            <PostExplorerFooting {...post} />
         </View>
     )
 }
@@ -77,6 +77,6 @@ const styles = StyleSheet.create({
     }, blockContainer: {
         marginBottom: 5,
         marginHorizontal: 5,
-        borderRadius:5
+        borderRadius: 5
     },
 })

@@ -3,7 +3,6 @@ import Animated, { SlideInDown, SlideInLeft, SlideOutLeft, SlideOutUp } from 're
 import { View, Text, StyleSheet, Dimensions } from 'react-native'
 import useThemeColors from '../../../../Hooks/useThemeColors'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 import { useRef, useState, useEffect } from 'react'
 import { SpanText } from '../../../../Components/Texts'
 
@@ -37,24 +36,7 @@ export default function UploadStatusFrom() {
                 <View style={{ backgroundColor: 'red', width: 40, aspectRatio: 1, borderRadius: 50 }}>
 
                 </View>
-                <RichEditor
-                    style={[styles.textEditoContainer]}
-                    editorStyle={{ ...styles.textEditor, color: themeColors.text, backgroundColor: themeColors.background2 }}
-                    textZoom={120}
-                    ref={richText}
-                    placeholder={"What is up fred?"}
-                    onChange={null}
-                    allowsLinkPreview
-                    disabled
-                    onScroll={null}
-                    pasteAsPlainText
-                    showsHorizontalScrollIndicator={false}
-                    useWebView2
-                    javaScriptEnabled={false}
-                    // initialContentHTML={sessionValues?.description}
-                    collapsable
-                    geolocationEnabled
-                />
+
             </View>
             <GestureDetector gesture={gesture}>
                 <Animated.View style={[styles.mediaExplorerContainer, { backgroundColor: themeColors.background2 }]}>

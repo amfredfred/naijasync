@@ -28,7 +28,7 @@ export default function FollowButton(props: IAuthContextData['user']['account'])
             onPress={handleFollowToggle}
             textStyle={{ textTransform: 'capitalize' }}
             containerStyle={{ backgroundColor: themeColors.error }}
-            title={`Follow ${formatNumber(followersCount ?? 0) }`}
+            title={`Follow ${formatNumber(followersCount ?? 0)}`}
         />
     )
 }

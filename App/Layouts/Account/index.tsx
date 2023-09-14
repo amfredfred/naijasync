@@ -1,6 +1,6 @@
 import { ContainerFlex } from '../../Components/Containers';
-import {  StatusBar, View } from "react-native";
-import {  useState } from 'react'
+import { StatusBar, View } from "react-native";
+import { useState } from 'react'
 import useKeyboardEvent from '../../Hooks/useKeyboardEvent';
 import useThemeColors from '../../Hooks/useThemeColors';
 import Header from '../Guest/Header';
