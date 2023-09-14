@@ -1,7 +1,7 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground, Dimensions, Modal } from 'react-native'
 import { IPostItem } from '../../../../../Interfaces'
 import useThemeColors from '../../../../../Hooks/useThemeColors'
-import { HeadLine, SpanText } from '../../../../../Components/Texts'
+import { HeadLine, SpanText, TextExpandable } from '../../../../../Components/Texts'
 import { REQUESTS_API } from '@env'
 import { formatNumber, getMediaType } from '../../../../../Helpers'
 import { AntDesign, Ionicons, MaterialIcons, Octicons } from '@expo/vector-icons'
@@ -215,12 +215,7 @@ const UploadPostListItem = (post: IPostItem) => {
             </View>
             <View style={{ marginBottom: 6 }}>
                 <SpanText hidden={!post?.title} >{post.title}</SpanText>
-                <SpanText hidden={!post?.description} style={{ fontSize: 16 }}
-                    numberOfLines={3}
-                    ellipsizeMode="tail"
-                    selectable textBreakStrategy="highQuality">
-                    {post?.description}
-                </SpanText>
+                <TextExpandable hidden={!post?.description} style={{ fontSize: 14 }}   children={post?.description}  />
                 {
                     post?.tags && (
                         <ScrollView contentContainerStyle={{ paddingHorizontal: 6, gap: 10 }} style={{ paddingVertical: 6 }} horizontal>
@@ -317,22 +312,6 @@ const UploadPostListItem = (post: IPostItem) => {
         </View>
     )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export default function PostItem(post: IPostItem) {
     const RenderPost = () => {

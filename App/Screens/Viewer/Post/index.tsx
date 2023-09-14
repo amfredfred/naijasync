@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState, createRef } from "react";
 import ThemedModal from "../../../Components/Modals";
 import { IPostItem } from "../../../Interfaces";
-import { ScrollView, StyleSheet, View, useWindowDimensions, Animated as RNAnimated } from "react-native";
-import ExplorerPostItemWrapper from "../../Explorer/Wrapper";
+import { ScrollView, StyleSheet, View, useWindowDimensions, Animated as RNAnimated, TouchableOpacity } from "react-native";
 import ProfileAvatar from "../../../Components/ProfileAvatar";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -10,28 +9,22 @@ import { IconButton } from "../../../Components/Buttons";
 import useThemeColors from "../../../Hooks/useThemeColors";
 import ImageViewer from "./Image";
 import { REQUESTS_API } from "@env";
-import LikeButton from "../../__/PostsList/__/PostItem/Like";
 import PostExplorerFooting from "../../Explorer/Wrapper/Footing";
 import usePostForm from "../../../Hooks/usePostForms";
-
 import React, { useRef } from 'react';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import { TextExpandable } from "../../../Components/Texts";
 
-import { PinchGestureHandler, State } from 'react-native-gesture-handler';
-import Animated, {
-    Easing,
-    useSharedValue,
-    withSpring,
-    useAnimatedGestureHandler,
-    useAnimatedStyle,
-    withDecay,
-    useDerivedValue,
-} from 'react-native-reanimated';
 
 type IPostViewer = IPostItem & {
     onClose?(): void
 }
 
 export default function PostViewer(post: IPostViewer) {
+
+    //ads
+    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+    const [isBannerAdVisible, setisBannerAdVisible] = useState(true)
 
     const { onClose, onPress } = post
     const { height } = useWindowDimensions()
@@ -43,6 +36,7 @@ export default function PostViewer(post: IPostViewer) {
 
 
     const [panEnabled, setPanEnabled] = useState(false);
+    const [isPostFocused, setIsPostFocused] = useState(false)
     const scale = useRef(new RNAnimated.Value(1)).current;
     const translateX = useRef(new RNAnimated.Value(0)).current;
     const translateY = useRef(new RNAnimated.Value(0)).current;
@@ -50,46 +44,6 @@ export default function PostViewer(post: IPostViewer) {
     const pinchRef = createRef();
     const panRef = createRef();
 
-    const onPinchEvent = RNAnimated.event([{
-        nativeEvent: { scale }
-    }],
-        { useNativeDriver: true });
-
-    const onPanEvent = RNAnimated.event([{
-        nativeEvent: {
-            translationX: translateX,
-            translationY: translateY
-        }
-    }],
-        { useNativeDriver: true });
-
-    const handlePinchStateChange = ({ nativeEvent }) => {
-        // enabled pan only after pinch-zoom
-        if (nativeEvent.state === State.ACTIVE) {
-            setPanEnabled(true);
-        }
-
-        // when scale < 1, reset scale back to original (1)
-        const nScale = nativeEvent.scale;
-        if (nativeEvent.state === State.END) {
-            if (nScale < 1) {
-                RNAnimated.spring(scale, {
-                    toValue: 1,
-                    useNativeDriver: true
-                }).start();
-                RNAnimated.spring(translateX, {
-                    toValue: 0,
-                    useNativeDriver: true
-                }).start();
-                RNAnimated.spring(translateY, {
-                    toValue: 0,
-                    useNativeDriver: true
-                }).start();
-
-                setPanEnabled(false);
-            }
-        }
-    };
 
 
     const onRequestClose = () => {
@@ -118,12 +72,12 @@ export default function PostViewer(post: IPostViewer) {
     }
 
     const postHeading = (
-        <View style={[styles?.viewerHeading]}>
+        <View style={[styles?.viewerHeading, { zIndex: 10, }]}>
             <IconButton
                 onPress={onRequestClose}
                 icon={<Ionicons size={30} name='arrow-back' />}
             />
-            <ProfileAvatar {...post?.owner} />
+            <ProfileAvatar {...post?.owner} avatarOnly />
         </View>
     )
 
@@ -131,21 +85,32 @@ export default function PostViewer(post: IPostViewer) {
         <ScrollView style={[styles.postContent]}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ maxHeight: '100%', flexGrow: 1 }}>
-            <PinchGestureHandler
-                ref={pinchRef}
-                onGestureEvent={onPinchEvent}
-                simultaneousHandlers={[panRef]}
-                onHandlerStateChange={handlePinchStateChange}  >
-                <RNAnimated.View
-                    style={[{ flexGrow: 1, transform: [{ scale }, { translateX }, { translateY }] }]}>
+            <RNAnimated.View
+                style={{ flexGrow: 1 }}>
+                <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => setIsPostFocused(s => !s)}
+                    style={{ flexGrow: 1 }}>
                     {RenderPost()}
-                </RNAnimated.View>
-            </PinchGestureHandler>
+                </TouchableOpacity>
+            </RNAnimated.View>
         </ScrollView>
     )
 
     const posFooting = (
         <View style={[styles.posFooting]}>
+            <TextExpandable
+                hidden={!post?.description} style={{ fontSize: 17, lineHeight: 23, padding: 10, paddingBottom: 5 }} children={post?.description} />
+            {isBannerAdVisible && <View style={[styles.bannerAdContainer, { overflow: 'hidden' }]}>
+                <BannerAd
+                    unitId={adUnitId}
+                    size={BannerAdSize.BANNER}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                <IconButton onPress={() => setisBannerAdVisible(false)} icon={<Ionicons name="close" />} />
+            </View>}
             <PostExplorerFooting {...post} />
         </View>
     )
@@ -157,12 +122,12 @@ export default function PostViewer(post: IPostViewer) {
             onRequestClose={onRequestClose}
             visible={Boolean(post?.puid)} >
             <View style={{ backgroundColor: themeColors.background, height }}>
-                {postHeading}
+                {isPostFocused || postHeading}
                 {postContent}
-                {posFooting}
+                {isPostFocused || posFooting}
             </View>
         </ThemedModal>
-    ), [post?.puid])
+    ), [post?.puid, isPostFocused, isBannerAdVisible])
 }
 
 const styles = StyleSheet.create({
@@ -173,15 +138,27 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 10,
+        position: 'absolute',
+        top: 0,
+        backgroundColor: 'rgba(0,0,0,0.2)'
     },
     postContent: {
         flex: 1,
         width: '100%',
+        zIndex: -1
+    },
+    bannerAdContainer: {
+        position: 'relative',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginHorizontal: 10
     },
     posFooting: {
         width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        position: 'absolute',
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        overflow: 'hidden'
     }
 })

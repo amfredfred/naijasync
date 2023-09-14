@@ -49,24 +49,24 @@ function Routes() {
     const Buttom = createBottomTabNavigator()
     const auth = useAuthContext()
 
-    // const { load, show, error, isLoaded } = useAppOpenAd(TestIds.APP_OPEN, {
-    //     requestNonPersonalizedAdsOnly: true,
-    //     keywords: ['fashion', 'clothing'],
-    // })
+    const { load, show, error, isLoaded } = useAppOpenAd(TestIds.APP_OPEN, {
+        requestNonPersonalizedAdsOnly: true,
+        keywords: ['fashion', 'clothing'],
+    })
 
 
-    // useEffect(() => {
-    //     load()
-    //     if (isLoaded) {
-    //         console.log("APP OPEN ADS LOADED")
-    //         show()
-    //     }
-    // }, [isLoaded, load])
+    useEffect(() => {
+        load()
+        if (isLoaded) {
+            console.log("APP OPEN ADS LOADED")
+            show()
+        }
+    }, [isLoaded, load])
 
-    // Linking.addEventListener('url', ({ url }) => {
-    //     const route = url.replace(/.*?:\/\//g, '');
-    //     console.log(route, " FROM LINKING")
-    // });
+    Linking.addEventListener('url', ({ url }) => {
+        const route = url.replace(/.*?:\/\//g, '');
+        console.log(route, " FROM LINKING")
+    });
 
     const AccountSettingsRoutes = () => (
         <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
