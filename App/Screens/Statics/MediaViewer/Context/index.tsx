@@ -8,7 +8,7 @@ import { REQUESTS_API } from '@env'
 import usePostForm from '../../../../Hooks/usePostForms'
 
 const initialState: IMediaViewer = {
-    previewing: false
+    presenting: false
 }
 const MediaPlaybackContext = createContext<IMediaViewerProvider | null>(null)
 export const useMediaPlaybackContext = () => useContext(MediaPlaybackContext)
@@ -110,6 +110,8 @@ export function MediaViewerProvider({ children }) {
             loadMediaPlayable();
         }
 
+        console.log('ref chnaged', mediaRef)
+
         return () => {
             clearAllRefs()
         };
@@ -209,7 +211,7 @@ export function MediaViewerProvider({ children }) {
     return (
         <MediaPlaybackContext.Provider value={{ setMedia, removeMedia, mediaRef, ...methodsAndStates }}  >
             {children}
-            <MediaViewer ref={mediaRef} {...methodsAndStates} previewing={data?.previewing} />
+            <MediaViewer ref={mediaRef} {...methodsAndStates} presenting={data?.presenting} />
         </MediaPlaybackContext.Provider>
     )
 }

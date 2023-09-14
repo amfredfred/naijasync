@@ -4,7 +4,7 @@ import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import useThemeColors from "../../../Hooks/useThemeColors";
 import { IPostItem } from "../../../Interfaces";
 import { REQUESTS_API } from "@env";
-import LikeButton from "../../__/PostsList/__/PostItem/Like";
+import LikeButton from "../../_partials/PostComponents/Like";
 import ShareContent from "../../../Components/ShareFile";
 import { formatNumber } from "../../../Helpers";
 import dayjs from 'dayjs'

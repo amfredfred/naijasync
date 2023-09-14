@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { IconButton } from "../../../../../../Components/Buttons";
-import useThemeColors from "../../../../../../Hooks/useThemeColors";
-import { IPostItem } from "../../../../../../Interfaces";
-import { useAuthContext } from "../../../../../../Contexts/AuthContext";
-import { IAuthContextData } from "../../../../../../Interfaces/iAuthContext";
-import { formatNumber } from "../../../../../../Helpers";
+import { IconButton } from "../../../Components/Buttons";
+import useThemeColors from "../../../Hooks/useThemeColors";
+import { IPostItem } from "../../../Interfaces";
+import { useAuthContext } from "../../../Contexts/AuthContext";
+import { IAuthContextData } from "../../../Interfaces/iAuthContext";
+import { formatNumber } from "../../../Helpers";
 
 export default function FollowButton(props: IAuthContextData['user']['account']) {
 

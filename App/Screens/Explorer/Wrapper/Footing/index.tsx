@@ -1,7 +1,7 @@
 import { TouchableOpacity, View, StyleSheet } from "react-native";
 import { SpanText } from "../../../../Components/Texts";
 import { formatNumber } from "../../../../Helpers";
-import LikeButton from "../../../__/PostsList/__/PostItem/Like";
+import LikeButton from "../../../_partials/PostComponents/Like";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import ShareContent from "../../../../Components/ShareFile";
 import { REQUESTS_API } from "@env";

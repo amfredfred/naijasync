@@ -1,7 +1,7 @@
 import { Dimensions, Modal, ScrollView, StyleSheet, View } from "react-native";
 import useThemeColors from "../../Hooks/useThemeColors";
 
-type IThemedmodal = Modal['props'] & {
+export type IThemedmodal = Modal['props'] & {
     hideBar?: boolean
 }
 const { height, width } = Dimensions.get('window')

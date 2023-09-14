@@ -1,13 +1,13 @@
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState } from 'react'
 import { TouchableOpacity } from 'react-native'
-import { SpanText } from '../../../../../../Components/Texts';
-import useThemeColors from '../../../../../../Hooks/useThemeColors';
-import { formatNumber } from '../../../../../../Helpers';
-import { IPostItem } from '../../../../../../Interfaces';
+import { SpanText } from '../../../../Components/Texts';
+import useThemeColors from '../../../../Hooks/useThemeColors';
+import { formatNumber } from '../../../../Helpers';
+import { IPostItem } from '../../../../Interfaces';
 import Animated, { useSharedValue, withSpring, useAnimatedStyle } from 'react-native-reanimated';
-import { useAuthContext } from '../../../../../../Contexts/AuthContext';
-import usePostForm from '../../../../../../Hooks/usePostForms';
+import { useAuthContext } from '../../../../Contexts/AuthContext';
+import usePostForm from '../../../../Hooks/usePostForms';
 
 interface ILikeButton {
     post: IPostItem,

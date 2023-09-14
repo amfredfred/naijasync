@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { IPostItem } from '../../../Interfaces';
 import { REQUESTS_API } from '@env';
-import PostItem from '../../__/PostsList/__/PostItem';
+import PostItem from '../../_partials/PostItem';
 import { IPostType } from '../../../Interfaces/IPostContext';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
 import PagerView from 'react-native-pager-view';

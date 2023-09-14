@@ -35,6 +35,7 @@ import UpdateFundsRequestsSettings from '../Screens/User/Account/Settings/Paymen
 import UpdateFundsTranferSettings from '../Screens/User/Account/Settings/Payment/FundsTransfer';
 import UpdateBiometricSettings from '../Screens/User/Account/Settings/Security/SetupBiometrics';
 import { useEffect } from 'react';
+import PostViewer from '../Screens/Viewer/Post/PresentMedia';
 
 const screenOptions = {
     headerShown: false,
@@ -111,6 +112,7 @@ function Routes() {
             <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name='PostComposer' component={PostComposer} />
             <Stack.Screen name="Account" component={AccountRoutes} />
+            <Stack.Screen name='ViewPost' component={PostViewer} />
         </Stack.Navigator>
     )
 

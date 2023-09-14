@@ -21,7 +21,13 @@ export const SpanText = (props: ISpanText) => {
         textAlignVertical: 'center',
     }
 
-    return hidden || <Text style={[styles, style]} {...otherProps} />
+    return hidden || <Text
+        style={[styles, style]}
+        {...otherProps}
+        ellipsizeMode="tail"
+    >
+        {props.children}
+    </Text>
 }
 
 export const HeadLine = (props: ISpanText) => {
@@ -34,22 +40,37 @@ export const HeadLine = (props: ISpanText) => {
 
     return hidden || <SpanText hidden={hidden} style={[styles, style]} {...otherProps} />
 }
+export const TextExpandable = (props) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    let pressTimeout;
 
-export const TextExpandable = (props: ITextExpandable) => {
-    const [isExpanaded, setisExpanaded] = useState(false)
-    const handleOnPressIn = (d) => {
-        setisExpanaded(s => !s)
-        props?.onPress?.(d)
-    }
+    const handleOnPress = () => {
+        // Check the press duration to determine if it's a long-press or a short press
+        pressTimeout = setTimeout(() => {
+            // Long press (do nothing)
+        }, 500); // Adjust the duration as needed
+
+        setIsExpanded(!isExpanded);
+        props?.onPress?.();
+    };
+
+    const handleOnLongPress = () => {
+        // Clear the pressTimeout to prevent toggling on long-press
+        clearTimeout(pressTimeout);
+        // Handle long-press here, or leave it empty if you don't want to do anything
+    };
+
     return (
         <SpanText
             ellipsizeMode="tail"
             selectable
-            textBreakStrategy="highQuality" 
-            numberOfLines={isExpanaded ? undefined : 3} {...props} onPress={handleOnPressIn}
-            style={[{ fontSize: 14,fontWeight:'200', lineHeight:18 }, props?.style]}
-        
-        />
-    )
-
+            textBreakStrategy="highQuality"
+            numberOfLines={isExpanded ? undefined : 3}
+            onPress={handleOnPress}
+            onLongPress={handleOnLongPress} // Handle long-press here
+            style={[{ fontSize: 14, fontWeight: '200', lineHeight: 18 }, props?.style]}
+        >
+            {props.children}
+        </SpanText>
+    );
 }

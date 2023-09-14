@@ -53,7 +53,7 @@ export type IImageMedia = {
 // Define a common interface for media viewer
 export type IMediaViewer = IPostItem & {
     media?: IMediaPlayable;
-    previewing: boolean
+    presenting: boolean
 };
 
 // Define a common interface for media viewer options
