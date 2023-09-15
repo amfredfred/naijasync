@@ -53,13 +53,14 @@ export default function LikeButton(props: ILikeButton) {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 3,
+            minWidth: 25,
         }}>
-            <Animated.View style={[{ width: 20, height: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }, animatedStyle]}>
+            <Animated.View style={[{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }, animatedStyle]}>
                 <AntDesign
                     style={{}}
-                    size={20} color={liked ? themeColors?.error : themeColors.text} name={liked ? 'heart' : 'hearto'} />
+                    size={13} color={liked ? 'red' : themeColors.text} name={liked ? 'heart' : 'hearto'} />
             </Animated.View>
-            <SpanText style={{ color: liked ? themeColors?.error : themeColors.text, fontSize: 18 }}>{formatNumber(likeCount)}</SpanText>
+            <SpanText style={{ color: liked ? 'red' : themeColors.text, fontSize: 15 }}>{formatNumber(likeCount)}</SpanText>
         </TouchableOpacity>
     );
 };

@@ -7,6 +7,7 @@ import ShareContent from "../../../../Components/ShareFile";
 import { REQUESTS_API } from "@env";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 import { IPostItem } from "../../../../Interfaces";
+import PostComments from "../../../_partials/PostComponents/Comments";
 
 export default function PostExplorerFooting(post: IPostItem) {
 
@@ -15,21 +16,14 @@ export default function PostExplorerFooting(post: IPostItem) {
     return (
         <View style={[styles.spaceBetween, { flexGrow: 1, padding: 10 }]}>
 
-            <TouchableOpacity style={[styles.spaceBetween, { width: 150, borderRadius: 50, overflow: 'hidden' }]}>
-                <SpanText
-                    children={`${formatNumber(0)} Comming soon`}
-                    style={{
-                        height: 25,
-                        paddingHorizontal: 10, width: '100%', fontSize: 11, backgroundColor: themeColors.background, borderRadius: 50
-                    }} />
-            </TouchableOpacity>
+            <PostComments {...post} />
 
             <LikeButton post={post} onLikeToggle={() => { }} />
+
             <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3 }]}>
                 <AntDesign size={15} color={themeColors.text} name='barchart' />
                 <SpanText style={{ fontSize: 18 }}>{formatNumber(post?.views as number)}</SpanText>
             </TouchableOpacity>
-
 
 
             <TouchableOpacity

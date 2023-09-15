@@ -22,6 +22,8 @@ import PostVideoItemList from '../PostType/_components/Video'
 import PostAudioItemList from '../PostType/_components/Audio'
 import PostImageItemList from '../PostType/_components/Image'
 import PostItemMenu from '../PostMenu'
+import PostComments from '../PostComponents/Comments'
+import PostAnalytics from '../PostComponents/Analytics/inedx'
 dayjs.extend(relativeTime)
 
 const StatusPostListItem = (post: IPostItem) => {
@@ -102,20 +104,8 @@ const UploadPostListItem = (post: IPostItem) => {
                 <View style={[styles.spaceBetween, { flexGrow: 1 }]}>
 
                     <LikeButton post={post} onLikeToggle={() => { }} />
-
-                    <TouchableOpacity style={[styles.spaceBetween, { padding: 0, gap: 3 }]}>
-                        <AntDesign size={15} color={themeColors.text} name='barchart' />
-                        <SpanText style={{ fontSize: 18 }}>{formatNumber(post?.views as number)}</SpanText>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={[styles.spaceBetween, { width: 100, borderRadius: 50, overflow: 'hidden' }]}>
-                        <SpanText
-                            children={`${formatNumber(1021)} Comment`}
-                            style={{
-                                height: 20,
-                                paddingHorizontal: 10, width: '100%', fontSize: 11, backgroundColor: themeColors.background2, borderRadius: 50
-                            }} />
-                    </TouchableOpacity>
+                    <PostAnalytics {...post} />
+                    <PostComments {...post} />
 
                     <TouchableOpacity
                         style={{ opacity: .4 }}
