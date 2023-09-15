@@ -18,7 +18,7 @@ export interface IMediaPlayable extends IPostItem {
     skipNextTo(props: number | 5): void
     skipPrevTo(props: number | 5): void
     remove(): void
-    connect?(props: IPostItem): void
+    connect?(props: IPostItem & { presenting?: boolean }): void
     setMediaState(props: (props: this['states']) => this['states']): void
     handleSeek(props: any): void
     handleLoad(props: any): void;
@@ -31,11 +31,35 @@ export interface IMediaPlayable extends IPostItem {
     states: {
         playState?: "paused" | "stopped" | "errored" | "ended" | "playing" | 'loading' | 'canPlay' | "seeking" | "shouldPlay"
         progress?: number
+        bufferProgress?: number
         duration?: number
+        isBufering?: boolean
+        position?:number
     }
     type: IMediaType
     mode?: "fullscreen" | "collapsed" | "floating" | "hidden",
-    previewing?: boolean
+    presenting?: boolean
+}
+
+
+export interface IMediaPlaybackUpdate {
+    "androidImplementation": "SimpleExoPlayer",
+    "audioPan": number,
+    "didJustFinish": boolean,
+    "durationMillis": number,
+    "isBuffering": boolean,
+    "isLoaded": boolean,
+    "isLooping": boolean,
+    "isMuted": boolean,
+    "isPlaying": boolean,
+    "playableDurationMillis": number,
+    "positionMillis": number,
+    "progressUpdateIntervalMillis": number,
+    "rate": string,
+    "shouldCorrectPitch": boolean,
+    "shouldPlay": boolean,
+    "uri": string,
+    "volume": number
 }
 
 

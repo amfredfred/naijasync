@@ -12,8 +12,7 @@ export const MediaViewer = forwardRef<Video, IMediaPlayable>((props, videoRef) =
 
     let Component = <></>
 
-    const postsForm =  usePostForm()
-    
+    if (props?.presenting) return null
 
     if (props?.type === 'video')
         Component = <VideoPlayer

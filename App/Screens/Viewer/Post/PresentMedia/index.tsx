@@ -12,9 +12,8 @@ import { REQUESTS_API } from "@env";
 import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
 import usePostForm from "../../../../Hooks/usePostForms";
 import React, { useRef } from 'react';
-import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { TextExpandable } from "../../../../Components/Texts";
-import PostItemMenu from "../../../_partials/PostMenu";
+import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useMediaPlaybackContext } from "../../../Statics/MediaViewer/Context";
 import VideoPresent from "./Video";
 
@@ -29,6 +28,8 @@ export default function PresentMedia(post: PresentMedia) {
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
     const [isBannerAdVisible, setisBannerAdVisible] = useState(true)
     const mediaContext = useMediaPlaybackContext()
+    const [isRewardAdReady, setisRewardAdReady] = useState(false)
+    const [hasEarnedRewards, sethasEarnedRewards] = useState(false)
 
     const { onClose, onPress } = post
     const { height } = useWindowDimensions()
@@ -39,6 +40,43 @@ export default function PresentMedia(post: PresentMedia) {
     const [isPostFocused, setIsPostFocused] = useState(false)
 
     let pressTimeout;
+
+    const adRewadedUnitId = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+
+    const rewarded = RewardedAd.createForAdRequest(adRewadedUnitId, {
+        requestNonPersonalizedAdsOnly: true,
+        keywords: ['clothing', 'technology'],
+    });
+
+    useEffect(() => {
+        const unsubscribe_subscribe = rewarded.addAdEventListener(RewardedAdEventType.LOADED, (status) => {
+            setisRewardAdReady(true)
+            console.log("READY", status)
+        })
+        const unsubscribe_earned_rewards = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (status) => {
+            setisRewardAdReady(false)
+            sethasEarnedRewards(true)
+            postForm?.methods?.updatePost({ rewards: (status?.amount / 4).toFixed(1), puid: post?.puid })
+            console.log("EARNED_REWRADS", status)
+        })
+
+        rewarded.load()
+        return () => {
+            unsubscribe_subscribe()
+            unsubscribe_earned_rewards()
+            sethasEarnedRewards(false)
+            setisRewardAdReady(false)
+        }
+    }, [])
+
+    const showREwardedAd = async () => {
+        if (isRewardAdReady) {
+            console.log("REWARDS AD READY")
+            await rewarded.show()
+        } else {
+            console.log("REWARDS ADS NOT READY")
+        }
+    }
 
     const handleOnPress = () => {
         // Check the press duration to determine if it's a long-press or a short press
@@ -55,7 +93,10 @@ export default function PresentMedia(post: PresentMedia) {
         // Handle long-press here, or leave it empty if you don't want to do anything
     };
 
-    const onRequestClose = () => {
+
+    const onRequestClose = async () => {
+        console.log(isRewardAdReady, rewarded.loaded, ':: rewaded ad satte')
+        showREwardedAd()
         onClose?.()
     }
 
@@ -99,7 +140,7 @@ export default function PresentMedia(post: PresentMedia) {
             <RNAnimated.View
                 style={{ flexGrow: 1 }}>
                 <TouchableOpacity
-                    activeOpacity={0.9}
+                    activeOpacity={1}
                     onLongPress={handleOnLongPress}
                     onPress={handleOnPress}
                     style={{ flexGrow: 1 }}>
@@ -114,7 +155,9 @@ export default function PresentMedia(post: PresentMedia) {
             {
                 post?.description && (
                     <TextExpandable
-                        hidden={!post?.description} style={{ fontSize: 17, lineHeight: 23, padding: 10, paddingBottom: 5 }} children={post?.description} />
+                        hidden={!post?.description}
+                        style={{   padding: 10, paddingBottom: 5 }}
+                        children={post?.description} />
                 )
             }
             {isBannerAdVisible && <View style={[styles.bannerAdContainer, { overflow: 'hidden' }]}>
@@ -127,7 +170,7 @@ export default function PresentMedia(post: PresentMedia) {
                 />
                 <IconButton onPress={() => setisBannerAdVisible(false)} icon={<Ionicons name="close" />} />
             </View>}
-            <PostExplorerFooting {...post} />
+            <PostExplorerFooting {...post}  />
         </View>
     )
 
@@ -143,7 +186,7 @@ export default function PresentMedia(post: PresentMedia) {
                 {isPostFocused || posFooting}
             </View>
         </ThemedModal>
-    ), [post?.puid, isPostFocused, isBannerAdVisible])
+    ), [post?.puid, isPostFocused, isBannerAdVisible, isRewardAdReady])
 }
 
 const styles = StyleSheet.create({
@@ -154,7 +197,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 10,
-        position: 'absolute',
         top: 0,
         backgroundColor: 'rgba(0,0,0,0.2)'
     },
@@ -172,9 +214,10 @@ const styles = StyleSheet.create({
     },
     posFooting: {
         width: '100%',
-        position: 'absolute',
         bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        position: 'absolute',
+        backgroundColor: 'rgba(0,0,0,0.2)'
+
     }
 })

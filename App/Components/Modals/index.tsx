@@ -23,7 +23,7 @@ export default function ThemedModal(modalprops: IThemedmodal) {
                     </View>}
                     <ScrollView
                         showsVerticalScrollIndicator={false}
-                        style={{ flexGrow: 1, width: '100%' }}>
+                        style={{ flexGrow: 1, width: '100%'}}>
                         {children}
                     </ScrollView>
                 </View>

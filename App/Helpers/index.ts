@@ -109,15 +109,16 @@ export function formatDuration(durationInSeconds: number): string {
 export function formatPlaytimeDuration(durationInSeconds: number): string {
     const hours = Math.floor(durationInSeconds / 3600);
     const minutes = Math.floor((durationInSeconds % 3600) / 60);
-    const seconds = durationInSeconds % 60;
-
+    const seconds = Math.floor(durationInSeconds % 60);
     const parts = [];
-    if (hours > 0) parts.push(hours.toString().padStart(2, '0'));
+    if (hours > 0) {
+        parts.push(hours.toString().padStart(2, '0'));
+    }
     parts.push(minutes.toString().padStart(2, '0'));
-    parts.push(formatDecimal(seconds, 0).padStart(2, '0'));
-
+    parts.push(seconds.toString().padStart(2, '0'));
     return parts.join(':');
 }
+
 
 export function linkChecker({ link }) {
     const patterns = [

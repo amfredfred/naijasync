@@ -1,11 +1,10 @@
 import { } from 'react-native'
 import { useReducer, createContext, useContext, useEffect, useRef, useState } from 'react'
-import { IMediaViewer, IMediaViewerProvider, IMediaPlayable, IMediaType, } from '../Interface'
+import { IMediaViewer, IMediaViewerProvider, IMediaPlayable, IMediaType, IMediaPlaybackUpdate, } from '../Interface'
 import { Audio, Video } from 'expo-av'
 import MediaViewer from '..'
 import { getMediaType, wait } from '../../../../Helpers'
 import { REQUESTS_API } from '@env'
-import usePostForm from '../../../../Hooks/usePostForms'
 
 const initialState: IMediaViewer = {
     presenting: false
@@ -28,25 +27,31 @@ export function MediaViewerProvider({ children }) {
     }
 
     const mediaRef = useRef<Video>(null)
-    const audioObjectRef = useRef<Audio.SoundObject>(null); 
+    const audioObjectRef = useRef<Audio.SoundObject>(null);
 
-    const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({});
+    const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({
+        duration: 0,
+        position: 0,
+        progress: 0,
+        bufferProgress: 0
+    });
     let mediaType: IMediaType = getMediaType(data.fileUrl);
     const removeMedia: IMediaViewerProvider['removeMedia'] = () => {
         dispatch({ payload: { fileUrl: '' } })
     }
 
-    const handlePlaybackStatusUpdate = (data) => {
+    const handlePlaybackStatusUpdate = (data: IMediaPlaybackUpdate) => {
         if (data?.isLoaded && !data.isPlaying && data.didJustFinish) {
-            console.log('Media playback has ended.');
-            setMediaState(s => s = ({ playState: 'ended' }));
+            return setMediaState(s => s = ({ ...s, playState: 'ended' }));
         }
         const { positionMillis, playableDurationMillis, durationMillis } = data;
-        const calculatedProgress = (positionMillis / playableDurationMillis) * 100;
         setMediaState((prevState) => ({
             ...prevState,
-            progress: Number((calculatedProgress ?? 0).toFixed(0)),
-            duration: durationMillis / 1000
+            progress: Number(positionMillis / durationMillis),
+            position: positionMillis / 1000,
+            duration: durationMillis / 1000,
+            bufferProgress: Number(positionMillis / playableDurationMillis),
+            isBufering: data.isBuffering
         }));
     };
 
@@ -79,7 +84,7 @@ export function MediaViewerProvider({ children }) {
                 const playbackObject = await Audio.Sound.createAsync?.(
                     { uri: `${REQUESTS_API}${data?.fileUrl}` },
                     { shouldPlay: shouldPlay },
-                    handlePlaybackStatusUpdate
+                    handlePlaybackStatusUpdate as any
                 );
                 await Audio.setAudioModeAsync({
                     allowsRecordingIOS: false,
@@ -96,7 +101,7 @@ export function MediaViewerProvider({ children }) {
                 }, true);
             }
             setMediaState(S => ({ ...S, playState: 'canPlay' }))
-            await play()
+            play()
         } catch (error) {
             console.log("ERROR: loadMediaPlayable-> ", error)
             // await clearAllRefs()
@@ -107,10 +112,9 @@ export function MediaViewerProvider({ children }) {
     useEffect(() => {
 
         if (mediaType) {
+            setMediaState(S => ({ ...S, playState: 'loading' }))
             loadMediaPlayable();
         }
-
-        console.log('ref chnaged', mediaRef)
 
         return () => {
             clearAllRefs()
@@ -121,9 +125,15 @@ export function MediaViewerProvider({ children }) {
     const play = async () => {
         try {
             if (mediaType === 'audio') {
-                await audioObjectRef?.current?.sound?.playAsync();
+                if (mediaState?.playState === 'ended')
+                    await audioObjectRef?.current?.sound?.replayAsync();
+                else
+                    await audioObjectRef?.current?.sound?.playAsync();
             } else if (mediaType === 'video') {
-                await mediaRef?.current?.playAsync();
+                if (mediaState?.playState === 'ended')
+                    await mediaRef?.current?.replayAsync();
+                else
+                    await mediaRef?.current?.playAsync();
             }
             setMediaState((prevState) => ({ ...prevState, playState: 'playing' }));
         } catch (error) {
@@ -164,6 +174,7 @@ export function MediaViewerProvider({ children }) {
     }
 
     const connect: IMediaPlayable['connect'] = async (props) => {
+        dispatch({ 'key': 'presenting', payload: props?.presenting })
         try {
             setMedia(props)
             await play()

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useThemeColors from "../../Hooks/useThemeColors";
 import { useDataContext } from "../../Contexts/DataContext";
 import React from 'react';
-// import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useNavigation } from "@react-navigation/native";
 import PostsList from "../__/PostsList";
 import { useQuery } from '@tanstack/react-query';

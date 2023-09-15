@@ -48,7 +48,7 @@ export const TextExpandable = (props) => {
         // Check the press duration to determine if it's a long-press or a short press
         pressTimeout = setTimeout(() => {
             // Long press (do nothing)
-        }, 500); // Adjust the duration as needed
+        }, 200); // Adjust the duration as needed
 
         setIsExpanded(!isExpanded);
         props?.onPress?.();
@@ -62,13 +62,16 @@ export const TextExpandable = (props) => {
 
     return (
         <SpanText
+            hidden={typeof props.children !== 'string'}
             ellipsizeMode="tail"
             selectable
             textBreakStrategy="highQuality"
             numberOfLines={isExpanded ? undefined : 3}
             onPress={handleOnPress}
             onLongPress={handleOnLongPress} // Handle long-press here
-            style={[{ fontSize: 14, fontWeight: '200', lineHeight: 18 }, props?.style]}
+            style={[{
+                fontSize: 14, fontWeight: '200', lineHeight: 18, height: isExpanded ? undefined : 60
+            }, props?.style]}
         >
             {props.children}
         </SpanText>
