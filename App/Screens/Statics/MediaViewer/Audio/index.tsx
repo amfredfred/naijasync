@@ -1,5 +1,5 @@
 import { View, StyleSheet, Dimensions, Text, Image, TouchableOpacity, FlatList } from 'react-native'
-import Animated, { SlideInDown } from 'react-native-reanimated'
+import Animated, { SlideInDown, SlideInLeft, SlideOutLeft } from 'react-native-reanimated'
 import { IMediaPlayable } from '../Interface'
 import { Audio } from 'expo-av'
 import { forwardRef, useState } from 'react'
@@ -8,11 +8,15 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import useThemeColors from '../../../../Hooks/useThemeColors'
 import { useToast } from '../../../../Contexts/ToastContext'
 import useKeyboardEvent from '../../../../Hooks/useKeyboardEvent'
+import MediaPlayerControls from '../../../_partials/PlayerControls'
+import { SpanText } from '../../../../Components/Texts'
+import { formatPlaytimeDuration } from '../../../../Helpers'
+import { ThemeProvider } from 'react-native-paper'
 
 const { width, height } = Dimensions.get('window')
 
-const AudioPlayer = forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) => {
-    const { thumbnailUrl, previewing, ...AV } = props
+export default forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) => {
+    const { thumbnailUrl, presenting, ...AV } = props
     const colors = useThemeColors()
     const { toast } = useToast()
 
@@ -21,12 +25,7 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) =
         setisShwoingList(s => !s)
     }
 
-    const [isKeyboadVisible, setisKeyboadVisible] = useState(false)
 
-    useKeyboardEvent({
-        onShow: () => setisKeyboadVisible(true),
-        onHide: () => setisKeyboadVisible(false)
-    })
 
 
     const handleRefreshAudioList = () => {
@@ -35,7 +34,8 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) =
 
     const AudioList = (
         <Animated.View
-            entering={SlideInDown}
+            entering={SlideInLeft}
+            exiting={SlideOutLeft}
             style={[styles.audioListContainer]}>
             <FlatList
                 stickyHeaderHiddenOnScroll
@@ -93,7 +93,6 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) =
                                         onPress={() => {
                                             AV.fileUrl !== item.fileUrl ? AV?.connect(item) : AV.fileUrl === item.fileUrl && AV.states?.playState === 'paused' ? AV?.play() : AV.pause()
                                         }}     >
-                                        {/* props?.connect(item?.fileUrl, item.thumbnailUrl) */}
                                         <Ionicons
                                             size={25}
                                             color={colors.text}
@@ -110,92 +109,83 @@ const AudioPlayer = forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) =
         </Animated.View>
     )
 
-    if (isKeyboadVisible) return null
+
     return (
-        <Animated.View
-            style={[styles.container, { backgroundColor: colors.background, position: isShwoingList ? 'absolute' : 'relative' }]}>
-            {!isShwoingList || AudioList}
-
-            <View style={[{ backgroundColor: colors.background2 }]}>
-
-                <View style={styles.progressBarContainer}>
-                    <View style={[styles.progressBar, { width: `${AV?.states.progress ?? 0}%` }]} />
-                </View>
-                <View style={[styles.spaceBetween]}>
-                    <TouchableOpacity
+        <Animated.View style={[styles.container, styles.spaceBetween]}>
+            <View style={{ gap: 10, flex: 1, padding: 5, backgroundColor: colors.background2, borderTopRightRadius: 10 }}>
+                <View style={{ gap: 10 }}>
+                    <IconButton
                         onPress={AV?.remove}
-                        style={{ borderRadius: 50, backgroundColor: colors.background, overflow: 'hidden' }}>
-                        <Image
-                            source={{ uri: thumbnailUrl }}
-                            style={{ width: 40, aspectRatio: 1 }}
-                            resizeMethod='resize'
-                            resizeMode='contain'
-                        />
-                    </TouchableOpacity>
-
-                    <View
-                        style={{ padding: 0, flex: 1 }} >
-                        <TouchableOpacity  >
-                            {AV?.title && <Text children={AV?.title} style={{ padding: 0, fontWeight: '800', fontSize: 18, color: colors.text }} />}
-                            <Text numberOfLines={1} children={AV?.description} style={{ fontSize: 11, fontWeight: '300', color: colors.text }} />
-                        </TouchableOpacity>
-                    </View>
-
+                        icon={<MaterialIcons
+                            name={'close'}
+                            color={colors.text}
+                            size={25}
+                        />}
+                    />
                     <IconButton
                         onPress={handleToggleAudioList}
                         icon={<MaterialIcons
-                            name={isShwoingList ? 'close' : 'queue-music'}
+                            name={isShwoingList ? 'arrow-back' : 'queue-music'}
                             color={colors.text}
-                            size={40}
-                        />}
-                    />
-                    <IconButton
-                        onPress={AV.states.playState === 'playing' ? AV?.pause : AV.play}
-                        containerStyle={{}}
-                        icon={<Ionicons
-                            name={AV.states.playState === 'playing' ? 'pause-circle' : 'play-circle'}
-                            color={colors.text}
-                            size={40}
+                            size={25}
                         />}
                     />
                 </View>
+
+                <View style={{ alignItems: 'center',  justifyContent: 'center' }}>
+                    <SpanText
+                        hidden={!AV?.states?.duration}
+                        style={{ fontSize: 10 }}
+                        children={formatPlaytimeDuration(AV?.states?.position)} />
+                    <SpanText children='/' />
+                    <SpanText
+                        hidden={!AV?.states?.duration}
+                        style={{ fontSize: 10 }}
+                        children={formatPlaytimeDuration(AV?.states?.duration)} />
+                </View>
+                <IconButton
+                    containerStyle={{}}
+                    onPress={AV.states.playState === 'playing' ? AV?.pause : AV.play}
+                    icon={<Ionicons
+                        name={AV.states.playState === 'playing' ? 'pause-circle' : 'play-circle'}
+                        color={colors.text}
+                        size={25}
+                    />}
+                />
             </View>
+            {!isShwoingList || AudioList}
         </Animated.View>
     )
 
 })
 
-export default AudioPlayer
-
-
 const styles = StyleSheet.create({
     container: {
-        padding: 0,
-        width: '100%',
+        position: 'absolute',
+        left: 0,
         bottom: 0,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20
+        width: 50,
     },
     spaceBetween: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-end',
         'justifyContent': 'space-between',
-        paddingBottom: 6,
-        paddingHorizontal: 5,
-        gap: 10
+        gap: 5
     },
     audioListContainer: {
-        borderTopLeftRadius: 5,
-        borderTopRightRadius: 5,
-        maxHeight: height / 2,
-        width: '100%',
+        borderRadius: 10,
+        width: width - 60,
+        height: height / 3,
+        position: 'absolute',
+        left: 55
     },
     audioListItem: {
         height: 50,
         paddingHorizontal: 0,
         marginBottom: 10,
         borderRadius: 10,
-        overflow: 'hidden'
+        overflow: 'hidden',
+
     },
     audiolistItemImage: {
         height: 50,
@@ -213,30 +203,5 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center'
-    },
-
-
-    button: {
-
-    },
-    progressBarContainer: {
-        width: '100%',
-        height: 2,
-        backgroundColor: '#ccc',
-        marginBottom: 10,
-    },
-    progressBar: {
-        height: '100%',
-        backgroundColor: 'red',
-    },
-    seekContainer: {
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
-        height: 20,
-    },
-    seekBar: {
-        height: '100%',
-        backgroundColor: 'transparent',
-    },
+    }
 })

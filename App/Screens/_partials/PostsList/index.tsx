@@ -1,7 +1,7 @@
 import { View, FlatList, RefreshControl, StyleSheet } from 'react-native'
 import { IPostItem } from '../../../Interfaces'
 import PostItem from '../PostItem'
-import useThemeColors from '../../../Hooks/useThemeColors' 
+import useThemeColors from '../../../Hooks/useThemeColors'
 import { SpanText } from '../../../Components/Texts'
 
 interface IPostList {

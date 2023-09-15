@@ -1,16 +1,15 @@
-import { Overlay, ScrollContainer } from "../../../../Components/Containers";
+import { Overlay } from "../../../../Components/Containers";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 import { Video, ResizeMode } from "expo-av";
-import { IThemedComponent } from "../../../../Interfaces";
 import { useState, forwardRef, useEffect, useRef } from 'react'
 import { IconButton } from "../../../../Components/Buttons";
-import { IMediaPlayable, IMediaViewer } from "../Interface";
-import { View, StyleSheet, Dimensions, StatusBar, PanResponder, Text, BackHandler, TouchableOpacity, ScrollView, FlatList } from 'react-native'
+import { IMediaPlayable } from "../Interface";
+import { View, StyleSheet, Dimensions, StatusBar, PanResponder, Text, BackHandler, TouchableOpacity, ScrollView } from 'react-native'
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import useTimeout from "../../../../Hooks/useTimeout";
-import { formatDuration, formatPlaytimeDuration, wait } from "../../../../Helpers";
+import { formatPlaytimeDuration, wait } from "../../../../Helpers";
 import { useNavigation } from "@react-navigation/native";
 import ShareContent from "../../../../Components/ShareFile";
 import { Videos } from "../../../../dummy-data";
@@ -22,7 +21,7 @@ const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
 
-const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
+export default forwardRef<Video, IMediaPlayable>((props, ref) => {
 
     const colors = useThemeColors()
     const [isShwoingControls, setisShwoingControls] = useState(false)
@@ -124,8 +123,6 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
         setisVideoLoading(true)
         VP?.handleLoadStart()
     }
-
-
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
@@ -363,15 +360,12 @@ const VideoPlayer = forwardRef<Video, IMediaPlayable>((props, ref) => {
                         hidden={(!isVideoLoading)}
                         imageSource={VP?.thumbnailUrl}
                     />
+                    
                     <Video
                         posterSource={{ uri: VP?.thumbnailUrl }}
                         style={[styles.video]}
                         resizeMode={ResizeMode.CONTAIN}
-                        onLoad={handleOnLoad}
-                        onLoadStart={handleOnStartLoad}
-                        onError={VP?.handleError}
                         ref={ref}
-                        onPlaybackStatusUpdate={VP.handlePlaybackStatusUpdate}  // Can be a URL or a local file.
                     />
 
                     {MediaControls}
@@ -491,5 +485,3 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10
     },
 });
-
-export default VideoPlayer

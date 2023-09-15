@@ -1,19 +1,18 @@
 import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { HeadLine, SpanText } from "../../../Components/Texts";
-import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { HeadLine, SpanText, TextExpandable } from "../../../Components/Texts";
+import {  MaterialIcons } from "@expo/vector-icons";
 import useThemeColors from "../../../Hooks/useThemeColors";
 import { IPostItem } from "../../../Interfaces";
-import { REQUESTS_API } from "@env";
-import LikeButton from "../../_partials/PostComponents/Like";
-import ShareContent from "../../../Components/ShareFile";
-import { formatNumber } from "../../../Helpers";
+import { REQUESTS_API } from "@env"; 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import PostExplorerFooting from "./Footing";
+import PostItemMenu from "../../_partials/PostMenu";
+import { useState } from "react";
 dayjs.extend(relativeTime)
 
 export default function ExplorerPostItemWrapper({ post, children }: { post: IPostItem, children: React.ReactNode }) {
-
+    const [isMenuModalVisile, setisMenuModalVisile] = useState(false)
     const themeColors = useThemeColors()
 
     return (
@@ -42,6 +41,7 @@ export default function ExplorerPostItemWrapper({ post, children }: { post: IPos
                             </View>
                         </View>
                         <TouchableOpacity
+                            onPressIn={() => setisMenuModalVisile(true)}
                             onPress={null}
                             children={<MaterialIcons
                                 size={23}
@@ -54,15 +54,16 @@ export default function ExplorerPostItemWrapper({ post, children }: { post: IPos
             </View>
             <View >
                 <SpanText hidden={!post?.title} >{post.title}</SpanText>
-                <SpanText hidden={!post?.description} style={{ fontSize: 16, padding: 5 }}
+                <TextExpandable  style={{   padding: 5 }}
                     numberOfLines={2}
                     ellipsizeMode='tail'
                     selectable textBreakStrategy="highQuality">
                     {post?.description}
-                </SpanText>
+                </TextExpandable>
             </View>
             {children}
             <PostExplorerFooting {...post} />
+            <PostItemMenu {...post} visible={isMenuModalVisile} onRequestClose={() => setisMenuModalVisile(false)} />
         </View>
     )
 }

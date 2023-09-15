@@ -65,7 +65,7 @@ export interface IMediaPlaybackUpdate {
 
 
 export interface IMediaViewerProvider extends IMediaPlayable {
-    setMedia(props: IPostItem): void;
+    setMedia(props: IPostItem & { presenting?: boolean }): void;
     removeMedia: IMediaPlayable['remove']
 }
 

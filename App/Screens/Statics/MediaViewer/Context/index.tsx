@@ -5,6 +5,7 @@ import { Audio, Video } from 'expo-av'
 import MediaViewer from '..'
 import { getMediaType, wait } from '../../../../Helpers'
 import { REQUESTS_API } from '@env'
+import { useToast } from '../../../../Contexts/ToastContext'
 
 const initialState: IMediaViewer = {
     presenting: false
@@ -22,6 +23,8 @@ export function MediaViewerProvider({ children }) {
 
     const [data, dispatch] = useReducer(mediaReducer, initialState)
 
+    const { toast } = useToast()
+
     const setMedia: IMediaViewerProvider['setMedia'] = (props) => {
         dispatch({ payload: props })
     }
@@ -36,8 +39,17 @@ export function MediaViewerProvider({ children }) {
         bufferProgress: 0
     });
     let mediaType: IMediaType = getMediaType(data.fileUrl);
+
+    const clearAllRefs = async () => {
+        mediaType = null
+        await mediaRef?.current?.unloadAsync?.()
+        await audioObjectRef?.current?.sound?.unloadAsync?.()
+        setMediaState({});
+    }
+
     const removeMedia: IMediaViewerProvider['removeMedia'] = () => {
-        dispatch({ payload: { fileUrl: '' } })
+        clearAllRefs()
+        setMedia({ fileUrl: null, presenting: false })
     }
 
     const handlePlaybackStatusUpdate = (data: IMediaPlaybackUpdate) => {
@@ -72,11 +84,6 @@ export function MediaViewerProvider({ children }) {
         setMediaState((prevState) => ({ ...prevState, duration: data.durationMillis }));
     };
 
-    const clearAllRefs = async () => {
-        setMediaState({});
-        await mediaRef?.current?.unloadAsync?.()
-        await audioObjectRef?.current?.sound?.unloadAsync?.()
-    }
 
     const loadMediaPlayable = async (shouldPlay?: boolean) => {
         try {
@@ -99,11 +106,19 @@ export function MediaViewerProvider({ children }) {
                 await mediaRef?.current?.loadAsync?.({ uri: `${REQUESTS_API}${data?.fileUrl}` }, {
                     'shouldCorrectPitch': true,
                 }, true);
+
+                mediaRef?.current?.setOnPlaybackStatusUpdate(states => handlePlaybackStatusUpdate(states as any))
             }
             setMediaState(S => ({ ...S, playState: 'canPlay' }))
             play()
         } catch (error) {
             console.log("ERROR: loadMediaPlayable-> ", error)
+            toast({
+                message: "error occured while loading media !!",
+                timeout: 5000,
+                severnity: 'error',
+                headline: 'Error loading '.concat(mediaType)
+            })
             // await clearAllRefs()
             setMediaState(S => ({ ...S, playState: 'errored' }))
         }
@@ -164,13 +179,7 @@ export function MediaViewerProvider({ children }) {
     }
 
     const remove: IMediaPlayable['remove'] = async () => {
-        try {
-            removeMedia()
-            clearAllRefs()
-            console.log("REMOVE CALLED")
-        } catch (error) {
-            console.log("ERROR: remove-> ", error)
-        }
+        removeMedia()
     }
 
     const connect: IMediaPlayable['connect'] = async (props) => {

@@ -3,19 +3,16 @@ import { IPostItem } from '../../../Interfaces'
 import useThemeColors from '../../../Hooks/useThemeColors'
 import { HeadLine, SpanText, TextExpandable } from '../../../Components/Texts'
 import { REQUESTS_API } from '@env'
-import { formatNumber, getMediaType } from '../../../Helpers'
-import { AntDesign, Ionicons, MaterialIcons, Octicons } from '@expo/vector-icons'
+import {  getMediaType } from '../../../Helpers'
+import {  Ionicons, MaterialIcons,  } from '@expo/vector-icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ShareContent from '../../../Components/ShareFile'
 import { IconButton } from '../../../Components/Buttons'
 import { ScrollView, } from 'react-native-gesture-handler'
 import LikeButton from '../PostComponents/Like'
-import ThemedModal from '../../../Components/Modals'
 import { useState } from 'react'
-import MenuItem from '../../../Components/MenuItem'
 import { useAuthContext } from '../../../Contexts/AuthContext'
-import { ContainerSpaceBetween } from '../../../Components/Containers'
 import ProfileAvatar from '../../../Components/ProfileAvatar'
 import { useNavigation } from '@react-navigation/native'
 import PostVideoItemList from '../PostType/_components/Video'
@@ -37,9 +34,9 @@ const StatusPostListItem = (post: IPostItem) => {
 }
 
 const UploadPostListItem = (post: IPostItem) => {
-    const themeColors = useThemeColors()
     const [isMenuModalVisile, setisMenuModalVisile] = useState(false)
-    const authContext = useAuthContext()
+    const { navigate } = useNavigation()
+    const themeColors = useThemeColors()
 
     // 
     const fileType = getMediaType(post?.fileUrl)
@@ -51,8 +48,6 @@ const UploadPostListItem = (post: IPostItem) => {
     else if (fileType === 'audio')
         PostComponent = <PostAudioItemList {...post} />
 
-
-    const { navigate } = useNavigation()
 
     const UploadPostListItemContentRow = (
         <View

@@ -112,7 +112,7 @@ function Routes() {
             <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name='PostComposer' component={PostComposer} />
             <Stack.Screen name="Account" component={AccountRoutes} />
-            <Stack.Screen name='ViewPost' component={PostViewer} />
+            {/* <Stack.Screen name='ViewPost' component={PostViewer} /> */}
         </Stack.Navigator>
     )
 

@@ -7,7 +7,7 @@ import { IconButton } from "../../../Components/Buttons"
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import useThemeColors from "../../../Hooks/useThemeColors"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import { REQUESTS_API } from "@env"
@@ -19,6 +19,7 @@ import LikeButton from "../../_partials/PostComponents/Like"
 import { formatNumber } from "../../../Helpers"
 import ShareContent from "../../../Components/ShareFile"
 import ExplorerPostItemWrapper from "../Wrapper"
+import PresentMedia from "../../Viewer/Post/PresentMedia"
 
 export default function VideoExplorer() {
 
@@ -26,7 +27,6 @@ export default function VideoExplorer() {
     const { exploring, genre, screen } = params as any
     const { height, width } = useWindowDimensions()
     const authContext = useAuthContext()
-    console.log(params)
 
     const [Videos, setVideos] = useState<IPostItem[]>()
 
@@ -80,39 +80,39 @@ export default function VideoExplorer() {
         </ContainerSpaceBetween>
     )
 
-    const VideoComponent = (props: IPostItem) => {
 
+    const VideoComponent = (post: IPostItem) => {
+        const [isPresentingMedia, setisPresentingMedia] = useState(false)
         const mediaPlayer = useMediaPlaybackContext()
-
         return (
-            <ExplorerPostItemWrapper post={props} >
-                <View style={[styles.vieoContainer]}>
+            <ExplorerPostItemWrapper post={post} >
+                <TouchableOpacity
+                    onPress={() => setisPresentingMedia(true)}
+                    style={[styles.vieoContainer]}>
                     <View style={[styles.overlay]}
-                        children={<Ionicons onPress={() => mediaPlayer.setMedia(props)}
-                            name="play-circle" size={40} color={text} />}
-                    />
+                        children={<Ionicons onPress={() => mediaPlayer.setMedia(post)}
+                            name="play-circle" size={40} color={text} />}   />
                     <Image
                         resizeMethod="resize"
                         resizeMode="cover"
                         style={[styles.videoThumbImage]}
-                        source={{ uri: `${REQUESTS_API}${props?.thumbnailUrl ?? props?.fileUrl}` }}
-                    />
+                        source={{ uri: `${REQUESTS_API}${post?.thumbnailUrl ?? post?.fileUrl}` }}   />
                     {
-                        !props?.thumbnailUrl && (
+                        !post?.thumbnailUrl && (
                             <Video
                                 resizeMode={ResizeMode.CONTAIN}
                                 style={[styles.videoComponent, { backgroundColor: background }]}
                                 ref={mediaPlayer?.mediaRef}
-                                source={{ 'uri': `${REQUESTS_API}${props?.fileUrl}` }}
-                            />
+                                source={{ 'uri': `${REQUESTS_API}${post?.fileUrl}` }} />
                         )
                     }
-                </View>
+                </TouchableOpacity>
+                {isPresentingMedia && (<PresentMedia onClose={() => setisPresentingMedia(false)}   {...post} />)}
             </ExplorerPostItemWrapper>
         )
     }
 
-    return (
+    return useMemo(() => (
         <FlatList
             stickyHeaderHiddenOnScroll
             stickyHeaderIndices={[0]}
@@ -121,7 +121,7 @@ export default function VideoExplorer() {
             refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
             renderItem={({ index, item }) => <VideoComponent {...item} />}
         />
-    )
+    ), [$videos.data?.data])
 }
 
 const styles = StyleSheet.create({
