@@ -3,8 +3,8 @@ import { IPostItem } from '../../../Interfaces'
 import useThemeColors from '../../../Hooks/useThemeColors'
 import { HeadLine, SpanText, TextExpandable } from '../../../Components/Texts'
 import { REQUESTS_API } from '@env'
-import {  getMediaType } from '../../../Helpers'
-import {  Ionicons, MaterialIcons,  } from '@expo/vector-icons'
+import { getMediaType } from '../../../Helpers'
+import { Ionicons, MaterialIcons, } from '@expo/vector-icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ShareContent from '../../../Components/ShareFile'
@@ -123,7 +123,7 @@ const UploadPostListItem = (post: IPostItem) => {
     return (
         <TouchableOpacity
             activeOpacity={.9}
-            onPress={() => (navigate as any)?.("ViewPost", { post: post })} style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background, marginBottom: 6 }}>
+            onPress={() => (navigate as any)?.("ViewPost", { post })} style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background, marginBottom: 6 }}>
             <View style={[styles.postWrapper]}>
                 <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
                     <ProfileAvatar  {...post?.owner} avatarOnly />

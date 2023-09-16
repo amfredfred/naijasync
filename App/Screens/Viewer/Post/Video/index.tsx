@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { IconButton } from "../../../../Components/Buttons";
 import { View, StyleSheet, Dimensions, StatusBar, Text, RefreshControl, TouchableOpacity, ScrollView, FlatList, Image, ImageBackground, BackHandler } from 'react-native'
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay, FadeOutDown, FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay,   FadeIn, FadeOut } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { wait } from "../../../../Helpers";
 import { useRoute } from "@react-navigation/native";
@@ -131,7 +131,7 @@ export default function PlayVideo() {
                 rewards: ((rewardedInterstitialAd?.reward?.amount / 100) * 70).toFixed(3),
                 puid: mediaContext?.puid
             })
-            // reward the  user
+            // reward the user
             if (authContext?.user?.person === 'isAuthenticated') {
                 authContext?.updateAccount({
                     points: (rewardedInterstitialAd?.reward?.amount / 100) * 30
