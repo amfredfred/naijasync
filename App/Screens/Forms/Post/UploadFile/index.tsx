@@ -15,7 +15,7 @@ import { Audio, Video, ResizeMode } from "expo-av";
 import { getMediaType } from '../../../../Helpers';
 import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
 import { IMediaType } from '../../../../Interfaces';
-import { IMediaPlayable } from '../../../Statics/MediaViewer/Interface';
+import { IMediaPlayable } from '../../../Statics/Interface';
 import usePostForm from "../../../../Hooks/usePostForms";
 import { useDataContext } from "../../../../Contexts/DataContext";
 

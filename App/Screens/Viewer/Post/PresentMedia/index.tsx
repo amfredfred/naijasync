@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, createRef } from "react";
+import { useEffect,  useState,   } from "react";
 import ThemedModal from "../../../../Components/Modals";
 import { IPostItem } from "../../../../Interfaces";
 import { ScrollView, StyleSheet, View, useWindowDimensions, Animated as RNAnimated, TouchableOpacity } from "react-native";
@@ -9,14 +9,13 @@ import { IconButton } from "../../../../Components/Buttons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 import ImagePresent from "./Image";
 import { REQUESTS_API } from "@env";
-import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
 import usePostForm from "../../../../Hooks/usePostForms";
 import React, { useRef } from 'react';
-import { TextExpandable } from "../../../../Components/Texts";
 import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import { useMediaPlaybackContext } from "../../../Statics/MediaViewer/Context";
 import VideoPresent from "./Video";
-import MediaPlayerControls from "../../../_partials/PlayerControls";
+import useMediaPlayback from "../../../../Hooks/usemediaPlayback";
+import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
+import { TextExpandable } from "../../../../Components/Texts";
 import { LinearGradient } from "expo-linear-gradient";
 
 
@@ -25,13 +24,11 @@ type PresentMedia = IPostItem & {
 }
 
 export default function PresentMedia(post: PresentMedia) {
-
+    const [isRewardAdReady, setisRewardAdReady] = useState(false)
+    const [hasEarnedRewards, sethasEarnedRewards] = useState(false)
     //ads
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
     const [isBannerAdVisible, setisBannerAdVisible] = useState(true)
-    const mediaContext = useMediaPlaybackContext()
-    const [isRewardAdReady, setisRewardAdReady] = useState(false)
-    const [hasEarnedRewards, sethasEarnedRewards] = useState(false)
 
     const { onClose, onPress } = post
     const { height } = useWindowDimensions()
@@ -111,6 +108,10 @@ export default function PresentMedia(post: PresentMedia) {
         console.log('reloaded')
     }, [])
 
+
+
+
+
     const RenderPost = () => {
         switch (post?.postType) {
             case 'UPLOAD': {
@@ -156,27 +157,11 @@ export default function PresentMedia(post: PresentMedia) {
         </ScrollView>
     )
 
-    const posFooting = (
+
+    const postFooting = (
         <LinearGradient
             colors={['transparent', 'transparent', 'black']}
             style={[styles.posFooting]}>
-            <View style={{ height: 35 }}>
-                <MediaPlayerControls
-                    hidden={!mediaContext?.mediaRef?.current}
-                    {...mediaContext?.states}
-                    Button={
-                        <IconButton
-                            onPress={mediaContext.states.playState === 'playing' ? mediaContext?.pause : mediaContext.play}
-                            containerStyle={{ backgroundColor: 'transparent' }}
-                            style={{ width: 35, backgroundColor: 'transparent' }}
-                            icon={<Ionicons
-                                name={mediaContext?.states?.playState === 'playing' ? 'pause' : 'play'}
-                                color={'white'}
-                                size={35}
-                            />}
-                        />
-                    } />
-            </View>
             <TextExpandable
                 hidden={!post?.description}
                 style={{ padding: 10, paddingBottom: 5 }}
@@ -195,6 +180,7 @@ export default function PresentMedia(post: PresentMedia) {
         </LinearGradient>
     )
 
+
     return (
         <ThemedModal
             hideBar
@@ -204,12 +190,12 @@ export default function PresentMedia(post: PresentMedia) {
             <View style={{ backgroundColor: themeColors.background, height }}>
                 {isPostFocused || postHeading}
                 {postContent}
-                {isPostFocused || posFooting}
+                {isPostFocused || postFooting}
             </View>
         </ThemedModal>
     )
 }
-    
+
 
 const styles = StyleSheet.create({
     viewerHeading: {
@@ -237,8 +223,7 @@ const styles = StyleSheet.create({
     posFooting: {
         width: '100%',
         bottom: 0,
-        position: 'absolute', 
-        borderTopLeftRadius: 20, 
-        borderTopRightRadius:20
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20
     }
 })

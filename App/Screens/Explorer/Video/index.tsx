@@ -13,7 +13,7 @@ import axios from "axios"
 import { REQUESTS_API } from "@env"
 import { useAuthContext } from "../../../Contexts/AuthContext"
 import { IPostItem } from "../../../Interfaces"
-import { useMediaPlaybackContext } from "../../Statics/MediaViewer/Context"
+import { useMediaPlaybackContext } from "../../../Contexts/MediaPlaybackContext"
 import { ResizeMode, Video } from "expo-av"
 import LikeButton from "../../_partials/PostComponents/Like"
 import { formatNumber } from "../../../Helpers"
@@ -90,13 +90,13 @@ export default function VideoExplorer() {
                     onPress={() => setisPresentingMedia(true)}
                     style={[styles.vieoContainer]}>
                     <View style={[styles.overlay]}
-                        children={<Ionicons onPress={() => mediaPlayer.setMedia(post)}
-                            name="play-circle" size={40} color={text} />}   />
+                        children={<Ionicons onPress={() => (navigate as any)?.('PlayVideo', { post })}
+                            name="play-circle" size={40} color={text} />} />
                     <Image
                         resizeMethod="resize"
                         resizeMode="cover"
                         style={[styles.videoThumbImage]}
-                        source={{ uri: `${REQUESTS_API}${post?.thumbnailUrl ?? post?.fileUrl}` }}   />
+                        source={{ uri: `${REQUESTS_API}${post?.thumbnailUrl ?? post?.fileUrl}` }} />
                     {
                         !post?.thumbnailUrl && (
                             <Video

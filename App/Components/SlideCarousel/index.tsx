@@ -8,7 +8,7 @@ import { IListSlider, IPostItem } from "../../Interfaces";
 import useThemeColors from "../../Hooks/useThemeColors";
 import { useNavigation } from "@react-navigation/native";
 import { useDataContext } from "../../Contexts/DataContext";
-import { useMediaPlaybackContext } from "../../Screens/Statics/MediaViewer/Context";
+import { useMediaPlaybackContext } from "../../Contexts/MediaPlaybackContext";
 
 
 export function ListSlideItem(props: IPostItem) {

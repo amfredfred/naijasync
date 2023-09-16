@@ -13,7 +13,7 @@ import axios from "axios"
 import { REQUESTS_API } from "@env"
 import { useAuthContext } from "../../../Contexts/AuthContext"
 import { IPostItem } from "../../../Interfaces"
-import { useMediaPlaybackContext } from "../../Statics/MediaViewer/Context"
+import { useMediaPlaybackContext } from "../../../Contexts/MediaPlaybackContext"
 import ExplorerPostItemWrapper from "../Wrapper"
 
 export default function AudioExplorer() {
@@ -93,7 +93,7 @@ export default function AudioExplorer() {
                         {props?.description && <SpanText numberOfLines={2} children={props?.description} style={{ fontSize: 12, marginTop: 10 }} />}
                         <View style={[styles.spaceBetween, { marginTop: 10 }]}>
                             <TouchableOpacity
-                                onPress={() => mediaPlayer?.setMedia(props)}     >
+                                onPress={() => mediaPlayer?.connect(props)}     >
                                 <Ionicons name={(props?.fileUrl === mediaPlayer?.fileUrl) && mediaPlayer?.states?.playState === 'playing' ? 'pause' : mediaPlayer?.states?.playState === 'loading' ? 'warning' : 'play'} size={30} color={text} />
                             </TouchableOpacity>
                         </View>

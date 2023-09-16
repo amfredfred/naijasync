@@ -1,17 +1,14 @@
 import { View, StyleSheet, Dimensions, Text, Image, TouchableOpacity, FlatList } from 'react-native'
-import Animated, { SlideInDown, SlideInLeft, SlideOutLeft } from 'react-native-reanimated'
+import Animated, { SlideInLeft, SlideOutLeft } from 'react-native-reanimated'
 import { IMediaPlayable } from '../Interface'
 import { Audio } from 'expo-av'
 import { forwardRef, useState } from 'react'
-import { IconButton } from '../../../../Components/Buttons'
+import { IconButton } from '../../../Components/Buttons'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
-import useThemeColors from '../../../../Hooks/useThemeColors'
-import { useToast } from '../../../../Contexts/ToastContext'
-import useKeyboardEvent from '../../../../Hooks/useKeyboardEvent'
-import MediaPlayerControls from '../../../_partials/PlayerControls'
-import { SpanText } from '../../../../Components/Texts'
-import { formatPlaytimeDuration } from '../../../../Helpers'
-import { ThemeProvider } from 'react-native-paper'
+import useThemeColors from '../../../Hooks/useThemeColors'
+import { useToast } from '../../../Contexts/ToastContext'
+import { SpanText } from '../../../Components/Texts'
+import { formatPlaytimeDuration } from '../../../Helpers'
 
 const { width, height } = Dimensions.get('window')
 
@@ -132,7 +129,7 @@ export default forwardRef<Audio.SoundObject, IMediaPlayable>((props, ref) => {
                     />
                 </View>
 
-                <View style={{ alignItems: 'center',  justifyContent: 'center' }}>
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                     <SpanText
                         hidden={!AV?.states?.duration}
                         style={{ fontSize: 10 }}

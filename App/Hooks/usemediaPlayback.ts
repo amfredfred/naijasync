@@ -1,35 +1,33 @@
-import { } from 'react-native'
-import { useReducer, createContext, useContext, useEffect, useRef, useState } from 'react'
-import { IMediaViewer, IMediaViewerProvider, IMediaPlayable, IMediaType, IMediaPlaybackUpdate, } from '../Interface'
-import { Audio, Video } from 'expo-av'
-import MediaViewer from '..'
-import { getMediaType, wait } from '../../../../Helpers'
-import { REQUESTS_API } from '@env'
-import { useToast } from '../../../../Contexts/ToastContext'
+'use strict'
+
+import { useEffect, useReducer, useRef, useState } from "react";
+import { useToast } from "../Contexts/ToastContext";
+import { IMediaPlayable, IMediaPlaybackUpdate, IMediaViewer, IMediaViewerProvider } from "../Screens/Statics/Interface";
+import { Audio, Video } from "expo-av";
+import { IMediaType } from "../Interfaces";
+import { getMediaType } from "../Helpers";
+import { REQUESTS_API } from "@env";
 
 const initialState: IMediaViewer = {
     presenting: false
 }
-const MediaPlaybackContext = createContext<IMediaViewerProvider | null>(null)
-export const useMediaPlaybackContext = () => useContext(MediaPlaybackContext)
 
-export function MediaViewerProvider({ children }) {
-
+export default function useMediaPlayback(prop?: IMediaPlayable['mediaRef']): IMediaPlayable {
     const mediaReducer = (state, { key, payload }: { key?: any, payload }) => {
-        const saveable = key ? { [key]: payload } : payload
-        const data = ({ ...state, ...(saveable ?? {}) })
-        return data
+        if (key) {
+            return { ...state, [key]: payload };
+        }
+        return payload;
     }
 
     const [data, dispatch] = useReducer(mediaReducer, initialState)
-
     const { toast } = useToast()
 
     const setMedia: IMediaViewerProvider['setMedia'] = (props) => {
         dispatch({ payload: props })
     }
 
-    const mediaRef = useRef<Video>(null)
+    const mediaRef = useRef<Video>(prop?.current)
     const audioObjectRef = useRef<Audio.SoundObject>(null);
 
     const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({
@@ -87,6 +85,7 @@ export function MediaViewerProvider({ children }) {
 
     const loadMediaPlayable = async (shouldPlay?: boolean) => {
         try {
+            setMediaState(S => ({ ...S, playState: 'loading' }))
             if (mediaType === 'audio') {
                 const playbackObject = await Audio.Sound.createAsync?.(
                     { uri: `${REQUESTS_API}${data?.fileUrl}` },
@@ -125,17 +124,13 @@ export function MediaViewerProvider({ children }) {
     };
 
     useEffect(() => {
-
         if (mediaType) {
-            setMediaState(S => ({ ...S, playState: 'loading' }))
             loadMediaPlayable();
         }
-
         return () => {
             clearAllRefs()
         };
-    }, [data?.fileUrl, mediaRef]);
-
+    }, [data?.fileUrl, mediaType]);
 
     const play = async () => {
         try {
@@ -207,7 +202,7 @@ export function MediaViewerProvider({ children }) {
     }
 
 
-    const methodsAndStates = {
+    return {
         ...data,
         play,
         pause,
@@ -228,10 +223,4 @@ export function MediaViewerProvider({ children }) {
         mediaRef: mediaRef,
     };
 
-    return (
-        <MediaPlaybackContext.Provider value={{ setMedia, removeMedia, mediaRef, ...methodsAndStates }}  >
-            {children}
-            <MediaViewer ref={mediaRef} {...methodsAndStates} presenting={data?.presenting} />
-        </MediaPlaybackContext.Provider>
-    )
 }

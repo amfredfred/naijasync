@@ -1,6 +1,6 @@
 import { View, TouchableOpacity, Image, StyleSheet, ImageBackground } from "react-native"
 import { IPostItem } from "../../../../../Interfaces"
-import { useMediaPlaybackContext } from "../../../../Statics/MediaViewer/Context"
+import { useMediaPlaybackContext } from "../../../../../Contexts/MediaPlaybackContext"
 import { Ionicons } from "@expo/vector-icons"
 import { SpanText } from "../../../../../Components/Texts"
 import { useState } from "react"
@@ -19,7 +19,7 @@ export default function PostAudioItemList(post: IPostItem) {
                 mP?.play()
             }
         } else
-            mP.setMedia(post)
+            mP?.connect(post)
     };
 
     return (

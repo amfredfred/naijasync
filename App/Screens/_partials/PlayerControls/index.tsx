@@ -1,7 +1,7 @@
 import { View, TouchableOpacity, StyleSheet } from "react-native"
 import { SpanText } from "../../../Components/Texts"
 import { formatPlaytimeDuration } from "../../../Helpers"
-import { IMediaPlayable } from "../../Statics/MediaViewer/Interface"
+import { IMediaPlayable } from "../../Statics/Interface"
 import { ITheme, IThemedComponent } from "../../../Interfaces"
 
 type IMediaPlayerControls = IMediaPlayable['states'] & IThemedComponent & {
@@ -28,7 +28,7 @@ export default function MediaPlayerControls(props: IMediaPlayerControls) {
                 </View>
                 <SpanText
                     hidden={!duration}
-                    style={{ fontSize: 10, padding: 0, marginTop: 5, width: '100%', textAlign: 'right' }}  >
+                    style={{ fontSize: 10, padding: 0, marginTop: 5, width: '100%', textAlign: 'right', color: 'white' }}  >
                     {formatPlaytimeDuration(position)}/{formatPlaytimeDuration(duration)}
                 </SpanText>
             </View>

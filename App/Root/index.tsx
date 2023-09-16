@@ -15,7 +15,7 @@ import "expo-dev-client"
 import Explorer from "../Screens/Explorer";
 import Search from "../Screens/Search";
 import { Linking } from 'react-native';
-import { MediaViewerProvider } from "../Screens/Statics/MediaViewer/Context";
+import { MediaViewerProvider } from "../Contexts/MediaPlaybackContext";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ToastProvider from "../Contexts/ToastContext";
 import { useAuthContext } from '../Contexts/AuthContext';
@@ -36,6 +36,7 @@ import UpdateFundsTranferSettings from '../Screens/User/Account/Settings/Payment
 import UpdateBiometricSettings from '../Screens/User/Account/Settings/Security/SetupBiometrics';
 import { useEffect } from 'react';
 import PostViewer from '../Screens/Viewer/Post/PresentMedia';
+import PlayVideo from '../Screens/Viewer/Post/Video';
 
 const screenOptions = {
     headerShown: false,
@@ -112,7 +113,7 @@ function Routes() {
             <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name='PostComposer' component={PostComposer} />
             <Stack.Screen name="Account" component={AccountRoutes} />
-            {/* <Stack.Screen name='ViewPost' component={PostViewer} /> */}
+            <Stack.Screen name='PlayVideo' component={PlayVideo} />
         </Stack.Navigator>
     )
 

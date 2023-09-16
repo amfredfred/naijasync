@@ -1,6 +1,6 @@
 import { RefObject } from 'react';
 import { Video, Audio } from 'expo-av';
-import { IPostItem } from '../../../../Interfaces';
+import { IPostItem } from '../../../Interfaces';
 
 // Enumeration for different types of media
 export enum IMediaType {
@@ -34,7 +34,7 @@ export interface IMediaPlayable extends IPostItem {
         bufferProgress?: number
         duration?: number
         isBufering?: boolean
-        position?:number
+        position?: number
     }
     type: IMediaType
     mode?: "fullscreen" | "collapsed" | "floating" | "hidden",

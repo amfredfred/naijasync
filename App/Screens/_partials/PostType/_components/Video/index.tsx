@@ -1,14 +1,16 @@
 import { View, TouchableOpacity, Image, StyleSheet } from "react-native"
 import { IPostItem } from "../../../../../Interfaces"
-import { useMediaPlaybackContext } from "../../../../Statics/MediaViewer/Context"
+import { useMediaPlaybackContext } from "../../../../../Contexts/MediaPlaybackContext"
 import { Ionicons } from "@expo/vector-icons"
 import { REQUESTS_API } from "@env"
 import { useState } from "react"
 import PresentMedia from "../../../../Viewer/Post/PresentMedia"
+import { useNavigation } from "@react-navigation/native"
 
 export default function PostVideoItemList(post: IPostItem) {
     const mediaContext = useMediaPlaybackContext()
     const [isPresentingMedia, setisPresentingMedia] = useState(false)
+    const { navigate } = useNavigation()
 
     return (
         <View style={[styles.mediaDisplayWrapper, {}]}>
@@ -25,7 +27,7 @@ export default function PostVideoItemList(post: IPostItem) {
             <View style={[styles.spaceBetween, styles.playPauseiconContainer]}>
                 <View style={{ flex: 1 }} />
                 <TouchableOpacity
-                    onPress={() => mediaContext?.setMedia(post)}
+                    onPress={() => (navigate as any)?.('PlayVideo', { post })}
                     style={[styles.allIconStyle]}>
                     <Ionicons
                         name='play-circle'
