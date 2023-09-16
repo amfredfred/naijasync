@@ -14,18 +14,14 @@ import { REQUESTS_API } from "@env"
 import { useAuthContext } from "../../../Contexts/AuthContext"
 import { IPostItem } from "../../../Interfaces"
 import { useMediaPlaybackContext } from "../../../Contexts/MediaPlaybackContext"
-import { ResizeMode, Video } from "expo-av"
-import LikeButton from "../../_partials/PostComponents/Like"
-import { formatNumber } from "../../../Helpers"
-import ShareContent from "../../../Components/ShareFile"
+import { ResizeMode, Video } from "expo-av" 
 import ExplorerPostItemWrapper from "../Wrapper"
 import PresentMedia from "../../Viewer/Post/PresentMedia"
 
 export default function VideoExplorer() {
 
     const { params } = useRoute()
-    const { exploring, genre, screen } = params as any
-    const { height, width } = useWindowDimensions()
+    const { exploring, genre, screen } = params as any 
     const authContext = useAuthContext()
 
     const [Videos, setVideos] = useState<IPostItem[]>()

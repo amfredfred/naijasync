@@ -3,23 +3,24 @@ import useThemeColors from "../../../../Hooks/useThemeColors";
 import { Video, ResizeMode } from "expo-av";
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { IconButton } from "../../../../Components/Buttons";
-import { View, StyleSheet, Dimensions, StatusBar, Text, BackHandler, TouchableOpacity, ScrollView, FlatList } from 'react-native'
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { View, StyleSheet, Dimensions, StatusBar, Text, RefreshControl, TouchableOpacity, ScrollView, FlatList, Image } from 'react-native'
+import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import useTimeout from "../../../../Hooks/useTimeout";
 import { wait } from "../../../../Helpers";
 import { useRoute } from "@react-navigation/native";
-import ShareContent from "../../../../Components/ShareFile";
-import { Videos } from "../../../../dummy-data";
-import { ProgressBar } from "../../../../Components/Inputs";
-import { HeadLine } from "../../../../Components/Texts";
+import { HeadLine, SpanText } from "../../../../Components/Texts";
 import usePostForm from "../../../../Hooks/usePostForms";
-import { useMediaPlaybackContext } from "../../../../Contexts/MediaPlaybackContext";
 import MediaPlayerControls from "../../../_partials/PlayerControls";
 import { REQUESTS_API } from "@env";
 import { LinearGradient } from "expo-linear-gradient";
 import useMediaPlayback from "../../../../Hooks/usemediaPlayback";
+import PostItemMenu from "../../../_partials/PostMenu";
+import { useQuery } from "@tanstack/react-query";
+import { IPostItem } from "../../../../Interfaces";
+import axios from "axios";
+import { useAuthContext } from "../../../../Contexts/AuthContext";
+import { ListSlideItem } from "../../../../Components/SlideCarousel";
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
@@ -28,10 +29,13 @@ export default function PlayVideo() {
 
     const colors = useThemeColors()
     const [isShwoingControls, setisShwoingControls] = useState(true)
+    const [isMenuModalVisile, setisMenuModalVisile] = useState(false)
+
     const postForm = usePostForm()
     const { params } = useRoute()
     const { post } = params as any
 
+    const authContext = useAuthContext()
     const mediaContext = useMediaPlayback()
 
     //Aniamtion
@@ -41,13 +45,8 @@ export default function PlayVideo() {
         top: contConH.value,
         display: contConDis.value as any
     }))
-
-    //setting video from the route param
     useEffect(() => { mediaContext?.connect({ ...post, presenting: true }) }, [])
-    // updating post views
     useEffect(() => { wait(2).then(R => postForm.methods.postView({ 'views': 1, puid: post?.puid })) }, [])
-
-
     const contenGetsture = Gesture.Pan()
         .onUpdate(e => {
             contConH.value = Math.max(0, Math.min(e.translationY / 1, height - VIDEO_HEIGHT));
@@ -79,6 +78,25 @@ export default function PlayVideo() {
             setisShwoingControls(true)
         }
     }
+
+    const [Videos, setVideos] = useState<IPostItem[]>()
+    const $videos = useQuery(
+        ['videos'],
+        async () => await axios.get<IPostItem[]>(`${REQUESTS_API}posts?type=video&username=${authContext?.user?.account?.username}`,),
+        { getNextPageParam: () => { } }
+    )
+
+    useEffect(() => {
+        if ($videos?.status === 'success') {
+            console.log($videos?.data?.data)
+            setVideos(($videos?.data?.data as any)?.data)
+        } else if ($videos?.status === 'error') {
+            console.log("ERERO ", ($videos?.failureReason as any)?.response?.data)
+        }
+    }, [$videos.status])
+
+
+    const onRefresh = () => $videos?.refetch()
 
     const MediaControls = (
         <Animated.View
@@ -112,58 +130,28 @@ export default function PlayVideo() {
     )
 
     const MediaDefinition = (
-        <View style={{ width: '100%', flex: 1 }}>
-            <TouchableOpacity
-                onPress={() => {
-                    contConDis.value = 'flex'
-                    contConH.value = 0
-                }}
-                style={{ padding: 10, minHeight: 40 }}>
-                <Text
-                    numberOfLines={2}
-                    style={[{ color: colors.text, maxWidth: '92%', }]}>
-                    {mediaContext?.title ?? mediaContext?.caption ?? mediaContext?.description ?? mediaContext?.mimeType}
-                </Text>
-            </TouchableOpacity>
-            <View>
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    style={{ maxHeight: 40, }}
-                    contentContainerStyle={{ padding: 10, gap: 10, alignItems: 'center' }}
-                >
-                    <IconButton
-                        onPress={null}
-                        title={"download"}
-                        containerStyle={[styles.iconsButton]}
-                        icon={<MaterialCommunityIcons size={25} name="download" />}
-                    />
-                    <IconButton
-                        title="share"
-                        onPress={() => ShareContent({
-                            title: 'sahre',
-                            message: 'message',
-                            url: mediaContext?.fileUrl
-                        })}
-                        containerStyle={styles.iconsButton}
-                        icon={<MaterialCommunityIcons size={25} name="share" />}
-                    />
-                    <IconButton
-                        title="report"
-                        containerStyle={styles.iconsButton}
-                        icon={<MaterialIcons size={25} name="report" />}
-                    />
-                    <IconButton
-                        title="watch later"
-                        containerStyle={styles.iconsButton}
-                        icon={<MaterialIcons size={25} name="watch-later" />}
-                    />
-                </ScrollView>
-                <ProgressBar
-                    // hidden
-                    filled={mediaContext?.states?.progress ?? 0}
+        <View style={[{ width: '100%' }]}>
+            <View style={[styles.spaceBetween, { padding: 0, borderBottomWidth: 1, borderBottomColor: colors.background2, marginBottom: 10 }]}>
+                <TouchableOpacity
+                    onPress={() => {
+                        contConDis.value = 'flex'
+                        contConH.value = 0
+                    }}
+                    style={{ minHeight: 40, flexGrow: 1, width: '80%', padding: 10 }}>
+                    <SpanText
+                        numberOfLines={2}
+                        style={[{ color: colors.text, fontSize: 14 }]}>
+                        {mediaContext?.title ?? mediaContext?.caption ?? mediaContext?.description ?? mediaContext?.mimeType}
+                    </SpanText>
+                </TouchableOpacity>
+                <MaterialIcons
+                    onPress={() => setisMenuModalVisile(true)}
+                    size={23}
+                    name='more-vert'
+                    color={colors.text}
                 />
             </View>
+
             <GestureDetector gesture={contenGetsture}>
                 <Animated.View
                     entering={SlideInDown}
@@ -194,12 +182,6 @@ export default function PlayVideo() {
                     </ScrollView>
                 </Animated.View>
             </GestureDetector>
-            <FlatList
-                style={[{ flex: 1 }]}
-                data={Videos}
-                renderItem={({ item, index }) => <Text style={{ color: 'white', height: 40, width: '100%', backgroundColor: 'pink', marginBottom: 10 }}>{item.fileUrl}</Text>}
-                keyExtractor={(item) => item.id}
-            />
         </View>
     )
 
@@ -226,9 +208,33 @@ export default function PlayVideo() {
                 {MediaControls}
             </Animated.View>
             {/* MORE ____ */}
-            {MediaDefinition}
+            <FlatList
+                stickyHeaderHiddenOnScroll
+                stickyHeaderIndices={[0]}
+                ListHeaderComponent={MediaDefinition}
+                data={Videos}
+                numColumns={3}
+                columnWrapperStyle={{ gap: 5 }}
+                contentContainerStyle={{ gap: 5, padding: 5 }}
+                refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
+                renderItem={({ item, index }: { item: IPostItem, index: number }) => (
+                    <TouchableOpacity
+                        disabled={Boolean(mediaContext?.fileUrl == item.fileUrl)}
+                        onPress={() => mediaContext?.connect(item)}
+                        style={{ flexGrow: 1, height: 170, overflow: 'hidden', borderRadius: 5, opacity: Boolean(mediaContext?.fileUrl == item.fileUrl) ? .4 : 1 }}   >
+                        <Image
+                            resizeMethod="resize"
+                            resizeMode="cover"
+                            style={{ width: '100%', height: '100%' }}
+                            source={{ uri: `${REQUESTS_API}${item?.thumbnailUrl}` }}
+                        />
+                    </TouchableOpacity>
+                )}
+            />
+            {/* MENU */}
+            <PostItemMenu {...post} visible={isMenuModalVisile} onRequestClose={() => setisMenuModalVisile(false)} />
         </Animated.View>
-    ), [mediaContext?.states, isShwoingControls])
+    ), [mediaContext?.states, isShwoingControls, isMenuModalVisile, $videos?.data?.data])
 }
 
 const styles = StyleSheet.create({
@@ -252,7 +258,6 @@ const styles = StyleSheet.create({
     containerInner: {
         backgroundColor: 'green',
     },
-
     videoContainer: {
         position: 'relative',
         padding: 0,
@@ -260,13 +265,10 @@ const styles = StyleSheet.create({
         width: '100%',
         maxHeight: VIDEO_HEIGHT,
     },
-
     video: {
         width: '100%',
         height: '100%',
     },
-
-
     controlsContainer: {
         position: 'absolute',
         width: '100%',
@@ -277,7 +279,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         overflow: 'hidden'
     },
-
     spaceBetween: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -307,26 +308,6 @@ const styles = StyleSheet.create({
     contentDescriptionContainerInner: {
         flex: 1,
         padding: 10
-    },
-
-    progressBarContainer: {
-        width: '100%',
-        height: 2,
-        backgroundColor: '#ccc',
-    },
-    progressBar: {
-        height: '100%',
-        backgroundColor: 'red',
-    },
-    seekContainer: {
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
-        height: 20,
-    },
-    seekBar: {
-        height: '100%',
-        backgroundColor: 'transparent',
     },
     iconsButton: {
         borderWidth: 0,

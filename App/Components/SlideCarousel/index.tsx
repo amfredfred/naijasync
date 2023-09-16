@@ -9,14 +9,13 @@ import useThemeColors from "../../Hooks/useThemeColors";
 import { useNavigation } from "@react-navigation/native";
 import { useDataContext } from "../../Contexts/DataContext";
 import { useMediaPlaybackContext } from "../../Contexts/MediaPlaybackContext";
+import { REQUESTS_API } from "@env";
 
 
 export function ListSlideItem(props: IPostItem) {
-    const { width, height } = useWindowDimensions();
-    const { navigate } = useNavigation();
-    const [isLongPressed, setIsLongPressed] = useState(false);
-    const { type } = props;
+    const { type, fileType } = props;
 
+    console.log('type', props)
 
     const handleOnPress = () => {
         console.log("PRESSED");
@@ -28,7 +27,7 @@ export function ListSlideItem(props: IPostItem) {
             onPress={handleOnPress}
             style={[styles.videoListItem]}  >
             <Image
-                source={{ uri: props?.thumbnailUrl }}
+                source={{ uri: `${REQUESTS_API}${props?.thumbnailUrl}` }}
                 style={[styles.listThumb]}
                 resizeMethod="auto"
                 resizeMode="cover" />
@@ -46,7 +45,7 @@ export function ListSlideItem(props: IPostItem) {
             onPress={handleOnPress}
             style={[styles.videoListItem, { width: 95, aspectRatio: 1 }]}  >
             <Image
-                source={{ uri: props?.thumbnailUrl }}
+                source={{ uri: `${REQUESTS_API}${props?.thumbnailUrl}` }}
                 style={[styles.listThumb]}
                 resizeMethod="auto"
                 resizeMode="cover" />
@@ -61,7 +60,7 @@ export function ListSlideItem(props: IPostItem) {
     )
 
 
-    switch (type) {
+    switch (type ?? fileType) {
         case 'audio':
             return < AudioItem />
         case 'video':
@@ -73,7 +72,6 @@ export function ListSlideItem(props: IPostItem) {
 
 export default function SlideCarousel(props: IListSlider) {
     const { items = [], headline } = props;
-    const { setMedia } = useMediaPlaybackContext();
     const { text } = useThemeColors();
     const { navigate } = useNavigation();
     const { setData } = useDataContext();
@@ -86,7 +84,7 @@ export default function SlideCarousel(props: IListSlider) {
     };
 
     const handleOnPressListItem = (itemProps: IPostItem) => {
-        setMedia?.(itemProps);
+
     };
 
     return (
@@ -124,7 +122,6 @@ const styles = StyleSheet.create({
     videoListItem: {
         width: 140,
         overflow: 'hidden',
-        maxHeight: 95,
         position: 'relative'
     },
     listThumb: {
