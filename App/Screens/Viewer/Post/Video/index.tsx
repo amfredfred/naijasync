@@ -3,15 +3,15 @@ import useThemeColors from "../../../../Hooks/useThemeColors";
 import { Video, ResizeMode } from "expo-av";
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { IconButton } from "../../../../Components/Buttons";
-import { View, StyleSheet, Dimensions, StatusBar, Text, RefreshControl, TouchableOpacity, ScrollView, FlatList, Image } from 'react-native'
-import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay } from 'react-native-reanimated'
+import { View, StyleSheet, Dimensions, StatusBar, Text, RefreshControl, TouchableOpacity, ScrollView, FlatList, Image, ImageBackground, BackHandler } from 'react-native'
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay, FadeOutDown, FadeIn, FadeOut } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { wait } from "../../../../Helpers";
 import { useRoute } from "@react-navigation/native";
 import { HeadLine, SpanText } from "../../../../Components/Texts";
 import usePostForm from "../../../../Hooks/usePostForms";
-import MediaPlayerControls from "../../../_partials/PlayerControls";
+import MediaProgressBar from "../../../_partials/MediaProgressBar";
 import { REQUESTS_API } from "@env";
 import { LinearGradient } from "expo-linear-gradient";
 import useMediaPlayback from "../../../../Hooks/usemediaPlayback";
@@ -21,6 +21,10 @@ import { IPostItem } from "../../../../Interfaces";
 import axios from "axios";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
 import { ListSlideItem } from "../../../../Components/SlideCarousel";
+import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
+import LikeButton from "../../../_partials/PostComponents/Like";
+import MediaPlayDuration from "../../../_partials/MediaPlayDuration";
+import { TestIds, useInterstitialAd, useRewardedInterstitialAd } from "react-native-google-mobile-ads";
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
@@ -30,6 +34,7 @@ export default function PlayVideo() {
     const colors = useThemeColors()
     const [isShwoingControls, setisShwoingControls] = useState(true)
     const [isMenuModalVisile, setisMenuModalVisile] = useState(false)
+    const [playerMode, setPlayerMode] = useState<"fullscreen" | "default">('default')
 
     const postForm = usePostForm()
     const { params } = useRoute()
@@ -45,8 +50,9 @@ export default function PlayVideo() {
         top: contConH.value,
         display: contConDis.value as any
     }))
+    //setting media
     useEffect(() => { mediaContext?.connect({ ...post, presenting: true }) }, [])
-    useEffect(() => { wait(2).then(R => postForm.methods.postView({ 'views': 1, puid: post?.puid })) }, [])
+    useEffect(() => { wait(5).then(R => postForm.methods.postView({ 'views': 1, puid: post?.puid })) }, [])
     const contenGetsture = Gesture.Pan()
         .onUpdate(e => {
             contConH.value = Math.max(0, Math.min(e.translationY / 1, height - VIDEO_HEIGHT));
@@ -65,11 +71,6 @@ export default function PlayVideo() {
             }
         })
 
-
-    const handleHidePlayerControls = () => {
-        setisShwoingControls(false)
-    }
-
     const handleShowPlayControls = () => {
         console.log("PRESSED")
         if (isShwoingControls) {
@@ -79,13 +80,14 @@ export default function PlayVideo() {
         }
     }
 
-    const [Videos, setVideos] = useState<IPostItem[]>()
+    //fetching more videos
+    const [Videos, setVideos] = useState<IPostItem[]>([])
     const $videos = useQuery(
         ['videos'],
         async () => await axios.get<IPostItem[]>(`${REQUESTS_API}posts?type=video&username=${authContext?.user?.account?.username}`,),
         { getNextPageParam: () => { } }
     )
-
+    const onRefresh = () => $videos?.refetch()
     useEffect(() => {
         if ($videos?.status === 'success') {
             console.log($videos?.data?.data)
@@ -95,43 +97,100 @@ export default function PlayVideo() {
         }
     }, [$videos.status])
 
+    //initializing ads
+    const interstitialAd = useInterstitialAd(TestIds.INTERSTITIAL, {
+        requestNonPersonalizedAdsOnly: true,
+    });
 
-    const onRefresh = () => $videos?.refetch()
+    useEffect(() => {
+        if (interstitialAd?.isClosed) {
+            console.log(" navigation.navigate('NextScreen');")
+        }
+    }, [interstitialAd?.isClosed,]);
+    //reloading ads
+    useEffect(() => {
+        interstitialAd?.load()
+        return () => {
+
+        }
+    }, [mediaContext?.fileUrl])
+    //video rewarded ads
+    const rewardedInterstitialAd = useRewardedInterstitialAd(TestIds.REWARDED_INTERSTITIAL, {
+        requestNonPersonalizedAdsOnly: true
+    })
+
+    //handlebackpress
+    useEffect(() => {
+        rewardedInterstitialAd.load()
+    }, [mediaContext?.fileUrl])
+
+    //sharing rewards from ads
+    useEffect(() => {
+        if (rewardedInterstitialAd?.reward?.amount) {
+            postForm?.methods?.updatePost({
+                rewards: ((rewardedInterstitialAd?.reward?.amount / 100) * 70).toFixed(3),
+                puid: mediaContext?.puid
+            })
+            // reward the  user
+            if (authContext?.user?.person === 'isAuthenticated') {
+                authContext?.updateAccount({
+                    points: (rewardedInterstitialAd?.reward?.amount / 100) * 30
+                })
+            }
+        }
+    }, [rewardedInterstitialAd?.isClosed])
+
 
     const MediaControls = (
         <Animated.View
             style={[styles.controlsContainer]}  >
             <View />
-
             <View
                 onTouchStart={handleShowPlayControls}
-                style={{ width: '100%', height: '100%', position: 'absolute', left: 0, top: 0 }} />
+                style={{ width: '100%', height: '100%', position: 'absolute', left: 0, top: 0, justifyContent: 'center', alignItems: 'center' }}>
+                {mediaContext?.states?.playState == 'ended' && <TouchableOpacity onPress={mediaContext?.play} children={<Ionicons color={'white'} size={40} name={'play'} />} />}
+            </View>
             {
-                !isShwoingControls || (
+                !(isShwoingControls || mediaContext?.states?.playState == 'ended') || (
                     <LinearGradient colors={['transparent', 'transparent', 'transparent', 'rgba(0,0,0,0.4)']} style={{ justifyContent: 'space-between' }}>
                         <Animated.View
                             entering={FadeInDown}
-                            exiting={SlideOutDown} style={{ height: 50 }} >
-                            <MediaPlayerControls {...mediaContext?.states}
-                                Button={
+                            exiting={SlideOutDown}  >
+                            <View style={[styles.spaceBetween]}>
+                                <View style={[styles.spaceBetween]}>
+                                    <MediaPlayDuration {...mediaContext?.states} />
+                                </View>
+                                <View style={[styles.spaceBetween]}>
+                                    <TouchableOpacity
+                                        onPress={async () => await mediaContext?.mediaRef?.current?._setFullscreen(true)}
+                                        children={<MaterialIcons
+                                            color={'white'}
+                                            size={25} name={'fullscreen'} />}
+                                    />
                                     <TouchableOpacity
                                         onPress={mediaContext?.states?.playState === 'playing' ? mediaContext?.pause : mediaContext?.play}
                                         children={<Ionicons
                                             color={'white'}
                                             size={25} name={mediaContext?.states?.playState === 'playing' ? 'pause' : 'play'} />}
                                     />
-                                }
-                            />
+                                </View>
+                            </View>
                         </Animated.View>
                     </LinearGradient>
                 )}
-
+            <MediaProgressBar {...mediaContext?.states} />
         </Animated.View>
     )
 
     const MediaDefinition = (
-        <View style={[{ width: '100%' }]}>
-            <View style={[styles.spaceBetween, { padding: 0, borderBottomWidth: 1, borderBottomColor: colors.background2, marginBottom: 10 }]}>
+        <View style={[{ width: '100%', }]}>
+            <View style={[styles.spaceBetween, {
+                padding: 0,
+                borderBottomWidth: 1,
+                backgroundColor: colors.background,
+                borderBottomColor: colors.background2,
+                marginBottom: 10,
+            }]}>
                 <TouchableOpacity
                     onPress={() => {
                         contConDis.value = 'flex'
@@ -185,56 +244,78 @@ export default function PlayVideo() {
         </View>
     )
 
+
+    const MoreVideos = (
+        <FlatList
+            stickyHeaderHiddenOnScroll
+            stickyHeaderIndices={[0]}
+            ListHeaderComponent={MediaDefinition}
+            data={[...Videos, ...Videos]}
+            numColumns={3}
+            ListEmptyComponent={() => Array.from({ length: 20 }, (_) => <View style={{ height: 170, borderRadius: 5, backgroundColor: colors.background2 }} />)}
+            columnWrapperStyle={{ gap: 5 }}
+            contentContainerStyle={{ gap: 5, padding: 5 }}
+            refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
+            renderItem={({ item, index }: { item: IPostItem, index: number }) => (
+                <TouchableOpacity
+                    disabled={Boolean(mediaContext?.fileUrl == item.fileUrl)}
+                    onPress={() => {
+                        if (rewardedInterstitialAd?.isLoaded)
+                            rewardedInterstitialAd?.show()
+                        mediaContext?.connect(item)
+                    }}
+                    style={{ flexGrow: 1, height: 170, overflow: 'hidden', borderRadius: 5, opacity: Boolean(mediaContext?.fileUrl == item.fileUrl) ? .4 : 1 }}   >
+                    <Image
+                        resizeMethod="resize"
+                        resizeMode="cover"
+                        style={{ width: '100%', height: '100%' }}
+                        source={{ uri: `${REQUESTS_API}${item?.thumbnailUrl}` }}
+                    />
+                </TouchableOpacity>
+            )}
+        />
+    )
+
+
     return useMemo(() => (
         <Animated.View
             entering={SlideInDown}
             exiting={SlideOutDown}
             style={[styles.container, { backgroundColor: colors.background }]}>
             {/* VIDEO CONTAINER */}
-            <Animated.View
-                style={[styles.videoContainer]}>
-
-                <Overlay
-                    hidden={!Boolean(mediaContext.states?.playState == 'loading')}
-                    imageSource={`${REQUESTS_API}${mediaContext?.thumbnailUrl}`}
-                />
-
-                <Video
-                    style={[styles.video]}
-                    resizeMode={ResizeMode.CONTAIN}
-                    ref={mediaContext?.mediaRef}
-                />
-
-                {MediaControls}
-            </Animated.View>
-            {/* MORE ____ */}
-            <FlatList
-                stickyHeaderHiddenOnScroll
-                stickyHeaderIndices={[0]}
-                ListHeaderComponent={MediaDefinition}
-                data={Videos}
-                numColumns={3}
-                columnWrapperStyle={{ gap: 5 }}
-                contentContainerStyle={{ gap: 5, padding: 5 }}
-                refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
-                renderItem={({ item, index }: { item: IPostItem, index: number }) => (
-                    <TouchableOpacity
-                        disabled={Boolean(mediaContext?.fileUrl == item.fileUrl)}
-                        onPress={() => mediaContext?.connect(item)}
-                        style={{ flexGrow: 1, height: 170, overflow: 'hidden', borderRadius: 5, opacity: Boolean(mediaContext?.fileUrl == item.fileUrl) ? .4 : 1 }}   >
-                        <Image
-                            resizeMethod="resize"
-                            resizeMode="cover"
-                            style={{ width: '100%', height: '100%' }}
-                            source={{ uri: `${REQUESTS_API}${item?.thumbnailUrl}` }}
+            <ImageBackground
+                resizeMethod='resize'
+                resizeMode='cover'
+                blurRadius={170}
+                style={{ paddingTop: StatusBar.currentHeight }}
+                source={{ uri: `${REQUESTS_API}${mediaContext?.thumbnailUrl}` }}>
+                <Animated.View style={[styles.videoContainer, { backgroundColor: colors.background }]}>
+                    <Overlay
+                        hidden={!Boolean(mediaContext.states?.playState == 'loading')}
+                        imageSource={`${REQUESTS_API}${mediaContext?.thumbnailUrl}`} />
+                    <Video
+                        style={[styles.video]}
+                        resizeMode={ResizeMode.CONTAIN}
+                        ref={mediaContext?.mediaRef} />
+                    {mediaContext?.states?.playState === 'ended' && (
+                        <Animated.Image
+                            entering={FadeIn}
+                            exiting={FadeOut}
+                            source={{ uri: `${REQUESTS_API}${mediaContext?.thumbnailUrl}` }}
+                            style={{ width: '100%', height: '100%', position: 'absolute', left: 0, zIndex: 1, top: 0 }}
                         />
-                    </TouchableOpacity>
-                )}
-            />
+                    )}
+                    {MediaControls}
+                </Animated.View>
+            </ImageBackground>
+
+            {/* MORE ____ */}
+            {playerMode == 'default' && MoreVideos}
             {/* MENU */}
             <PostItemMenu {...post} visible={isMenuModalVisile} onRequestClose={() => setisMenuModalVisile(false)} />
+            <PostExplorerFooting {...(mediaContext ?? [] as any)} />
         </Animated.View>
-    ), [mediaContext?.states, isShwoingControls, isMenuModalVisile, $videos?.data?.data])
+    ), [mediaContext?.states, isShwoingControls, isMenuModalVisile, $videos?.data?.data, interstitialAd])
 }
 
 const styles = StyleSheet.create({
@@ -247,11 +328,8 @@ const styles = StyleSheet.create({
     },
     container: {
         // overflow: 'hidden',
-        backgroundColor: 'red',
-        position: 'absolute',
         flex: 1,
         height: height,
-        marginTop: StatusBar.currentHeight,
         zIndex: 10,
         width,
     },
@@ -272,7 +350,6 @@ const styles = StyleSheet.create({
     controlsContainer: {
         position: 'absolute',
         width: '100%',
-        backgroundColor: 'rgba(0,0,0,0.3)',
         height: '100%',
         flex: 1,
         bottom: 0,

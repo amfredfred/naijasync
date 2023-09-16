@@ -1,22 +1,24 @@
-import { useEffect,  useState,   } from "react";
+import { useEffect, useState, } from "react";
 import ThemedModal from "../../../../Components/Modals";
 import { IPostItem } from "../../../../Interfaces";
 import { ScrollView, StyleSheet, View, useWindowDimensions, Animated as RNAnimated, TouchableOpacity } from "react-native";
 import ProfileAvatar from "../../../../Components/ProfileAvatar";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import { IconButton } from "../../../../Components/Buttons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 import ImagePresent from "./Image";
 import { REQUESTS_API } from "@env";
 import usePostForm from "../../../../Hooks/usePostForms";
-import React, { useRef } from 'react';
-import { BannerAd, BannerAdSize, TestIds, RewardedAd, AdEventType, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import React from 'react';
+import { BannerAd, BannerAdSize, TestIds, useRewardedAd } from 'react-native-google-mobile-ads';
 import VideoPresent from "./Video";
 import useMediaPlayback from "../../../../Hooks/usemediaPlayback";
 import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
 import { TextExpandable } from "../../../../Components/Texts";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRewardedInterstitialAd } from "react-native-google-mobile-ads";
+import { useAuthContext } from "../../../../Contexts/AuthContext";
+
 
 
 type PresentMedia = IPostItem & {
@@ -24,63 +26,70 @@ type PresentMedia = IPostItem & {
 }
 
 export default function PresentMedia(post: PresentMedia) {
-    const [isRewardAdReady, setisRewardAdReady] = useState(false)
-    const [hasEarnedRewards, sethasEarnedRewards] = useState(false)
-    //ads
-    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-    const [isBannerAdVisible, setisBannerAdVisible] = useState(true)
+    //ads rewarded video
+    const RewardedAdsId = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+    const bannerAdId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+    const RewarededInterStitialId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+    // rewarded
+    const rewardedVideoAd = useRewardedAd(RewardedAdsId, {
+        requestNonPersonalizedAdsOnly: true,
+        keywords: ['clothing', 'technology'],
+    })
+    //rewarded interstitial ads
+    const rewardedInterstitialAd = useRewardedInterstitialAd(RewarededInterStitialId, {
+        requestNonPersonalizedAdsOnly: true
+    })
 
     const { onClose, onPress } = post
     const { height } = useWindowDimensions()
-    const { } = useNavigation()
     const themeColors = useThemeColors()
     const postForm = usePostForm()
-
+    const authContext = useAuthContext()
     const [isPostFocused, setIsPostFocused] = useState(false)
-
-    let pressTimeout;
-
-    const adRewadedUnitId = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-
-    const rewarded = RewardedAd.createForAdRequest(adRewadedUnitId, {
-        requestNonPersonalizedAdsOnly: true,
-        keywords: ['clothing', 'technology'],
-    });
+    const [isBannerAdVisible, setisBannerAdVisible] = useState(true)
 
     useEffect(() => {
-        const unsubscribe_subscribe = rewarded.addAdEventListener(RewardedAdEventType.LOADED, (status) => {
-            setisRewardAdReady(true)
-            console.log("READY", status)
-        })
-        const unsubscribe_earned_rewards = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (status) => {
-            setisRewardAdReady(false)
-            sethasEarnedRewards(true)
-            postForm?.methods?.updatePost({ rewards: (status?.amount / 4).toFixed(1), puid: post?.puid })
-            console.log("EARNED_REWRADS", status)
-        })
+        rewardedInterstitialAd.load()
+        // rewardedVideoAd.load()
+    }, [post?.fileUrl])
 
-        rewarded.load()
-        return () => {
-            unsubscribe_subscribe()
-            unsubscribe_earned_rewards()
-            sethasEarnedRewards(false)
-            setisRewardAdReady(false)
+    //sharing rewards from ads
+    useEffect(() => {
+        if (rewardedInterstitialAd?.reward?.amount || rewardedVideoAd?.reward) {
+            postForm?.methods?.updatePost({
+                rewards: ((rewardedInterstitialAd?.reward?.amount ?? rewardedVideoAd?.reward?.amount / 100) * 70).toFixed(3),
+                puid: post?.puid
+            })
+            // reward the  user
+            if (authContext?.user?.person === 'isAuthenticated') {
+                authContext?.updateAccount({
+                    points: (rewardedInterstitialAd?.reward?.amount ?? rewardedVideoAd?.reward?.amount / 100) * 30
+                })
+            }
         }
-    }, [])
+    }, [rewardedInterstitialAd?.isClosed, rewardedVideoAd?.isClosed])
+
+    console.log(rewardedInterstitialAd,)
 
     const showREwardedAd = async () => {
         try {
-            if (isRewardAdReady) {
-                console.log("REWARDS AD READY")
-                await rewarded.show()
+            if (rewardedVideoAd?.isLoaded) {
+                console.log("LOADED rewardedVideoAd")
+                rewardedVideoAd.show()
+            } else if (rewardedInterstitialAd?.isLoaded) {
+                console.log("LOADED rewardedInterstitialAd")
+                rewardedInterstitialAd?.show({ immersiveModeEnabled: true })
             } else {
                 console.log("REWARDS ADS NOT READY")
             }
         } catch (error) {
             console.log("PRESENT_MEDIA_REWARDED_VIDEO_ERROR -> ", error)
         }
+        onClose?.()
     }
 
+
+    let pressTimeout = undefined;
     const handleOnPress = () => {
         // Check the press duration to determine if it's a long-press or a short press
         pressTimeout = setTimeout(() => {
@@ -97,20 +106,12 @@ export default function PresentMedia(post: PresentMedia) {
     };
 
 
-    const onRequestClose = async () => {
-        console.log(isRewardAdReady, rewarded.loaded, ':: rewaded ad satte')
-        showREwardedAd()
-        onClose?.()
-    }
+    const onRequestClose = async () => showREwardedAd()
 
     useEffect(() => {
         postForm?.methods?.updatePost({ 'views': 1, puid: post?.puid })
         console.log('reloaded')
     }, [])
-
-
-
-
 
     const RenderPost = () => {
         switch (post?.postType) {
@@ -168,7 +169,7 @@ export default function PresentMedia(post: PresentMedia) {
                 children={post?.description} />
             {isBannerAdVisible && <View style={[styles.bannerAdContainer, { overflow: 'hidden' }]}>
                 <BannerAd
-                    unitId={adUnitId}
+                    unitId={bannerAdId}
                     size={BannerAdSize.BANNER}
                     requestOptions={{
                         requestNonPersonalizedAdsOnly: true,

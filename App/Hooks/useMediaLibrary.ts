@@ -38,7 +38,7 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             }
             Alert.alert(
                 "DELETE ITEM",
-                "Are you sure you want to delete this ietm?",
+                "Are you sure you want to delete this item?",
                 [
                     { text: "Delete", onPress: removeAssetOrAssets },
                     { text: "cancel", onPress: () => true }
@@ -280,11 +280,6 @@ export default function useMediaLibrary(): IUseMediaLibrary {
             }
         };
     }, [downloadStataus]);
-
-
-   
-
-
 
     async function requestExternalStoragePermission() {
         console.log("ACLAE FOR ER")

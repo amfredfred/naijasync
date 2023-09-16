@@ -1,16 +1,12 @@
 import { View, TouchableOpacity, StyleSheet } from "react-native"
-import { SpanText } from "../../../Components/Texts"
-import { formatPlaytimeDuration } from "../../../Helpers"
 import { IMediaPlayable } from "../../Statics/Interface"
 import { ITheme, IThemedComponent } from "../../../Interfaces"
 
-type IMediaPlayerControls = IMediaPlayable['states'] & IThemedComponent & {
-    Button?: React.ReactNode
-}
+export type IMediaPlayerControls = IMediaPlayable['states'] & IThemedComponent  
 
-export default function MediaPlayerControls(props: IMediaPlayerControls) {
+export default function MediaProgressBard(props: IMediaPlayerControls) {
 
-    const { duration, position, bufferProgress, progress, Button, hidden, playState } = props
+    const { duration, position, bufferProgress, progress,   hidden, playState } = props
 
     if (hidden) return null
 
@@ -26,13 +22,8 @@ export default function MediaPlayerControls(props: IMediaPlayerControls) {
                     </View>
                     <View style={[styles.mediaBufferBar, { width: `${bufferProgress * 100}%` }]} />
                 </View>
-                <SpanText
-                    hidden={!duration}
-                    style={{ fontSize: 10, padding: 0, marginTop: 5, width: '100%', textAlign: 'right', color: 'white' }}  >
-                    {formatPlaytimeDuration(position)}/{formatPlaytimeDuration(duration)}
-                </SpanText>
+                
             </View>
-            {Button && Button}
         </TouchableOpacity>
     )
 }
@@ -41,11 +32,9 @@ export default function MediaPlayerControls(props: IMediaPlayerControls) {
 const styles = StyleSheet.create({
     playControlsContainer: {
         width: '100%',
-        height: 40,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 10,
         position: 'absolute',
         bottom: 0,
     },

@@ -3,16 +3,25 @@ import ThemedModal, { IThemedmodal } from "../../../Components/Modals";
 import { IPostItem } from "../../../Interfaces";
 import ProfileAvatar from "../../../Components/ProfileAvatar";
 import { useAuthContext } from "../../../Contexts/AuthContext";
-import { AntDesign, Ionicons, Octicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import useThemeColors from "../../../Hooks/useThemeColors";
 import MenuItem from "../../../Components/MenuItem";
 import { ContainerSpaceBetween } from "../../../Components/Containers";
 import { IconButton } from "../../../Components/Buttons";
+import { getMediaType } from "../../../Helpers";
+import useMediaLibrary from "../../../Hooks/useMediaLibrary";
+import { REQUESTS_API } from "@env";
 
 export default function PostItemMenu(props: IPostItem & IThemedmodal) {
 
     const authContext = useAuthContext()
     const themeColors = useThemeColors()
+    const fileType = getMediaType(props?.fileUrl)
+    const mediaLibContext = useMediaLibrary()
+
+    const handleDownloadItem = () => {
+        mediaLibContext?.createDownload(`${REQUESTS_API}${props?.fileUrl}`, `${props?.puid}.${props?.fileUrl?.split('.')[1]}`)
+    }
 
     //
     const postPrivateMenuItem = [
@@ -49,6 +58,13 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
             onPress: () => { },
             icon: <Octicons size={30} name='report' color={themeColors?.text} />,
             description: 'You can report this post if you find it inappropriate.'
+        },
+        {
+            title: `Download ${fileType}`,
+            hideIconRight: true,
+            onPress: handleDownloadItem,
+            icon: <MaterialCommunityIcons size={30} name='download' color={themeColors?.text} />,
+            description: `Donwload ${fileType} for access offline.`
         }
     ];
 
@@ -78,9 +94,11 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
             <View
                 children={postPublicMenuItem.map((item, index) => <MenuItem key={index} {...item} />)}
                 style={{ padding: 5, backgroundColor: themeColors.background2, margin: 10, borderRadius: 10 }} />
-            {props?.owner?.userId !== authContext?.user?.account?.userId && <View
-                children={postWhenNotownerMenuItem.map((item, index) => <MenuItem key={index} {...item} />)}
-                style={{ padding: 5, backgroundColor: themeColors.background2, margin: 10, borderRadius: 10 }} />}
+            {
+                props?.owner?.userId !== authContext?.user?.account?.userId && <View
+                    children={postWhenNotownerMenuItem.map((item, index) => <MenuItem key={index} {...item} />)}
+                    style={{ padding: 5, backgroundColor: themeColors.background2, margin: 10, borderRadius: 10 }} />
+            }
             {
                 props?.owner?.userId === authContext?.user?.account?.userId && <ContainerSpaceBetween
                     children={postPrivateMenuItem.map((item, index) => (<IconButton key={index} onPress={() => null} containerStyle={{ padding: 10 }} icon={item.icon} />))}

@@ -6,7 +6,7 @@ import { IconButton } from "../../../../../Components/Buttons";
 import { Ionicons } from "@expo/vector-icons";
 import { REQUESTS_API } from "@env";
 import { Overlay } from "../../../../../Components/Containers";
-import MediaPlayerControls from "../../../../_partials/PlayerControls";
+import MediaPlayerControls from "../../../../_partials/MediaProgressBar";
 import useMediaPlayback from "../../../../../Hooks/usemediaPlayback";
 
 
@@ -36,19 +36,17 @@ export default function VideoPresent(post: IPostItem) {
             <View style={{ height: 35 }}>
                 <MediaPlayerControls
                     hidden={!mediaContext?.mediaRef?.current}
-                    {...mediaContext?.states}
-                    Button={
-                        <IconButton
-                            onPress={mediaContext.states.playState === 'playing' ? mediaContext?.pause : mediaContext.play}
-                            containerStyle={{ backgroundColor: 'transparent' }}
-                            style={{ width: 35, backgroundColor: 'transparent' }}
-                            icon={<Ionicons
-                                name={mediaContext?.states?.playState === 'playing' ? 'pause' : 'play'}
-                                color={'white'}
-                                size={35}
-                            />}
-                        />
-                    } />
+                    {...mediaContext?.states} />
+                <IconButton
+                    onPress={mediaContext.states.playState === 'playing' ? mediaContext?.pause : mediaContext.play}
+                    containerStyle={{ backgroundColor: 'transparent' }}
+                    style={{ width: 35, backgroundColor: 'transparent' }}
+                    icon={<Ionicons
+                        name={mediaContext?.states?.playState === 'playing' ? 'pause' : 'play'}
+                        color={'white'}
+                        size={35}
+                    />}
+                />
             </View>
         </View>
     )

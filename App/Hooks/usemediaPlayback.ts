@@ -13,12 +13,8 @@ const initialState: IMediaViewer = {
 }
 
 export default function useMediaPlayback(prop?: IMediaPlayable['mediaRef']): IMediaPlayable {
-    const mediaReducer = (state, { key, payload }: { key?: any, payload }) => {
-        if (key) {
-            return { ...state, [key]: payload };
-        }
-        return payload;
-    }
+
+    const mediaReducer = (state, { key, payload }: { key?: any, payload }) => (key) ? { ...state, [key]: payload } : payload;
 
     const [data, dispatch] = useReducer(mediaReducer, initialState)
     const { toast } = useToast()
