@@ -8,6 +8,7 @@ import { REQUESTS_API } from "@env";
 import { Overlay } from "../../../../../Components/Containers";
 import MediaPlayerControls from "../../../../_partials/MediaProgressBar";
 import useMediaPlayback from "../../../../../Hooks/usemediaPlayback";
+import PlayButton from "../../../../_partials/PlayButton";
 
 
 export default function VideoPresent(post: IPostItem) {
@@ -33,20 +34,11 @@ export default function VideoPresent(post: IPostItem) {
                     onPlaybackStatusUpdate={mediaContext?.handlePlaybackStatusUpdate}
                 />
             </View>
-            <View style={{ height: 35 }}>
-                <MediaPlayerControls
-                    hidden={!mediaContext?.mediaRef?.current}
-                    {...mediaContext?.states} />
-                <IconButton
-                    onPress={mediaContext.states.playState === 'playing' ? mediaContext?.pause : mediaContext.play}
-                    containerStyle={{ backgroundColor: 'transparent' }}
-                    style={{ width: 35, backgroundColor: 'transparent' }}
-                    icon={<Ionicons
-                        name={mediaContext?.states?.playState === 'playing' ? 'pause' : 'play'}
-                        color={'white'}
-                        size={35}
-                    />}
-                />
+            <View style={{ height: 35, flexDirection:'row', alignItems:'center', gap:10, paddingHorizontal:15 }}>
+                <View style={{flex:1}}>
+                    <MediaPlayerControls hidden={!mediaContext?.mediaRef?.current}  {...mediaContext} />
+                </View>
+                <PlayButton  {...mediaContext} />
             </View>
         </View>
     )

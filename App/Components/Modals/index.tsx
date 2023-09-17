@@ -21,11 +21,10 @@ export default function ThemedModal(modalprops: IThemedmodal) {
                     {hideBar || <View style={[styles.spaceBetween, { height: 20, justifyContent: 'center', backgroundColor: themeColors.background2, width: '100%' }]}>
                         <View style={[styles.contentDescriptionContainerBar, { backgroundColor: themeColors.text }]} />
                     </View>}
-                    <ScrollView
-                        showsVerticalScrollIndicator={false}
+                    <View
                         style={{ flexGrow: 1, width: '100%'}}>
                         {children}
-                    </ScrollView>
+                    </View>
                 </View>
             </View>
         </Modal>

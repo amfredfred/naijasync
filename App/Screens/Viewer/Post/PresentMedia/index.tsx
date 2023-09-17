@@ -141,7 +141,7 @@ export default function PresentMedia(post: PresentMedia) {
                 onPress={onRequestClose}
                 icon={<Ionicons size={30} name='arrow-back' />}
             />
-            <ProfileAvatar {...post?.owner} avatarOnly />
+
         </View>
     )
 
@@ -181,10 +181,12 @@ export default function PresentMedia(post: PresentMedia) {
                 />
                 <IconButton onPress={() => setisBannerAdVisible(false)} icon={<Ionicons name="close" />} />
             </View>}
-            <PostExplorerFooting {...post} />
+            <View style={{flexDirection:'row', alignItems:'center',  justifyContent:'space-between', paddingLeft:9}}>
+                <ProfileAvatar {...post?.owner} avatarOnly />
+                <PostExplorerFooting {...post} />
+            </View>
         </LinearGradient>
     )
-
 
     return (
         <ThemedModal
@@ -193,7 +195,6 @@ export default function PresentMedia(post: PresentMedia) {
             onRequestClose={onRequestClose}
             visible={Boolean(post?.puid)} >
             <View style={{ backgroundColor: themeColors.background, height }}>
-                {isPostFocused || postHeading}
                 {postContent}
                 {isPostFocused || postFooting}
             </View>
