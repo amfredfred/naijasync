@@ -7,13 +7,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { REQUESTS_API } from "@env";
 import { Overlay } from "../../../../../Components/Containers";
 import MediaPlayerControls from "../../../../_partials/MediaProgressBar";
-import useMediaPlayback from "../../../../../Hooks/usemediaPlayback";
 import PlayButton from "../../../../_partials/PlayButton";
+import { useMediaPlaybackContext } from "../../../../../Contexts/MediaPlaybackContext";
 
 
 export default function VideoPresent(post: IPostItem) {
 
-    const mediaContext = useMediaPlayback()
+    const mediaContext = useMediaPlaybackContext()
     useEffect(() => { mediaContext?.connect({ ...post, presenting: true }) }, [post?.fileUrl])
 
     return (

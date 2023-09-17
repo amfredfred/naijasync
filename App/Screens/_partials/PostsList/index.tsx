@@ -1,66 +1,19 @@
-import { View, FlatList, RefreshControl, StyleSheet } from 'react-native'
+import { View, FlatList, StyleSheet } from 'react-native'
 import { IPostItem } from '../../../Interfaces'
-import PostItem from '../PostItem'
 import useThemeColors from '../../../Hooks/useThemeColors'
-import { SpanText } from '../../../Components/Texts'
-
-interface IPostList {
-    list: IPostItem[],
-    onRefresh?(): void,
-    isRefrehing?: boolean
-    ListHeaderComponent?: FlatList['props']['ListHeaderComponent']
-    invertStickyHeaders?: FlatList['props']['invertStickyHeaders']
-    stickyHeaderHiddenOnScroll?: FlatList['props']['stickyHeaderHiddenOnScroll']
-    stickyHeaderIndices?: FlatList['props']['stickyHeaderIndices']
-}
-
 
 export const Empty = () => {
     const themeColors = useThemeColors()
 
     return (
         <View style={{ height: 340, paddingTop: 10 }}>
-            <View style={[styles.postWrapper]}>
+            <View style={[styles.postWrapper, { padding: 10 }]}>
                 <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
                     <View style={{ width: 40, aspectRatio: 1, borderRadius: 50, backgroundColor: themeColors.background, opacity: .6 }} />
                 </View>
                 <View style={[styles.postContentWrapper, { backgroundColor: themeColors.background, opacity: .6 }]} />
             </View>
         </View>
-    )
-}
-
-export default function PostsList({ list,
-    onRefresh, isRefrehing,
-    ListHeaderComponent,
-    invertStickyHeaders,
-    stickyHeaderHiddenOnScroll,
-    stickyHeaderIndices = [0]
-}: IPostList) {
-
-    const themeColors = useThemeColors()
-
-    const handleOnRefreshList = () => {
-
-        onRefresh?.()
-
-    }
-
-    return (
-        <FlatList
-            stickyHeaderIndices={stickyHeaderIndices}
-            stickyHeaderHiddenOnScroll={stickyHeaderHiddenOnScroll}
-            invertStickyHeaders={invertStickyHeaders}
-            ListHeaderComponent={ListHeaderComponent}
-            maxToRenderPerBatch={4}
-            // ItemSeparatorComponent={() => <View style={{ backgroundColor: themeColors.background2, height: 5 }} />}
-            style={{ flex: 1, backgroundColor: themeColors.background2 }}
-            data={list}
-            renderItem={({ item, index }) => (<PostItem {...item} />)}
-            ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
-            refreshControl={<RefreshControl onRefresh={handleOnRefreshList} refreshing={isRefrehing} />}
-            {...{}}
-        />
     )
 }
 

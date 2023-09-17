@@ -22,7 +22,7 @@ export default function PostVideoItemList(post: IPostItem) {
                     style={{ width: '100%', height: '100%', position: 'absolute', left: 0, top: 0 }}
                     source={{ uri: `${REQUESTS_API}${post?.thumbnailUrl}` }}
                     resizeMethod='resize'
-                    resizeMode='repeat' />
+                    resizeMode='cover' />
             </TouchableOpacity>
             <View style={[styles.spaceBetween, styles.playPauseiconContainer]}>
                 <View style={{ flex: 1 }} />

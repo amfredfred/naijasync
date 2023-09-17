@@ -14,7 +14,7 @@ import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads
 import "expo-dev-client"
 import Explorer from "../Screens/Explorer";
 import Search from "../Screens/Search";
-import { Linking } from 'react-native';
+import { Linking, View } from 'react-native';
 import { MediaViewerProvider } from "../Contexts/MediaPlaybackContext";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ToastProvider from "../Contexts/ToastContext";
@@ -34,9 +34,59 @@ import UpdatePassword from '../Screens/User/Account/Settings/Security/ChangePass
 import UpdateFundsRequestsSettings from '../Screens/User/Account/Settings/Payment/FundsRequest';
 import UpdateFundsTranferSettings from '../Screens/User/Account/Settings/Payment/FundsTransfer';
 import UpdateBiometricSettings from '../Screens/User/Account/Settings/Security/SetupBiometrics';
-import { useEffect } from 'react';
-import PostViewer from '../Screens/Viewer/Post/PresentMedia';
+import { useEffect, useLayoutEffect, useMemo } from 'react';
 import PlayVideo from '../Screens/Viewer/Post/Video';
+import { ProgressBar } from '../Components/Inputs';
+
+const Stack = createNativeStackNavigator();
+const Buttom = createBottomTabNavigator()
+
+const AccountSettingsRoutes = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+        <Stack.Screen name='Personalization & Security' component={SettingsHome} />
+        <Stack.Screen name='Personal Info' key={'Public Profile Update'} component={UpdateProfile} />
+        <Stack.Screen name='Notificaions Preference' component={UpdateNotification} />
+        <Stack.Screen name='Update Password' component={UpdatePassword} />
+        <Stack.Screen name='Payment Requests' component={UpdateFundsRequestsSettings} />
+        <Stack.Screen name='Funds Transfer' component={UpdateFundsTranferSettings} />
+        <Stack.Screen name='Setup Biometrics' component={UpdateBiometricSettings} />
+    </Stack.Navigator>
+)
+
+const AccountDashboardRoutes = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+        <Stack.Screen name='Account overview 🌟' component={DashboardHome} />
+    </Stack.Navigator>
+)
+
+const AccountFundingRoutes = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+        <Stack.Screen name='Payments & Transfers' component={FinanceHome} />
+    </Stack.Navigator>
+)
+
+const AccountRoutes = () => (
+    <AccountLayout>
+        <Buttom.Navigator tabBar={op => <AccountTabBar {...op} />} screenOptions={screenOptions} >
+            <Buttom.Screen name='Posts' options={{ tabBarBadge: 'posts' }} component={Account} />
+            <Buttom.Screen name='Dashboard' options={{ tabBarBadge: 'dashboard' }} component={AccountDashboardRoutes} />
+            <Buttom.Screen name='Payments' options={{ tabBarBadge: 'wallet' }} component={AccountFundingRoutes} />
+            <Buttom.Screen name='Settings' options={{ tabBarBadge: 'settings' }} component={AccountSettingsRoutes} />
+        </Buttom.Navigator>
+    </AccountLayout>
+)
+
+const PublicRoutes = (
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+        <Stack.Screen name='Home' component={Home} />
+        <Stack.Screen name='Downloads' component={Downloads} />
+        <Stack.Screen name="Explorer" component={Explorer} initialParams={{ screen: 'videos' }} />
+        <Stack.Screen name="Search" component={Search} />
+        <Stack.Screen name='PostComposer' component={PostComposer} />
+        <Stack.Screen name="Account" component={AccountRoutes} />
+        <Stack.Screen name='PlayVideo' component={PlayVideo} />
+    </Stack.Navigator>
+)
 
 const screenOptions = {
     headerShown: false,
@@ -45,77 +95,15 @@ const screenOptions = {
 } as const
 
 function Routes() {
-    // const [isAuthenticated, setisAuthenticated] = useState(true)
-    const { status } = useAppStatus()
-    const Stack = createNativeStackNavigator();
-    const Buttom = createBottomTabNavigator()
+
     const auth = useAuthContext()
-
-    const { load, show, error, isLoaded } = useAppOpenAd(TestIds.APP_OPEN, {
-        requestNonPersonalizedAdsOnly: true,
-        keywords: ['fashion', 'clothing'],
-    })
-
-
-    useEffect(() => {
-        load()
-        if (isLoaded) {
-            console.log("APP OPEN ADS LOADED")
-            show()
-        }
-    }, [isLoaded, load])
 
     Linking.addEventListener('url', ({ url }) => {
         const route = url.replace(/.*?:\/\//g, '');
         console.log(route, " FROM LINKING")
     });
 
-    const AccountSettingsRoutes = () => (
-        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
-            <Stack.Screen name='Personalization & Security' component={SettingsHome} />
-            <Stack.Screen name='Personal Info' key={'Public Profile Update'} component={UpdateProfile} />
-            <Stack.Screen name='Notificaions Preference' component={UpdateNotification} />
-            <Stack.Screen name='Update Password' component={UpdatePassword} />
-            <Stack.Screen name='Payment Requests' component={UpdateFundsRequestsSettings} />
-            <Stack.Screen name='Funds Transfer' component={UpdateFundsTranferSettings} />
-            <Stack.Screen name='Setup Biometrics' component={UpdateBiometricSettings} />
-        </Stack.Navigator>
-    )
 
-    const AccountDashboardRoutes = () => (
-        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
-            <Stack.Screen name='Account overview 🌟' component={DashboardHome} />
-        </Stack.Navigator>
-    )
-
-    const AccountFundingRoutes = () => (
-        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
-            <Stack.Screen name='Payments & Transfers' component={FinanceHome} />
-        </Stack.Navigator>
-    )
-
-    const AccountRoutes = () => (
-        <AccountLayout>
-            <Buttom.Navigator tabBar={op => <AccountTabBar {...op} />} screenOptions={screenOptions} >
-                <Buttom.Screen name='Posts' options={{ tabBarBadge: 'posts' }} component={Account} />
-                <Buttom.Screen name='Dashboard' options={{ tabBarBadge: 'dashboard' }} component={AccountDashboardRoutes} />
-                <Buttom.Screen name='Payments' options={{ tabBarBadge: 'wallet' }} component={AccountFundingRoutes} />
-                <Buttom.Screen name='Settings' options={{ tabBarBadge: 'settings' }} component={AccountSettingsRoutes} />
-            </Buttom.Navigator>
-        </AccountLayout>
-    )
-
-    const PublicRoutes = (
-        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
-            <Stack.Screen name='Home' component={Home} />
-            <Stack.Screen name='Downloads' component={Downloads} />
-            <Stack.Screen name="Explorer" component={Explorer} initialParams={{ screen: 'videos' }} />
-            <Stack.Screen name="Search" component={Search} />
-            <Stack.Screen name='PostComposer' component={PostComposer} />
-            <Stack.Screen name="Account" component={AccountRoutes} />
-            <Stack.Screen name='PlayVideo' component={PlayVideo} />
-        </Stack.Navigator>
-    )
 
     const GuestRoutes = (
         <GuestLayout>
@@ -127,30 +115,39 @@ function Routes() {
         </GuestLayout>
     )
 
-    return ((auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? PublicRoutes : GuestRoutes)
-
+    return (
+        <View style={{ flex: 1 }}>
+            {((auth?.user?.person === 'hasSkippedAuthentication' || auth?.user?.person === 'isAuthenticated') ? PublicRoutes : GuestRoutes)}
+        </View>
+    )
 }
 
 export default function Root() {
 
     const Client = new QueryClient()
 
+    const appOpenAd = useAppOpenAd(TestIds.APP_OPEN, {
+        requestNonPersonalizedAdsOnly: true,
+        keywords: ['fashion', 'clothing'],
+    })
+    useLayoutEffect(() => { appOpenAd?.load() }, [appOpenAd?.load])
+    useEffect(() => { !appOpenAd?.isLoaded || appOpenAd?.show() }, [appOpenAd?.isLoaded])
+
+
     return (
-        <SafeAreaProvider>
-            <NavigationContainer>
-                <QueryClientProvider client={Client}>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                        <ToastProvider>
-                            <MediaViewerProvider>
-                                <DataContextProvider>
-                                    <Routes />
-                                </DataContextProvider>
-                            </MediaViewerProvider>
-                        </ToastProvider>
-                    </GestureHandlerRootView>
-                </QueryClientProvider>
-            </NavigationContainer>
-        </SafeAreaProvider>
+        <NavigationContainer>
+            <QueryClientProvider client={Client} >
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                    <ToastProvider>
+                        <MediaViewerProvider>
+                            <DataContextProvider>
+                                <Routes />
+                            </DataContextProvider>
+                        </MediaViewerProvider>
+                    </ToastProvider>
+                </GestureHandlerRootView>
+            </QueryClientProvider>
+        </NavigationContainer>
     )
 }
 

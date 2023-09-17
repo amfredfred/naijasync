@@ -154,7 +154,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
 
     const confirmNumber: IAuthContextMethods['confirmNumber'] = async () => {
         return true
-    }
+    } 
 
     const logout: IAuthContextMethods['logout'] = async () => {
         method?.setObjectItem?.('user', { 'accessToken': null, person: 'isNew' })
@@ -162,6 +162,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     }
 
     const skipAuth: IAuthContextMethods['skipAuth'] = () => {
+        console.log('skip aut pressed')
         setObjectItem('user', { person: 'hasSkippedAuthentication' })
     }
 
@@ -172,8 +173,6 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     const showMiniAuthForm: IAuthContextMethods['showMiniAuthForm'] = (state) => {
         setObjectItem('user', { person: 'isNew' })
     }
-
-
 
     useEffect(() => {
         const checkAuthStatus = async () => {
@@ -199,7 +198,6 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         return () => { }
     }, [NaijaSync?.user?.person])
 
-
     const data: (IAuthContextData & IAuthContextMethods) = {
         login,
         register,
@@ -212,6 +210,9 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         isBusy,
         user: states.user,
     }
+
+    console.log('MIAN RELOADED')
+
 
     return (
         <AuthContext.Provider value={data}>

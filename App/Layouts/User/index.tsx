@@ -171,7 +171,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                                 />
                             </ContainerSpaceBetween> */}
                             <ContainerSpaceBetween style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: themeColors.background2 }}>
-                                <DigitalClock />
+                                {/* <DigitalClock /> */}
                                 <IconButton
                                     textStyle={{ textTransform: 'uppercase' }}
                                     title={`NAIJASYNC • ${new Date().getFullYear()}`}

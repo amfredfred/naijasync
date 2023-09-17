@@ -12,7 +12,6 @@ import usePostForm from "../../../../Hooks/usePostForms";
 import React from 'react';
 import { BannerAd, BannerAdSize, TestIds, useRewardedAd } from 'react-native-google-mobile-ads';
 import VideoPresent from "./Video";
-import useMediaPlayback from "../../../../Hooks/usemediaPlayback";
 import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
 import { TextExpandable } from "../../../../Components/Texts";
 import { LinearGradient } from "expo-linear-gradient";

@@ -14,7 +14,6 @@ import usePostForm from "../../../../Hooks/usePostForms";
 import MediaProgressBar from "../../../_partials/MediaProgressBar";
 import { REQUESTS_API } from "@env";
 import { LinearGradient } from "expo-linear-gradient";
-import useMediaPlayback from "../../../../Hooks/usemediaPlayback";
 import PostItemMenu from "../../../_partials/PostMenu";
 import { useQuery } from "@tanstack/react-query";
 import { IPostItem } from "../../../../Interfaces";
@@ -24,6 +23,7 @@ import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
 import MediaPlayDuration from "../../../_partials/MediaPlayDuration";
 import { TestIds, useInterstitialAd, useRewardedInterstitialAd } from "react-native-google-mobile-ads";
 import PlayButton from "../../../_partials/PlayButton";
+import { useMediaPlaybackContext } from "../../../../Contexts/MediaPlaybackContext";
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
@@ -40,7 +40,7 @@ export default function PlayVideo() {
     const { post } = params as any
 
     const authContext = useAuthContext()
-    const mediaContext = useMediaPlayback()
+    const mediaContext = useMediaPlaybackContext()
     //Aniamtion
     const contConH = useSharedValue(VIDEO_HEIGHT)
     const contConDis = useSharedValue('none')

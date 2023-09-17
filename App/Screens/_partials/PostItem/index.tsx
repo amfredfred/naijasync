@@ -123,7 +123,7 @@ const UploadPostListItem = (post: IPostItem) => {
     return (
         <TouchableOpacity
             activeOpacity={.9}
-            onPress={() => (navigate as any)?.("ViewPost", { post })} style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background, marginBottom: 6 }}>
+            onPress={() => (navigate as any)?.("ViewPost", { post })} style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background}}>
             <View style={[styles.postWrapper]}>
                 <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
                     <ProfileAvatar  {...post?.owner} avatarOnly />
@@ -163,9 +163,10 @@ const styles = StyleSheet.create({
         flexGrow: 1,
     },
     postContentWrapper: {
-        flex: 1,
         minHeight: 'auto',
         paddingRight: 10,
+        flex: 1,
+        flexGrow:1
     },
     playPauseiconContainer: {
         width: '100%',
