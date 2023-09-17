@@ -11,7 +11,6 @@ export default function Explorer() {
 
     const { params } = useRoute()
     const { exploring, genre, screen } = params as any
-    console.log(params)
 
     const { background, background2 } = useThemeColors()
     const { navigate } = useNavigation()

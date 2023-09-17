@@ -5,9 +5,9 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { IconButton } from "../../../../Components/Buttons";
 import { View, StyleSheet, Dimensions, StatusBar, Text, RefreshControl, TouchableOpacity, ScrollView, FlatList, Image, ImageBackground, BackHandler } from 'react-native'
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay,   FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay, FadeIn, FadeOut } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { wait } from "../../../../Helpers";
+import { getRandomBoolean, wait } from "../../../../Helpers";
 import { useRoute } from "@react-navigation/native";
 import { HeadLine, SpanText } from "../../../../Components/Texts";
 import usePostForm from "../../../../Hooks/usePostForms";
@@ -20,11 +20,10 @@ import { useQuery } from "@tanstack/react-query";
 import { IPostItem } from "../../../../Interfaces";
 import axios from "axios";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
-import { ListSlideItem } from "../../../../Components/SlideCarousel";
 import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
-import LikeButton from "../../../_partials/PostComponents/Like";
 import MediaPlayDuration from "../../../_partials/MediaPlayDuration";
 import { TestIds, useInterstitialAd, useRewardedInterstitialAd } from "react-native-google-mobile-ads";
+import PlayButton from "../../../_partials/PlayButton";
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
@@ -42,7 +41,6 @@ export default function PlayVideo() {
 
     const authContext = useAuthContext()
     const mediaContext = useMediaPlayback()
-
     //Aniamtion
     const contConH = useSharedValue(VIDEO_HEIGHT)
     const contConDis = useSharedValue('none')
@@ -85,12 +83,12 @@ export default function PlayVideo() {
     const $videos = useQuery(
         ['videos'],
         async () => await axios.get<IPostItem[]>(`${REQUESTS_API}posts?type=video&username=${authContext?.user?.account?.username}`,),
-        { getNextPageParam: () => { } }
+        { enabled: mediaContext?.states.isReady, getNextPageParam: () => { } }
     )
     const onRefresh = () => $videos?.refetch()
     useEffect(() => {
+        console.log("VIDEP LOADED")
         if ($videos?.status === 'success') {
-            console.log($videos?.data?.data)
             setVideos(($videos?.data?.data as any)?.data)
         } else if ($videos?.status === 'error') {
             console.log("ERERO ", ($videos?.failureReason as any)?.response?.data)
@@ -121,8 +119,9 @@ export default function PlayVideo() {
 
     //handlebackpress
     useEffect(() => {
-        rewardedInterstitialAd.load()
-    }, [mediaContext?.fileUrl])
+        if (mediaContext?.states.isReady)
+            rewardedInterstitialAd.load()
+    }, [mediaContext?.fileUrl, mediaContext?.states.isReady])
 
     //sharing rewards from ads
     useEffect(() => {
@@ -139,6 +138,21 @@ export default function PlayVideo() {
             }
         }
     }, [rewardedInterstitialAd?.isClosed])
+
+    const handleBackPress = (canShowAd) => {
+        if (canShowAd)
+            rewardedInterstitialAd?.show()
+        return false
+    }
+
+
+    //Effects
+    useEffect(() => {
+        const BHND = BackHandler.addEventListener('hardwareBackPress', () => handleBackPress(rewardedInterstitialAd?.isLoaded))
+        return () => {
+            BHND.remove()
+        }
+    }, [rewardedInterstitialAd?.isLoaded])
 
 
     const MediaControls = (
@@ -158,27 +172,34 @@ export default function PlayVideo() {
                             exiting={SlideOutDown}  >
                             <View style={[styles.spaceBetween]}>
                                 <View style={[styles.spaceBetween]}>
-                                    <MediaPlayDuration {...mediaContext?.states} />
+                                    <MediaPlayDuration {...mediaContext} />
                                 </View>
                                 <View style={[styles.spaceBetween]}>
+                                    <TouchableOpacity
+                                        onPress={async () => mediaContext?.skipPrevTo(-5)}
+                                        children={<MaterialIcons
+                                            color={'white'}
+                                            size={25} name='replay-5' />}
+                                    />
+                                    <TouchableOpacity
+                                        onPress={async () => mediaContext?.skipNextTo(5)}
+                                        children={<MaterialIcons
+                                            color={'white'}
+                                            size={25} name='forward-5' />}
+                                    />
                                     <TouchableOpacity
                                         onPress={async () => await mediaContext?.mediaRef?.current?._setFullscreen(true)}
                                         children={<MaterialIcons
                                             color={'white'}
                                             size={25} name={'fullscreen'} />}
                                     />
-                                    <TouchableOpacity
-                                        onPress={mediaContext?.states?.playState === 'playing' ? mediaContext?.pause : mediaContext?.play}
-                                        children={<Ionicons
-                                            color={'white'}
-                                            size={25} name={mediaContext?.states?.playState === 'playing' ? 'pause' : 'play'} />}
-                                    />
+                                    <PlayButton {...mediaContext} />
                                 </View>
                             </View>
                         </Animated.View>
                     </LinearGradient>
                 )}
-            <MediaProgressBar {...mediaContext?.states} />
+            <MediaProgressBar {...mediaContext} />
         </Animated.View>
     )
 
@@ -206,7 +227,7 @@ export default function PlayVideo() {
                 <MaterialIcons
                     onPress={() => setisMenuModalVisile(true)}
                     size={23}
-                    name='more-vert'
+                    name='more-horiz'
                     color={colors.text}
                 />
             </View>
@@ -250,9 +271,10 @@ export default function PlayVideo() {
             stickyHeaderHiddenOnScroll
             stickyHeaderIndices={[0]}
             ListHeaderComponent={MediaDefinition}
-            data={[...Videos, ...Videos]}
+            data={[...Videos]}
             numColumns={3}
-            ListEmptyComponent={() => Array.from({ length: 20 }, (_) => <View style={{ height: 170, borderRadius: 5, backgroundColor: colors.background2 }} />)}
+            maxToRenderPerBatch={10}
+            ListEmptyComponent={() => Array.from({ length: 3 }, (_) => <View style={{ height: 170, borderRadius: 5, backgroundColor: colors.background2 }} />)}
             columnWrapperStyle={{ gap: 5 }}
             contentContainerStyle={{ gap: 5, padding: 5 }}
             refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
@@ -260,9 +282,10 @@ export default function PlayVideo() {
                 <TouchableOpacity
                     disabled={Boolean(mediaContext?.fileUrl == item.fileUrl)}
                     onPress={() => {
-                        if (rewardedInterstitialAd?.isLoaded)
-                            rewardedInterstitialAd?.show()
                         mediaContext?.connect(item)
+                        if (rewardedInterstitialAd?.isLoaded)
+                            if (getRandomBoolean())
+                                rewardedInterstitialAd?.show()
                     }}
                     style={{ flexGrow: 1, height: 170, overflow: 'hidden', borderRadius: 5, opacity: Boolean(mediaContext?.fileUrl == item.fileUrl) ? .4 : 1 }}   >
                     <Image
@@ -277,7 +300,7 @@ export default function PlayVideo() {
     )
 
 
-    return useMemo(() => (
+    return (
         <Animated.View
             entering={SlideInDown}
             exiting={SlideOutDown}
@@ -290,13 +313,14 @@ export default function PlayVideo() {
                 style={{ paddingTop: StatusBar.currentHeight }}
                 source={{ uri: `${REQUESTS_API}${mediaContext?.thumbnailUrl}` }}>
                 <Animated.View style={[styles.videoContainer, { backgroundColor: colors.background }]}>
-                    <Overlay
-                        hidden={!Boolean(mediaContext.states?.playState == 'loading')}
-                        imageSource={`${REQUESTS_API}${mediaContext?.thumbnailUrl}`} />
                     <Video
                         style={[styles.video]}
                         resizeMode={ResizeMode.CONTAIN}
                         ref={mediaContext?.mediaRef} />
+                    <Overlay
+                        hidden={!Boolean(mediaContext.states?.playState == 'loading')}
+                        imageSource={`${REQUESTS_API}${mediaContext?.thumbnailUrl}`} />
+
                     {mediaContext?.states?.playState === 'ended' && (
                         <Animated.Image
                             entering={FadeIn}
@@ -313,9 +337,8 @@ export default function PlayVideo() {
             {playerMode == 'default' && MoreVideos}
             {/* MENU */}
             <PostItemMenu {...post} visible={isMenuModalVisile} onRequestClose={() => setisMenuModalVisile(false)} />
-            <PostExplorerFooting {...(mediaContext ?? [] as any)} />
         </Animated.View>
-    ), [mediaContext?.states, isShwoingControls, isMenuModalVisile, $videos?.data?.data, interstitialAd])
+    )
 }
 
 const styles = StyleSheet.create({
@@ -353,7 +376,7 @@ const styles = StyleSheet.create({
         height: '100%',
         flex: 1,
         bottom: 0,
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         overflow: 'hidden'
     },
     spaceBetween: {
@@ -372,7 +395,6 @@ const styles = StyleSheet.create({
         top: 0,
         height: height - VIDEO_HEIGHT,
         position: 'absolute',
-        overflow: 'hidden',
         zIndex: 12
     },
 

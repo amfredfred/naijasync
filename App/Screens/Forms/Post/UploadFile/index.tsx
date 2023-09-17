@@ -94,8 +94,7 @@ export const UploadFileForm = () => {
                 type,
             })
             if (!pickedItems.canceled) {
-                const picked = pickedItems.assets?.[0]
-                console.log("DOEN DONE", picked, " {ICLED")
+                const picked = pickedItems.assets?.[0] 
                 setSessionValues(state => ({
                     ...state, file: {
                         uri: picked?.uri,
@@ -113,8 +112,7 @@ export const UploadFileForm = () => {
     }
 
     const handlePlaybackStatusUpdate = (data) => {
-        if (data?.isLoaded && !data.isPlaying && data.didJustFinish) {
-            console.log('Media playback has ended.');
+        if (data?.isLoaded && !data.isPlaying && data.didJustFinish) { 
             setMediaState(state => ({ playState: 'ended' }));
             videoMediaRef?.current?.setPositionAsync(0)
             audioMediaRef?.sound?.setPositionAsync(0)

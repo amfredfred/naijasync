@@ -18,6 +18,7 @@ import { TextExpandable } from "../../../../Components/Texts";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRewardedInterstitialAd } from "react-native-google-mobile-ads";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
+import { getRandomBoolean } from "../../../../Helpers";
 
 
 
@@ -29,7 +30,7 @@ export default function PresentMedia(post: PresentMedia) {
     //ads rewarded video
     const RewardedAdsId = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
     const bannerAdId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-    const RewarededInterStitialId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+    const RewarededInterStitialId = __DEV__ ? TestIds.REWARDED_INTERSTITIAL : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
     // rewarded
     const rewardedVideoAd = useRewardedAd(RewardedAdsId, {
         requestNonPersonalizedAdsOnly: true,
@@ -49,9 +50,12 @@ export default function PresentMedia(post: PresentMedia) {
     const [isBannerAdVisible, setisBannerAdVisible] = useState(true)
 
     useEffect(() => {
-        rewardedInterstitialAd.load()
-        // rewardedVideoAd.load()
-    }, [post?.fileUrl])
+        console.log("LOADING ADS")
+        if (!rewardedInterstitialAd.isLoaded)
+            rewardedInterstitialAd.load()
+        if (!rewardedVideoAd?.isLoaded)
+            rewardedVideoAd.load()
+    }, [post?.fileUrl, rewardedVideoAd.load, rewardedInterstitialAd.load])
 
     //sharing rewards from ads
     useEffect(() => {
@@ -69,22 +73,23 @@ export default function PresentMedia(post: PresentMedia) {
         }
     }, [rewardedInterstitialAd?.isClosed, rewardedVideoAd?.isClosed])
 
-    console.log(rewardedInterstitialAd,)
-
     const showREwardedAd = async () => {
-        try {
-            if (rewardedVideoAd?.isLoaded) {
-                console.log("LOADED rewardedVideoAd")
-                rewardedVideoAd.show()
-            } else if (rewardedInterstitialAd?.isLoaded) {
-                console.log("LOADED rewardedInterstitialAd")
-                rewardedInterstitialAd?.show({ immersiveModeEnabled: true })
-            } else {
-                console.log("REWARDS ADS NOT READY")
+        if (getRandomBoolean())
+            try {
+                if (rewardedVideoAd?.isLoaded) {
+                    console.log("LOADED rewardedVideoAd")
+                    rewardedVideoAd.show()
+                } else if (rewardedInterstitialAd?.isLoaded) {
+                    console.log("LOADED rewardedInterstitialAd")
+                    rewardedInterstitialAd?.show({ immersiveModeEnabled: true })
+                } else {
+                    console.log("REWARDS ADS NOT READY")
+                }
+            } catch (error) {
+                console.log("PRESENT_MEDIA_REWARDED_VIDEO_ERROR -> ", error)
             }
-        } catch (error) {
-            console.log("PRESENT_MEDIA_REWARDED_VIDEO_ERROR -> ", error)
-        }
+        else
+            console.log('not showing ads this time')
         onClose?.()
     }
 
@@ -110,7 +115,6 @@ export default function PresentMedia(post: PresentMedia) {
 
     useEffect(() => {
         postForm?.methods?.updatePost({ 'views': 1, puid: post?.puid })
-        console.log('reloaded')
     }, [])
 
     const RenderPost = () => {

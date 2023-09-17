@@ -14,9 +14,7 @@ import { REQUESTS_API } from "@env";
 
 export function ListSlideItem(props: IPostItem) {
     const { type, fileType } = props;
-
-    console.log('type', props)
-
+ 
     const handleOnPress = () => {
         console.log("PRESSED");
         props.onPress?.(props);

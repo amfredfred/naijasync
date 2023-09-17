@@ -35,6 +35,7 @@ export interface IMediaPlayable extends IPostItem {
         duration?: number
         isBufering?: boolean
         position?: number
+        isReady?:boolean
     }
     type: IMediaType
     mode?: "fullscreen" | "collapsed" | "floating" | "hidden",

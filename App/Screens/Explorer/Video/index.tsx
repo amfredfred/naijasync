@@ -36,8 +36,7 @@ export default function VideoExplorer() {
     )
 
     useEffect(() => {
-        if ($videos?.status === 'success') {
-            console.log($videos?.data?.data)
+        if ($videos?.status === 'success') { 
             setVideos(($videos?.data?.data as any)?.data)
         } else if ($videos?.status === 'error') {
             console.log("ERERO ", ($videos?.failureReason as any)?.response?.data)

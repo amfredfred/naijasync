@@ -61,16 +61,15 @@ export default function useMediaPlayback(prop?: IMediaPlayable['mediaRef']): IMe
         }));
     };
 
-    const handleSeek = (percentage) => {
+    const handleSeek = (positionSeconds) => {
         setMediaState(s => ({ ...s, playState: 'seeking' }));
-        const newPosition = (percentage * mediaState?.duration) / 100;
         if (mediaType === 'audio') {
-            audioObjectRef.current?.sound?.setPositionAsync(newPosition);
-        } else if (mediaType === 'video') {
-            console.log("SEEKD", percentage)
-            mediaRef.current?.setStatusAsync({ positionMillis: newPosition });
+            audioObjectRef.current?.sound?.setPositionAsync(positionSeconds);
+        } else if (mediaType === 'video') { 
+            mediaRef.current?.setStatusAsync({ positionMillis: positionSeconds });
         }
         setMediaState(s => ({ ...s, playState: 'shouldPlay' }));
+        play()
     };
 
     const handleLoad = (data) => {
@@ -78,58 +77,9 @@ export default function useMediaPlayback(prop?: IMediaPlayable['mediaRef']): IMe
         setMediaState((prevState) => ({ ...prevState, duration: data.durationMillis }));
     };
 
-
-    const loadMediaPlayable = async (shouldPlay?: boolean) => {
-        try {
-            setMediaState(S => ({ ...S, playState: 'loading' }))
-            if (mediaType === 'audio') {
-                const playbackObject = await Audio.Sound.createAsync?.(
-                    { uri: `${REQUESTS_API}${data?.fileUrl}` },
-                    { shouldPlay: shouldPlay },
-                    handlePlaybackStatusUpdate as any
-                );
-                await Audio.setAudioModeAsync({
-                    allowsRecordingIOS: false,
-                    playsInSilentModeIOS: true,
-                    // interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
-                    shouldDuckAndroid: true,
-                    // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
-                    staysActiveInBackground: true,
-                });
-                audioObjectRef.current = playbackObject;
-            } else if (mediaType === 'video') {
-                await mediaRef?.current?.loadAsync?.({ uri: `${REQUESTS_API}${data?.fileUrl}` }, {
-                    'shouldCorrectPitch': true,
-                }, true);
-
-                mediaRef?.current?.setOnPlaybackStatusUpdate(states => handlePlaybackStatusUpdate(states as any))
-            }
-            setMediaState(S => ({ ...S, playState: 'canPlay' }))
-            play()
-        } catch (error) {
-            console.log("ERROR: loadMediaPlayable-> ", error)
-            toast({
-                message: "error occured while loading media !!",
-                timeout: 5000,
-                severnity: 'error',
-                headline: 'Error loading '.concat(mediaType)
-            })
-            // await clearAllRefs()
-            setMediaState(S => ({ ...S, playState: 'errored' }))
-        }
-    };
-
-    useEffect(() => {
-        if (mediaType) {
-            loadMediaPlayable();
-        }
-        return () => {
-            clearAllRefs()
-        };
-    }, [data?.fileUrl, mediaType]);
-
     const play = async () => {
         try {
+            console.log('FROM ', Date.now())
             if (mediaType === 'audio') {
                 if (mediaState?.playState === 'ended')
                     await audioObjectRef?.current?.sound?.replayAsync();
@@ -142,6 +92,7 @@ export default function useMediaPlayback(prop?: IMediaPlayable['mediaRef']): IMe
                     await mediaRef?.current?.playAsync();
             }
             setMediaState((prevState) => ({ ...prevState, playState: 'playing' }));
+            console.log('PLAYED ', Date.now())
         } catch (error) {
             console.log("ERROR: play-> ", error)
             setMediaState((prevState) => ({ ...prevState, playState: 'errored' }));
@@ -162,11 +113,62 @@ export default function useMediaPlayback(prop?: IMediaPlayable['mediaRef']): IMe
         }
     };
 
+
+    const loadMediaPlayable = async (shouldPlay?: boolean) => {
+        try {
+            setMediaState(S => ({ ...S, playState: 'loading' }))
+            console.log("CALLED++++++++++++++++++++++++++++++++++++++++++++++++++=========================")
+
+            if (mediaType === 'audio') {
+                const playbackObject = await Audio.Sound.createAsync?.(
+                    { uri: `${REQUESTS_API}${data?.fileUrl}` },
+                    { shouldPlay: shouldPlay },
+                    handlePlaybackStatusUpdate as any
+                );
+                await Audio.setAudioModeAsync({
+                    allowsRecordingIOS: false,
+                    playsInSilentModeIOS: true,
+                    shouldDuckAndroid: true,
+                    staysActiveInBackground: true,
+                });
+                audioObjectRef.current = playbackObject;
+            } else if (mediaType === 'video') {
+                console.log('LOADING VIDEO')
+                await mediaRef?.current?.loadAsync?.({ uri: `${REQUESTS_API}${data?.fileUrl}` }, {}, false);
+                console.log("LAODED VIDEO")
+            } 
+            setMediaState(S => ({ ...S, isReady: true, playState: 'canPlay' }))
+            play()
+            mediaRef?.current?.setOnPlaybackStatusUpdate(states => handlePlaybackStatusUpdate(states as any))
+        } catch (error) {
+            console.log("ERROR: loadMediaPlayable-> ", error)
+            toast({
+                message: "error occured while loading media !!",
+                timeout: 5000,
+                severnity: 'error',
+                headline: 'Error loading '.concat(mediaType)
+            })
+            // await clearAllRefs()
+            setMediaState(S => ({ ...S, playState: 'errored' }))
+        }
+    };
+
+    useEffect(() => {
+        if (mediaType) {
+            loadMediaPlayable();
+            
+        }
+        return () => { };
+    }, [data?.fileUrl, mediaType]);
+
+
     const skipNextTo: IMediaPlayable['skipNextTo'] = async (to = 5) => {
-        handleSeek(to)
+        const newPosition = (mediaState.position + to) * 1000;
+        handleSeek(newPosition)
     }
     const skipPrevTo: IMediaPlayable['skipPrevTo'] = async (to = 5) => {
-        handleSeek(to)
+        const newPosition = (mediaState.position + to) * 1000;
+        handleSeek(newPosition)
     }
 
     const remove: IMediaPlayable['remove'] = async () => {
@@ -177,7 +179,6 @@ export default function useMediaPlayback(prop?: IMediaPlayable['mediaRef']): IMe
         dispatch({ 'key': 'presenting', payload: props?.presenting })
         try {
             setMedia(props)
-            await play()
         } catch (error) {
             console.log("ERROR: connect-> ", error)
         }

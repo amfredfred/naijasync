@@ -208,6 +208,10 @@ export const getTags = (inputString: string): string[] => {
     }
 }
 
+export const   getRandomBoolean = () =>  {
+    return Math.random() <= 0.51;  
+}
+
 
 export const extractUrl = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(ftp:\/\/[^\s]+)|(\b[\w-]+(\.[a-z]{2,})+\S*)/gi;

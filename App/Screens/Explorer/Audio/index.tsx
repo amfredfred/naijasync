@@ -22,7 +22,6 @@ export default function AudioExplorer() {
     const { exploring, genre, screen } = params as any
     const { height, width } = useWindowDimensions()
     const authContext = useAuthContext()
-    console.log(params)
 
     const [Videos, setVideos] = useState<IPostItem[]>()
 
@@ -37,7 +36,6 @@ export default function AudioExplorer() {
 
     useEffect(() => {
         if ($videos?.status === 'success') {
-            console.log($videos?.data?.data)
             setVideos(($videos?.data?.data as any)?.data)
         } else if ($videos?.status === 'error') {
             console.log("ERERO ", ($videos?.failureReason as any)?.response?.data)

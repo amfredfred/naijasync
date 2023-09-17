@@ -1,44 +1,68 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native"
+import { View, TouchableOpacity, StyleSheet, LayoutChangeEvent, } from "react-native"
 import { IMediaPlayable } from "../../Statics/Interface"
 import { ITheme, IThemedComponent } from "../../../Interfaces"
+import { useState } from 'react'
 
-export type IMediaPlayerControls = IMediaPlayable['states'] & IThemedComponent  
+export type IMediaPlayerControls = IMediaPlayable & IThemedComponent & {
+    open?: boolean
+}
 
 export default function MediaProgressBard(props: IMediaPlayerControls) {
 
-    const { duration, position, bufferProgress, progress,   hidden, playState } = props
+    if (props?.hidden) return null
 
-    if (hidden) return null
+    const { states: { duration, position, bufferProgress, progress, playState, }, open, handleSeek } = props
+
+    const [containerWidth, setContainerWidth] = useState<number | null>(null);
+
+    const handleSeekBarPress = (e: any) => {
+        if (containerWidth !== null) {
+            const { locationX } = e.nativeEvent;
+            const seekPercentage = (locationX / containerWidth) * 100;
+            const seekPositionMillis = ((seekPercentage / 100) * duration) * 1000;
+            // Call the handleSeek function with the seekPositionMillis
+            // handleSeek(seekPositionMillis);
+        }
+    };
+
+    const handleContainerLayout = (e: LayoutChangeEvent) => {
+        setContainerWidth(e.nativeEvent.layout.width);
+    };
+
 
     return (
-        <TouchableOpacity
-            onPress={() => console.log("------")}
-            style={[styles.playControlsContainer]} >
-            <View style={{ flex: 1 }} >
-                <View
-                    style={[styles.mediaProgressContainer]}>
-                    <View style={[styles.mediaProgressBar, { width: `${progress * 100}%` }]}>
-                        {playState === 'paused' && <View style={[styles.mediaProgressarPointer]} />}
-                    </View>
-                    <View style={[styles.mediaBufferBar, { width: `${bufferProgress * 100}%` }]} />
-                </View>
-                
+        <View
+            style={[styles.container, { height: open ? 30 : 2 }]}
+            onLayout={handleContainerLayout}   >
+            <View
+                onTouchMove={handleSeekBarPress}  style={[styles.playControlsContainer]} >
+                    <View style={{ flex: 1 }} >
+                        <View
+                            style={[styles.mediaProgressContainer]}>
+                            <View style={[styles.mediaProgressBar, { width: `${progress * 100}%` }]}>
+                                {(playState === 'paused' || open) && <View style={[styles.mediaProgressarPointer]} />}
+                            </View>
+                            <View style={[styles.mediaBufferBar, { width: `${bufferProgress * 100}%` }]} />
+                        </View>
+
+                    </View> 
             </View>
-        </TouchableOpacity>
+        </View>
     )
 }
 
 
 const styles = StyleSheet.create({
-    playControlsContainer: {
+    container: {
+        backgroundColor: 'darkgrey',
         width: '100%',
+    },
+    playControlsContainer: {
         flexDirection: 'row',
+        height: 2,
         alignItems: 'center',
         justifyContent: 'space-between',
-        position: 'absolute',
-        bottom: 0,
     },
-
 
     // 
     mediaProgressContainer: {
@@ -48,7 +72,6 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     },
     mediaBufferBar: {
-        backgroundColor: 'green',
         width: 80,
         position: 'absolute',
         left: 0,
