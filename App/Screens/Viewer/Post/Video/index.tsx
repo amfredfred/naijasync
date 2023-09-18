@@ -126,16 +126,10 @@ export default function PlayVideo() {
     //sharing rewards from ads
     useEffect(() => {
         if (rewardedInterstitialAd?.reward?.amount) {
-            postForm?.methods?.updatePost({
-                rewards: ((rewardedInterstitialAd?.reward?.amount / 100) * 70).toFixed(3),
+            postForm?.methods?.postReward({
+                rewards: rewardedInterstitialAd?.reward?.amount / 100,
                 puid: mediaContext?.puid
             })
-            // reward the user
-            if (authContext?.user?.person === 'isAuthenticated') {
-                authContext?.updateAccount({
-                    points: (rewardedInterstitialAd?.reward?.amount / 100) * 30
-                })
-            }
         }
     }, [rewardedInterstitialAd?.isClosed])
 

@@ -20,7 +20,8 @@ export interface IPostContext {
     postGenre?: string[] | null;
     price?: number | null;
     downloadable?: boolean;
-    postType?: IPostType['types']
+    postType?: IPostType['types'],
+    puid?: string
 }
 type PayloadTypes<T extends keyof IPostContext> = IPostContext[T]
 
@@ -46,8 +47,12 @@ type IPostFormTypesKeys<K extends IPostFormTypes['postTypes']> = IPostFormTypes[
 
 export type IPostFormMethods = {
     setData<K extends keyof IPostContext>(item: K, payload: PayloadTypes<K>): void
-    createPost(props: IPostContext): Promise<IPostContext | null>
-    updatePost(payload: IPostItem): void
+    // 
+    createPost(props: IPostContext): void
+    updatePost(payload: IPostContext): void
     deletePost(payload: IPostItem): void
+    // 
     postView(payload: IPostItem): void
+    postReward(payload: IPostItem): void
+    postReact(payload: IPostItem): void
 }

@@ -71,7 +71,7 @@ export interface IPostItem {
     tags?: string[],
     ratings?: string,
     price?: string,
-    rewards?: string,
+    rewards?: string | number,
     downloadable?: string,
     playtime?: string
     fileType?: string

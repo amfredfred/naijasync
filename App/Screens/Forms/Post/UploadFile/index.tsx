@@ -58,7 +58,11 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                 file: {
                     uri: `${REQUESTS_API}${post?.fileUrl}`
                 },
-                thumbnail: `${REQUESTS_API}${post?.thumbnailUrl}`
+                thumbnail: `${REQUESTS_API}${post?.thumbnailUrl}`,
+                description: post?.description,
+                title: post?.title,
+                tags: post?.tags,
+                postType: post?.postType
             })
         }
     }, [])
@@ -66,7 +70,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     const playPauseMedia = async () => {
         try {
             if (fileType === 'audio') {
-                if (!audioMediaRef)     
+                if (!audioMediaRef)
                     setAudioMediaRef(await Audio.Sound.createAsync({
                         uri: sessionValues?.file?.uri,
                     }, {}, handlePlaybackStatusUpdate))
@@ -94,9 +98,10 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     }
 
     const handleCreatePost = async () => {
-        const post = await createPost({
-            ...sessionValues, 'postType': "UPLOAD"
-        })
+        if (post?.formMode == 'create')
+            createPost({ ...sessionValues, 'postType': "UPLOAD" })
+        else
+            updatePost({ ...sessionValues })
     }
 
     const handlePickDocument = async () => {

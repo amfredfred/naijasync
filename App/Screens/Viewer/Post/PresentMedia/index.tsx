@@ -59,16 +59,10 @@ export default function PresentMedia(post: PresentMedia) {
     //sharing rewards from ads
     useEffect(() => {
         if (rewardedInterstitialAd?.reward?.amount || rewardedVideoAd?.reward) {
-            postForm?.methods?.updatePost({
-                rewards: ((rewardedInterstitialAd?.reward?.amount ?? rewardedVideoAd?.reward?.amount / 100) * 70).toFixed(3),
+            postForm?.methods?.postReward({
+                rewards: rewardedInterstitialAd?.reward?.amount ?? rewardedVideoAd?.reward?.amount,
                 puid: post?.puid
             })
-            // reward the  user
-            if (authContext?.user?.person === 'isAuthenticated') {
-                authContext?.updateAccount({
-                    points: (rewardedInterstitialAd?.reward?.amount ?? rewardedVideoAd?.reward?.amount / 100) * 30
-                })
-            }
         }
     }, [rewardedInterstitialAd?.isClosed, rewardedVideoAd?.isClosed])
 
@@ -113,7 +107,7 @@ export default function PresentMedia(post: PresentMedia) {
     const onRequestClose = async () => showREwardedAd()
 
     useEffect(() => {
-        postForm?.methods?.updatePost({ 'views': 1, puid: post?.puid })
+        postForm?.methods?.postView({ 'views': 1, puid: post?.puid })
     }, [])
 
     const RenderPost = () => {
@@ -180,7 +174,7 @@ export default function PresentMedia(post: PresentMedia) {
                 />
                 <IconButton onPress={() => setisBannerAdVisible(false)} icon={<Ionicons name="close" />} />
             </View>}
-            <View style={{flexDirection:'row', alignItems:'center',  justifyContent:'space-between', paddingLeft:9}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 9 }}>
                 <ProfileAvatar {...post?.owner} avatarOnly />
                 <PostExplorerFooting {...post} />
             </View>

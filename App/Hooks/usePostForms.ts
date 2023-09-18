@@ -7,6 +7,7 @@ import { useAuthContext } from "../Contexts/AuthContext";
 import { useDataContext } from "../Contexts/DataContext";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { ToastAndroid } from "react-native";
 
 export default function usePostForm(): { states: IPostContext, methods: IPostFormMethods } {
     const [states, setFormState] = useState({});
@@ -15,18 +16,20 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
     const dataContext = useDataContext()
     const navigation = useNavigation()
 
+    const AHeaders = {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${authContext?.user?.accessToken}`
+    }
+
     const createPostMutation = useMutation((info) => {
         return axios.post(`${REQUESTS_API}posts`,
             info, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${authContext?.user?.accessToken}`
-            }
+            headers: AHeaders
         })
     })
 
     const updatePostMutation = useMutation((info) => {
-        return axios.post(`${REQUESTS_API}posts/${(info as any)?.postId as any}?_method=PUT`,
+        return axios.post(`${REQUESTS_API}posts/${(info as any)?.postId}?_method=PUT`,
             (info as any)?.data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -36,22 +39,12 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
     })
 
     const deletePostMutation = useMutation((info) => {
-        return axios.delete(`${REQUESTS_API}posts/${(info as any)?.postId as any}`, {
+        return axios.delete(`${REQUESTS_API}posts/${(info as any)?.postId}`, {
             headers: { 'Authorization': `Bearer ${authContext?.user?.accessToken}` },
         })
     })
 
-    const postViewMutation = useMutation((info) => {
-        return axios.post(`${REQUESTS_API}post-viewed`,
-            info,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${authContext?.user?.accessToken}`
-                }
-            }
-        )
-    })
+
 
     const { toast } = useToast()
 
@@ -88,7 +81,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
             const post = await createPostMutation?.mutateAsync(formData as any)
             console.log(post?.status, 'States')
             if (post?.status == 201 || post?.status == 200) {
-                toast({ message: 'Nice !!', severnity: 'success' })
+                toast({ message: 'Nice !!', severity: 'success' })
                 createPostMutation.reset()
             } else {
                 console.log(post?.data, " : DATA FROM CREATE")
@@ -96,38 +89,100 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
             return post?.data
         } catch (error) {
             if (error?.response?.status === 401) {
-                toast({ message: error?.response?.data?.message, severnity: 'warning' })
+                toast({ message: error?.response?.data?.message, severity: 'warning' })
                 return authContext?.logout()
             }
+        } finally {
+            createPostMutation.reset()
         }
     }
 
-    const postView: IPostFormMethods['updatePost'] = async (payload) => {
-        const formData = new FormData()
-        await Promise.all(Object.keys(payload)?.map(d => {
-            formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
-        }))
-        postViewMutation?.mutate(formData as any)
-    }
-
     const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
+        if (authContext?.user?.person !== 'isAuthenticated') {
+            authContext?.logout()
+            return
+        }
         if (payload?.puid) {
-            if (authContext?.user?.person !== 'isAuthenticated') {
-                authContext?.logout()
-                return
-            }
             const formData = new FormData()
             await Promise.all(Object.keys(payload)?.map(d => {
                 formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
             }))
+            if (payload?.file)
+                formData.append('upload', {
+                    type: payload.file.type,
+                    name: payload.file.name,
+                    uri: payload.file.uri
+                } as any);
+            if (payload?.thumbnail)
+                formData.append('thumbnail', {
+                    type: 'image/*',
+                    name: 'thumbnail.jpg',
+                    uri: payload?.thumbnail
+                } as any)
             formData.append('_method', 'PATCH')
-            updatePostMutation?.mutate({ data: formData, postId: payload?.puid } as any)
+            // if (navigation?.canGoBack()) {
+            //     navigation?.goBack()
+            // }
+            try {
+                const post = await updatePostMutation?.mutateAsync({ data: formData, postId: payload?.puid } as any)
+                console.log(post?.status, 'States')
+                if (post?.status == 201 || post?.status == 200) {
+                    toast({ message: 'Nice !!', severity: 'success' })
+                    updatePostMutation.reset()
+                } else {
+                    console.log(post?.data, " : DATA FROM CREATE")
+                }
+                return post?.data
+            } catch (error) {
+                console.log(JSON.stringify(error?.response?.data?.message), ' ERROR REPOSNE')
+                if (error?.response?.status === 401) {
+                    toast({ message: error?.response?.data?.message, severity: 'warning' })
+                    return authContext?.logout()
+                }
+            }
+            finally {
+                updatePostMutation.reset()
+            }
         }
     }
 
     const deletePost: IPostFormMethods['deletePost'] = async (payload) => {
         const deleted = await deletePostMutation?.mutateAsync({ postId: payload?.puid } as any)
         console.log(deleted)
+    }
+
+
+    const postView: IPostFormMethods['postView'] = async (payload) => {
+        const [viewed] = await Promise.allSettled([axios.post(
+            `${REQUESTS_API}post-viewed`,
+            { reaction: payload?.liked }, { headers: AHeaders }
+        )])
+    }
+
+    const postReward: IPostFormMethods['postReward'] = async (payload) => {
+        const [reacted] = await Promise.allSettled([axios.post(
+            `${REQUESTS_API}posts/post-viewed`,
+            { reaction: payload?.liked }, { headers: AHeaders }
+        )])
+
+        if (reacted?.status === 'fulfilled') {
+            if (authContext?.user?.person === 'isAuthenticated') {
+                ToastAndroid.BOTTOM
+                ToastAndroid.show(`Post ${payload?.liked ? 'liked' : 'unliked'}`, 1000)
+            }
+        }
+    }
+
+    const postReact: IPostFormMethods['postReact'] = async (payload) => {
+        const [reacted] = await Promise.allSettled([axios.post(
+            `${REQUESTS_API}posts/post-viewed`,
+            { reaction: payload?.liked }, { headers: AHeaders }
+        )])
+
+        if (reacted?.status === 'fulfilled') {
+            ToastAndroid.BOTTOM
+            ToastAndroid.show(`Post ${payload?.liked ? 'liked' : 'unliked'}`, 1000)
+        }
     }
 
     const formContextValue = {
@@ -137,7 +192,9 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
             createPost,
             updatePost,
             postView,
-            deletePost
+            deletePost,
+            postReward,
+            postReact
         }
     }
 
