@@ -16,7 +16,6 @@ import { Empty } from '../_partials/PostsList';
 import * as Animatable from 'react-native-animatable';
 
 export default function Home() {
-    const { setData, states: NJS } = useDataContext()
     const themeColors = useThemeColors()
     const authContext = useAuthContext()
     const navigation = useNavigation()
@@ -124,12 +123,18 @@ export default function Home() {
         </View>
     )
 
+    const ListHeading = (
+        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}>
+
+        </View>
+    )
+
     return useMemo(() => (
         <UserLayout>
             <FlatList
                 stickyHeaderHiddenOnScroll
-                invertStickyHeaders
-                maxToRenderPerBatch={4}
+                ListHeaderComponent={ListHeading}
+                stickyHeaderIndices={$Posts ? [0] : undefined}
                 ItemSeparatorComponent={() => <View style={{ backgroundColor: themeColors.background2, height: 5 }} />}
                 style={{ flex: 1, backgroundColor: themeColors.background2 }}
                 data={$Posts}

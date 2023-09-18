@@ -150,7 +150,7 @@ export function MediaViewerProvider({ children }) {
             toast({
                 message: "error occured while loading media !!",
                 timeout: 5000,
-                severnity: 'error',
+                severity: 'error',
                 headline: 'Error loading '.concat(mediaType)
             })
             // await clearAllRefs()
@@ -162,7 +162,7 @@ export function MediaViewerProvider({ children }) {
         if (mediaType) {
             loadMediaPlayable();
         }
-        return () => { 
+        return () => {
 
         };
     }, [data?.fileUrl, mediaType]);

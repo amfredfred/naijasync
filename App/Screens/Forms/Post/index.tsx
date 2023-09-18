@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import useThemeColors from "../../../Hooks/useThemeColors";
@@ -8,11 +8,14 @@ import FormBottomTabs from "./BottomForTabs";
 import UploadStatusFrom from "./UploadStatus";
 import UploadFileForm from "./UploadFile";
 import { SpanText } from '../../../Components/Texts';
+import { useRoute } from '@react-navigation/native';
+import { IPostItem } from '../../../Interfaces';
 
 const { width, height } = Dimensions.get('window');
 
 export default function PostComposer() {
     const [activeTab, setactiveTab] = useState<IPostType['types']>('UPLOAD');
+    const [formMode, setformMode] = useState<'create' | 'edit'>('create')
     const [isShowingKeyboard, setisShowingKeyboard] = useState(false);
     const themeColors = useThemeColors();
     useKeyboardEvent({
@@ -21,6 +24,19 @@ export default function PostComposer() {
         dep: null
     });
     const handleOnButtonTabPress = (props: IPostType['types']) => setactiveTab(props);
+
+
+    // check if to update post
+    const { params } = useRoute()
+    const { post, formMode: formModePassed } = (params ?? { post: {}, formMode: 'create' }) as {
+        post: IPostItem,
+        formMode: 'create' | 'edit'
+    }
+    useEffect(() => {
+        setformMode(formModePassed)
+    }, [])
+
+
     return useMemo(() => (
         <KeyboardAvoidingView
             behavior={Platform.OS == 'android' ? 'height' : 'padding'}
@@ -47,9 +63,9 @@ export default function PostComposer() {
                 {/*  */}
                 <View style={[styles.innerContainer]}>
                     {activeTab === 'STATUS' && <UploadStatusFrom />}
-                    {activeTab === 'UPLOAD' && <UploadFileForm />}
+                    {activeTab === 'UPLOAD' && <UploadFileForm {...post} formMode={formMode} />}
                 </View>
-                <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard }} />
+                <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard || formMode === 'edit' }} />
             </View>
         </KeyboardAvoidingView>
     ), [activeTab, isShowingKeyboard, themeColors]);

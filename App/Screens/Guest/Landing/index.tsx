@@ -27,14 +27,14 @@ export default function Landing() {
         if (!dataContext?.states?.authing?.email.length) {
             return toastContext.toast({
                 message: "The email address field is required 😢",
-                severnity: 'error',
+                severity: 'error',
                 timeout: 5000
             })
         }
         if (!isValidEmail(dataContext?.states?.authing?.email)) {
             return toastContext.toast({
                 message: "You've entered an invalid email address 😢",
-                severnity: 'warning',
+                severity: 'warning',
                 timeout: 5000
             })
         }

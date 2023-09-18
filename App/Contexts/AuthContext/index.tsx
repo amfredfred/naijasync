@@ -81,7 +81,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
             setObjectItem('user', { person: 'isNew' })
             toast({
                 message: `${error?.response?.data?.message}`,
-                severnity: 'error',
+                severity: 'error',
             })
         } finally {
             setisBusy(false)
@@ -107,7 +107,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         } catch (error) {
             toast({
                 message: `${error?.response?.data?.message}`,
-                severnity: 'warning',
+                severity: 'warning',
             })
         } finally {
             setisBusy(false)
@@ -132,7 +132,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
             if (newAccountInfo?.profilePics)
                 formData.append('cover-image', newAccountInfo?.profilePics as any)
             const auth = await mutation?.mutateAsync(formData as any)
-            const user = (auth?.data as any)?.profile as IAuthContextData['user']  
+            const user = (auth?.data as any)?.profile as IAuthContextData['user']
             if (auth?.status == 201 || auth?.status == 200) {
                 user['accessToken'] = (auth?.data as any)?.accessToken
                 user['person'] = 'isAuthenticated'
@@ -143,7 +143,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         } catch (error) {
             toast({
                 message: ` ${error?.response?.data?.message}`,
-                severnity: 'error',
+                severity: 'error',
             })
         }
         finally {
@@ -154,7 +154,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
 
     const confirmNumber: IAuthContextMethods['confirmNumber'] = async () => {
         return true
-    } 
+    }
 
     const logout: IAuthContextMethods['logout'] = async () => {
         method?.setObjectItem?.('user', { 'accessToken': null, person: 'isNew' })

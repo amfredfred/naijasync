@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons'
 
 interface IToastProps {
     message?: string
-    severnity?: 'error' | 'success' | "warning" | "notify"
+    severity?: 'error' | 'success' | "warning" | "notify"
     timeout?: number
     headline?: string,
     autoHide?: boolean
@@ -38,7 +38,7 @@ export default function ToastProvider({ children }) {
         success: require('../../../assets/icons/icon-success.png'),
         notify: require('../../../assets/icons/info-icon.png'),
     }
-    
+
     const backgrounds = {
         error: 'red',
         warning: '',
@@ -46,8 +46,8 @@ export default function ToastProvider({ children }) {
         notify: '',
     }
 
-    const toast: IToast['toast'] = ({ message, severnity, timeout, autoHide, headline }) => {
-        setToastInfo({ message, severnity, timeout, autoHide, headline })
+    const toast: IToast['toast'] = ({ message, severity, timeout, autoHide, headline }) => {
+        setToastInfo({ message, severity, timeout, autoHide, headline })
     }
 
     useTimeout({
@@ -74,22 +74,22 @@ export default function ToastProvider({ children }) {
                             justifyContent: 'center',
                             left: '5%',
                             borderRadius: 10,
-                            borderLeftColor: backgrounds[toastInfo?.severnity],
+                            borderLeftColor: backgrounds[toastInfo?.severity],
                             borderLeftWidth: 1,
                             borderRightWidth: 1,
-                            borderRightColor: backgrounds[toastInfo?.severnity],
+                            borderRightColor: backgrounds[toastInfo?.severity],
                             borderBottomWidth: .1,
-                            borderBottomColor: backgrounds[toastInfo?.severnity],
+                            borderBottomColor: backgrounds[toastInfo?.severity],
                             borderTopWidth: .1,
-                            borderTopColor: backgrounds[toastInfo?.severnity],
+                            borderTopColor: backgrounds[toastInfo?.severity],
                         }}>
                         <View style={[styles?.spaceBeteen,]}>
                             <View style={[styles?.spaceBeteen, { justifyContent: 'flex-start' }]}>
                                 <Image
                                     resizeMethod='resize'
                                     resizeMode="contain"
-                                    style={{ width: 30, aspectRatio: 1 }} source={icons[toastInfo.severnity]} />
-                                <HeadLine children={toastInfo?.headline ?? toastInfo?.severnity} />
+                                    style={{ width: 30, aspectRatio: 1 }} source={icons[toastInfo.severity]} />
+                                <HeadLine children={toastInfo?.headline ?? toastInfo?.severity} />
                             </View>
                             <IconButton
                                 onPress={() => setToastInfo({ timeout: 3000 })}

@@ -3,8 +3,9 @@ import { StyleSheet, ScrollView, TouchableOpacity, Text, useColorScheme } from '
 import { MaterialCommunityIcons, MaterialIcons, Zocial } from '@expo/vector-icons'
 import useThemeColors from '../../../../Hooks/useThemeColors'
 import { IPostType } from '../../../../Interfaces/IPostContext'
+import { IThemedComponent } from '../../../../Interfaces'
 
-export interface IFormBottomTabs {
+export interface IFormBottomTabs extends IThemedComponent {
     handleOnButtonTabPress(props: IPostType['types']): void,
     activeTab: IPostType['types'],
     hidden?: boolean

@@ -14,14 +14,15 @@ import * as FilePicker from 'expo-document-picker'
 import { Audio, Video, ResizeMode } from "expo-av";
 import { getMediaType } from '../../../../Helpers';
 import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
-import { IMediaType } from '../../../../Interfaces';
+import { IMediaType, IPostItem } from '../../../../Interfaces';
 import { IMediaPlayable } from '../../../Statics/Interface';
 import usePostForm from "../../../../Hooks/usePostForms";
 import { useDataContext } from "../../../../Contexts/DataContext";
+import { REQUESTS_API } from "@env";
 
 const { height, width } = Dimensions.get('window')
 
-export const UploadFileForm = () => {
+export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' }) => {
 
     const videoMediaRef = useRef<Video>(null)
     const [audioMediaRef, setAudioMediaRef] = useState<Audio.SoundObject>(null)
@@ -31,7 +32,7 @@ export const UploadFileForm = () => {
     const [isKeyboardShown, setIsKeyboardShown] = useState(false)
     const themeColors = useThemeColors()
 
-    const { methods: { createPost } } = usePostForm()
+    const { methods: { createPost, updatePost } } = usePostForm()
 
     const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD' })
 
@@ -50,10 +51,22 @@ export const UploadFileForm = () => {
         }
     }, [sessionValues?.file?.uri])
 
+    useEffect(() => {
+        if (post) {
+            setSessionValues({
+                ...post as any,
+                file: {
+                    uri: `${REQUESTS_API}${post?.fileUrl}`
+                },
+                thumbnail: `${REQUESTS_API}${post?.thumbnailUrl}`
+            })
+        }
+    }, [])
+
     const playPauseMedia = async () => {
         try {
             if (fileType === 'audio') {
-                if (!audioMediaRef)
+                if (!audioMediaRef)     
                     setAudioMediaRef(await Audio.Sound.createAsync({
                         uri: sessionValues?.file?.uri,
                     }, {}, handlePlaybackStatusUpdate))
@@ -94,7 +107,7 @@ export const UploadFileForm = () => {
                 type,
             })
             if (!pickedItems.canceled) {
-                const picked = pickedItems.assets?.[0] 
+                const picked = pickedItems.assets?.[0]
                 setSessionValues(state => ({
                     ...state, file: {
                         uri: picked?.uri,
@@ -112,7 +125,7 @@ export const UploadFileForm = () => {
     }
 
     const handlePlaybackStatusUpdate = (data) => {
-        if (data?.isLoaded && !data.isPlaying && data.didJustFinish) { 
+        if (data?.isLoaded && !data.isPlaying && data.didJustFinish) {
             setMediaState(state => ({ playState: 'ended' }));
             videoMediaRef?.current?.setPositionAsync(0)
             audioMediaRef?.sound?.setPositionAsync(0)
@@ -170,7 +183,7 @@ export const UploadFileForm = () => {
                     onChangeText={handleOnChangeText}
                     multiline
                     textBreakStrategy="highQuality"
-                    autoFocus
+                    // autoFocus
                     placeholderTextColor={themeColors.text}
                     returnKeyType="default"
                 />
@@ -181,9 +194,7 @@ export const UploadFileForm = () => {
                         onPress={handleCreatePost}
                         style={[styles.spaceBetween, { gap: 3, borderRadius: 5, height: 50, marginTop: 10, backgroundColor: themeColors.success, justifyContent: 'center' }]}
                     >
-                        <SpanText>
-                            Post
-                        </SpanText>
+                        <SpanText> {post?.formMode}  </SpanText>
                         <Ionicons
                             size={20}
                             name='chevron-forward'

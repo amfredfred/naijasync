@@ -35,6 +35,12 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         })
     })
 
+    const deletePostMutation = useMutation((info) => {
+        return axios.delete(`${REQUESTS_API}posts/${(info as any)?.postId as any}`, {
+            headers: { 'Authorization': `Bearer ${authContext?.user?.accessToken}` },
+        })
+    })
+
     const postViewMutation = useMutation((info) => {
         return axios.post(`${REQUESTS_API}post-viewed`,
             info,
@@ -119,13 +125,19 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         }
     }
 
+    const deletePost: IPostFormMethods['deletePost'] = async (payload) => {
+        const deleted = await deletePostMutation?.mutateAsync({ postId: payload?.puid } as any)
+        console.log(deleted)
+    }
+
     const formContextValue = {
         states,
         methods: {
             setData,
             createPost,
             updatePost,
-            postView
+            postView,
+            deletePost
         }
     }
 

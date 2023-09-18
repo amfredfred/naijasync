@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, Alert, ToastAndroid, Platform } from "react-native";
 import ThemedModal, { IThemedmodal } from "../../../Components/Modals";
 import { IPostItem } from "../../../Interfaces";
 import ProfileAvatar from "../../../Components/ProfileAvatar";
@@ -11,29 +11,63 @@ import { IconButton } from "../../../Components/Buttons";
 import { getMediaType } from "../../../Helpers";
 import useMediaLibrary from "../../../Hooks/useMediaLibrary";
 import { REQUESTS_API } from "@env";
+import usePostForm from "../../../Hooks/usePostForms";
+import { useNavigation } from "@react-navigation/native";
+
+
+
 
 export default function PostItemMenu(props: IPostItem & IThemedmodal) {
 
     const authContext = useAuthContext()
     const themeColors = useThemeColors()
+    const postForm = usePostForm()
     const fileType = getMediaType(props?.fileUrl)
     const mediaLibContext = useMediaLibrary()
+    const navigation = useNavigation()
 
     const handleDownloadItem = () => {
-        mediaLibContext?.createDownload(`${REQUESTS_API}${props?.fileUrl}`, `${props?.puid}.${props?.fileUrl?.split('.')[1]}`)
+        // mediaLibContext?.createDownload(`${REQUESTS_API}${props?.fileUrl}`, `${props?.puid}.${props?.fileUrl?.split('.')[1]}`)
+    }
+
+    const handleOnDeleteButtonPresss = () => {
+        props?.onRequestClose?.(null)
+        Alert?.alert(
+            "Delete Post",
+            'Are you sure you want to delete this post?',
+            [{
+                isPreferred: true,
+                text: 'No',
+                onPress: () => null,
+                style: 'cancel'
+            }, {
+                text: 'Yes',
+                onPress: () => {
+                    postForm?.methods?.deletePost(props)
+                    if (Platform?.OS === 'android') {
+                        ToastAndroid?.BOTTOM
+                        ToastAndroid.show('The post will be deleted...', 2000)
+                    }
+                },
+                style: 'destructive'
+            }]
+        )
     }
 
     //
     const postPrivateMenuItem = [
         {
-            title: `Edits`,
-            onPress: () => null,
+            title: `Edit`,
+            onPress: () => {
+                props?.onRequestClose?.(null);
+                (navigation?.navigate as any)?.("PostComposer", { post: props, formMode: "edit" })
+            },
             icon: <AntDesign size={30} name='edit' color={themeColors?.text} />,
-            description: 'Allow/Disallow accounts to request funds from you'
+            description: ''
         },
         {
             title: `Delete`,
-            onPress: () => null,
+            onPress: handleOnDeleteButtonPresss,
             icon: <AntDesign size={30} name='delete' color={themeColors?.error} />,
             description: 'Allow/Disallow accounts to request funds from you'
         },
@@ -54,13 +88,13 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
             description: ''
         },
         {
-            title: `Report post`,
+            title: `Report post  (coming soon)`,
             onPress: () => { },
             icon: <Octicons size={30} name='report' color={themeColors?.text} />,
             description: 'You can report this post if you find it inappropriate.'
         },
         {
-            title: `Download ${fileType}`,
+            title: `Download ${fileType} (coming soon)`,
             hideIconRight: true,
             onPress: handleDownloadItem,
             icon: <MaterialCommunityIcons size={30} name='download' color={themeColors?.text} />,
@@ -101,7 +135,7 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
             }
             {
                 props?.owner?.userId === authContext?.user?.account?.userId && <ContainerSpaceBetween
-                    children={postPrivateMenuItem.map((item, index) => (<IconButton key={index} onPress={() => null} containerStyle={{ padding: 10 }} icon={item.icon} />))}
+                    children={postPrivateMenuItem.map((item, index) => (<IconButton key={index} onPress={item?.onPress} containerStyle={{ padding: 10 }} icon={item.icon} />))}
                     style={{ margin: 10, borderRadius: 10 }}
                 />
             }
