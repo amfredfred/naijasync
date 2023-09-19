@@ -56,23 +56,23 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         )
     };
 
-    const createPost: IPostFormMethods['createPost'] = async (props: IPostContext) => {
+    const createPost: IPostFormMethods['createPost'] = async (payload: IPostContext) => {
         const formData = new FormData()
-        if (props?.file)
+        await Promise.all(Object.keys(payload)?.map(d => {
+            formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
+        }))
+        if (payload?.file)
             formData.append('upload', {
-                type: props.file.type,
-                name: props.file.name,
-                uri: props.file.uri
+                type: payload.file.type,
+                name: payload.file.name,
+                uri: payload.file.uri
             } as any);
-        if (props?.thumbnail)
+        if (payload?.thumbnail)
             formData.append('thumbnail', {
                 type: 'image/*',
                 name: 'thumbnail.jpg',
-                uri: props?.thumbnail
+                uri: payload?.thumbnail
             } as any)
-        formData.append('description', JSON.stringify(props?.description))
-        formData.append('type', props.postType)
-        formData.append('tags', JSON.stringify(props?.tags))
         if (navigation?.canGoBack()) {
             navigation?.goBack()
         }
@@ -88,6 +88,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
             }
             return post?.data
         } catch (error) {
+            console.log(error?.response?.data?.message)
             if (error?.response?.status === 401) {
                 toast({ message: error?.response?.data?.message, severity: 'warning' })
                 return authContext?.logout()

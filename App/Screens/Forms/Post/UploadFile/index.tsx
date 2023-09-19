@@ -34,7 +34,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
 
     const { methods: { createPost, updatePost } } = usePostForm()
 
-    const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD' })
+    const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD', type:'UPLOAD' })
 
     useKeyboardEvent({
         onShow: () => setIsKeyboardShown(true),
@@ -156,43 +156,61 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
         }
     }
 
-    const handleRemoveMediaFromSelection = () => {
-        setSessionValues(state => ({ ...state, file: null }))
-    }
-
-    const handleOnChangeText = (text: string) => {
+    const handleOnCaptionTextChange = (text: string) => {
         setSessionValues(state => ({ ...state, description: text }))
     }
 
+    const handleOnTitleTextChange = (text: string) => {
+        setSessionValues(state => ({ ...state, title: text }))
+    }
+    
     const postCaption = (
-        <View style={[styles.textInputContainer]}>
-            <HeadLine
-                style={{ padding: 10, opacity: .7 }}
-                hidden={!isKeyboardShown}
-                children={'📢 Attention You! 📢'} />
-            <SpanText
-                style={{ fontSize: 12, padding: 10, opacity: .5 }}
-                hidden={!isKeyboardShown}    >
-                Adding captions to your posts can make a world of difference! It's more than just text
-                - it's a chance to share your story, your thoughts, and your personality.{'\n'}{'\n'}
-                Captions help your audience understand what your post is all about. Whether it's a breathtaking photo, a funny moment, or an inspiring quote, a caption gives context and meaning to your content.
-            </SpanText>
-            <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-end', height: (isKeyboardShown) ? 'auto' : sessionValues?.description ? 100 : undefined, }]}>
-                <TextInput
-                    onFocus={() => setIsCaptionInputFocused(true)}
-                    onBlur={() => setIsCaptionInputFocused(false)}
-                    style={[styles.textInput, { color: themeColors.text, flexGrow: 1 }]}
-                    placeholder={isKeyboardShown ? "Type your caption here..." : "What's up? caption 🖋️"}
-                    value={sessionValues?.description}
-                    onChangeText={handleOnChangeText}
-                    multiline
-                    textBreakStrategy="highQuality"
-                    // autoFocus
-                    placeholderTextColor={themeColors.text}
-                    returnKeyType="default"
-                />
-            </View>
+        <View style={{ flexGrow: 1 }}>
+            <View style={[styles.textInputContainer,]}>
+                <HeadLine
+                    style={{ padding: 10, opacity: .7 }}
+                    hidden={!isKeyboardShown}
+                    children={'📢 Attention You! 📢'} />
+                <SpanText
+                    style={{ fontSize: 12, padding: 10, opacity: .5 }}
+                    hidden={!isKeyboardShown}    >
+                    Adding captions to your posts can make a world of difference! It's more than just text
+                    - it's a chance to share your story, your thoughts, and your personality.{'\n'}{'\n'}
+                    Captions help your audience understand what your post is all about. Whether it's a breathtaking photo, a funny moment, or an inspiring quote, a caption gives context and meaning to your content.
+                </SpanText>
+                <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-end', height: (isKeyboardShown) ? 'auto' : sessionValues?.description ? 100 : undefined, flexGrow: 1 }]}>
+                    <TextInput
+                        onFocus={() => setIsCaptionInputFocused(true)}
+                        onBlur={() => setIsCaptionInputFocused(false)}
+                        style={[styles.textInput, { color: themeColors.text, flexGrow: 1 }]}
+                        placeholder={isKeyboardShown ? "Type your caption here..." : "What's up? caption 🖋️"}
+                        value={sessionValues?.description}
+                        onChangeText={handleOnCaptionTextChange}
+                        multiline
+                        textBreakStrategy="highQuality"
+                        // autoFocus
+                        placeholderTextColor={themeColors.text}
+                        returnKeyType="default"
+                    />
+                </View>
 
+            </View>
+        </View>
+    )
+
+    const Title = (
+        <View style={[styles.spaceBetween, { marginHorizontal: 10, borderRadius: 10, overflow: 'hidden', height:45,backgroundColor:themeColors.background2  }]}>
+            <TextInput
+                placeholder={`Enter ${fileType} title here (optional)`}
+                onFocus={() => setIsCaptionInputFocused(true)}
+                onBlur={() => setIsCaptionInputFocused(false)}
+                style={[styles.textInput, { color: themeColors.text, flex:1 }]}
+                value={sessionValues?.title}
+                onChangeText={handleOnTitleTextChange}
+                // autoFocus
+                placeholderTextColor={'darkgrey'}
+                returnKeyType="default"
+            />
         </View>
     )
 
@@ -319,43 +337,26 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
         </View>
     )
 
-    const fileExplorer = (
-        <View style={[{ flex: 1 }]}>
-            <ImageBackground
-                source={UploadBackground}
-                resizeMethod="resize"
-                resizeMode="stretch"
-                blurRadius={100}
-                style={{ flex: 1 }}>
-                <TouchableOpacity
-                    style={[styles.spaceBetween, { flex: 1, opacity: .3, justifyContent: 'center' }]}
-                    onPress={handlePickDocument}   >
-                    <Image source={UploadIcon} />
-                </TouchableOpacity>
-            </ImageBackground>
-        </View>
-    )
-
     const previewUploadedFile = (
         <View style={[styles.uploadedFilePreviewContainer]}>
             {
                 isKeyboardShown || (
                     <View style={[styles.spaceBetween, styles.uploadedFileContainer]}>
                         <ImageBackground
-                            blurRadius={100}
+                            blurRadius={180}
                             source={{ uri: sessionValues?.file?.uri }}
                             style={[styles.uploadedFilePreviewInnerContainer]}>
+                            {displayType()}
+                            {['video', 'audio'].includes(fileType) ? mediaState?.playState !== 'playing' && thumbPreviewer : null}
                             <Ionicons
                                 style={[styles.iconsStyle, { height: 40, position: 'absolute', right: 20, top: 20 }]}
                                 onPress={() => setSessionValues(state => ({ ...state, file: null }))}
                                 color={themeColors.text}
                                 size={30}
                                 name={'remove'} />
-                            {displayType()}
-                            {['video', 'audio'].includes(fileType) ? mediaState?.playState !== 'playing' && thumbPreviewer : null}
                             {['video', 'audio'].includes(fileType) &&
                                 <Ionicons
-                                    style={[styles.iconsStyle, { height: 40,position:'absolute', right:20, bottom:20 }]}
+                                    style={[styles.iconsStyle, { height: 40, position: 'absolute', right: 20, bottom: 20 }]}
                                     onPress={playPauseMedia}
                                     color={themeColors.text}
                                     size={30}
@@ -374,8 +375,8 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
             exiting={FadeOut}
             style={[styles.container, {}]}>
             {postCaption}
-            {/* {sessionValues?.file ? previewUploadedFile : fileExplorer} */}
-            {previewUploadedFile}
+            {!sessionValues?.file?.uri || previewUploadedFile}
+            {!['audio', 'video'].includes(fileType) || Title}
             {PostingTabs}
         </Animated.View>
     )
@@ -395,6 +396,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         justifyContent: 'flex-end',
         overflow: 'hidden',
+        flexGrow: 1
     },
     textEditorContainer: {
         borderRadius: 5,

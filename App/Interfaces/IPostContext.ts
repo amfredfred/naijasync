@@ -21,6 +21,7 @@ export interface IPostContext {
     price?: number | null;
     downloadable?: boolean;
     postType?: IPostType['types'],
+    type?: IPostType['types']
     puid?: string
 }
 type PayloadTypes<T extends keyof IPostContext> = IPostContext[T]
