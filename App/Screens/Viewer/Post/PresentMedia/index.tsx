@@ -49,7 +49,6 @@ export default function PresentMedia(post: PresentMedia) {
     const [isBannerAdVisible, setisBannerAdVisible] = useState(true)
 
     useEffect(() => {
-        console.log("LOADING ADS")
         if (!rewardedInterstitialAd.isLoaded)
             rewardedInterstitialAd.load()
         if (!rewardedVideoAd?.isLoaded)
@@ -58,34 +57,21 @@ export default function PresentMedia(post: PresentMedia) {
 
     //sharing rewards from ads
     useEffect(() => {
-        if (rewardedInterstitialAd?.reward?.amount || rewardedVideoAd?.reward) {
-            postForm?.methods?.postReward({
-                rewards: rewardedInterstitialAd?.reward?.amount ?? rewardedVideoAd?.reward?.amount,
-                puid: post?.puid
-            })
+        if (rewardedInterstitialAd?.isEarnedReward || rewardedVideoAd?.isEarnedReward) {
+            postForm?.methods?.postReward(rewardedInterstitialAd?.reward?.amount ?? rewardedVideoAd?.reward?.amount, post?.puid)
+            onClose?.()
         }
-    }, [rewardedInterstitialAd?.isClosed, rewardedVideoAd?.isClosed])
+    }, [rewardedInterstitialAd?.isEarnedReward, rewardedVideoAd?.isEarnedReward])
 
     const showREwardedAd = async () => {
         if (getRandomBoolean())
             try {
-                if (rewardedVideoAd?.isLoaded) {
-                    console.log("LOADED rewardedVideoAd")
-                    rewardedVideoAd.show()
-                } else if (rewardedInterstitialAd?.isLoaded) {
-                    console.log("LOADED rewardedInterstitialAd")
-                    rewardedInterstitialAd?.show({ immersiveModeEnabled: true })
-                } else {
-                    console.log("REWARDS ADS NOT READY")
-                }
-            } catch (error) {
-                console.log("PRESENT_MEDIA_REWARDED_VIDEO_ERROR -> ", error)
-            }
-        else
-            console.log('not showing ads this time')
-        onClose?.()
+                if (rewardedVideoAd?.isLoaded) rewardedVideoAd.show()
+                else if (rewardedInterstitialAd?.isLoaded) rewardedInterstitialAd?.show({ immersiveModeEnabled: true })
+                else onClose?.()
+            } catch { onClose?.() }
+        else onClose?.()
     }
-
 
     let pressTimeout = undefined;
     const handleOnPress = () => {
@@ -107,7 +93,7 @@ export default function PresentMedia(post: PresentMedia) {
     const onRequestClose = async () => showREwardedAd()
 
     useEffect(() => {
-        postForm?.methods?.postView({ 'views': 1, puid: post?.puid })
+        postForm?.methods?.postView(post?.puid)
     }, [])
 
     const RenderPost = () => {

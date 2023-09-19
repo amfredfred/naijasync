@@ -7,7 +7,7 @@ import { useAuthContext } from "../Contexts/AuthContext";
 import { useDataContext } from "../Contexts/DataContext";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { ToastAndroid } from "react-native";
+import { Platform, ToastAndroid } from "react-native";
 
 export default function usePostForm(): { states: IPostContext, methods: IPostFormMethods } {
     const [states, setFormState] = useState({});
@@ -134,7 +134,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
                 }
                 return post?.data
             } catch (error) {
-                console.log(JSON.stringify(error?.response?.data?.message), ' ERROR REPOSNE')
+                console.log(JSON.stringify(error), ' ERROR REPOSNE')
                 if (error?.response?.status === 401) {
                     toast({ message: error?.response?.data?.message, severity: 'warning' })
                     return authContext?.logout()
@@ -148,40 +148,39 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
 
     const deletePost: IPostFormMethods['deletePost'] = async (payload) => {
         const deleted = await deletePostMutation?.mutateAsync({ postId: payload?.puid } as any)
-        console.log(deleted)
     }
 
-
-    const postView: IPostFormMethods['postView'] = async (payload) => {
+    const postView: IPostFormMethods['postView'] = async (puid) => {
         const [viewed] = await Promise.allSettled([axios.post(
-            `${REQUESTS_API}post-viewed`,
-            { reaction: payload?.liked }, { headers: AHeaders }
+            `${REQUESTS_API}post-viewed`, { puid }, { headers: AHeaders }
         )])
     }
 
-    const postReward: IPostFormMethods['postReward'] = async (payload) => {
-        const [reacted] = await Promise.allSettled([axios.post(
-            `${REQUESTS_API}posts/post-viewed`,
-            { reaction: payload?.liked }, { headers: AHeaders }
-        )])
-
-        if (reacted?.status === 'fulfilled') {
-            if (authContext?.user?.person === 'isAuthenticated') {
-                ToastAndroid.BOTTOM
-                ToastAndroid.show(`Post ${payload?.liked ? 'liked' : 'unliked'}`, 1000)
+    const postReward: IPostFormMethods['postReward'] = async (rewards, puid) => {
+        try {
+            const rewarded = await axios.post(`${REQUESTS_API}post-reward`, { rewards, puid }, { headers: AHeaders })
+            console.log(rewarded?.data, AHeaders)
+            if (rewarded?.status === 200) {
+                if (authContext?.user?.person === 'isAuthenticated') {
+                    ToastAndroid.BOTTOM
+                    ToastAndroid.show(`You earned points`, 10000)
+                }
             }
+        } catch (error) { 
+            console.log(error?.response)
         }
     }
-
-    const postReact: IPostFormMethods['postReact'] = async (payload) => {
-        const [reacted] = await Promise.allSettled([axios.post(
-            `${REQUESTS_API}posts/post-viewed`,
-            { reaction: payload?.liked }, { headers: AHeaders }
-        )])
-
-        if (reacted?.status === 'fulfilled') {
-            ToastAndroid.BOTTOM
-            ToastAndroid.show(`Post ${payload?.liked ? 'liked' : 'unliked'}`, 1000)
+   
+    const postReact: IPostFormMethods['postReact'] = async (reacted, puid) => {
+        try {
+            const reaction = await axios.post(`${REQUESTS_API}post-react`, { reacted, puid }, { headers: AHeaders })
+            if (reaction?.status === 200)
+                if (Platform.OS === 'android') {
+                    ToastAndroid.BOTTOM
+                    ToastAndroid.show(`${reacted ? 'Liked' : 'Unlike'}`, 1000)
+                }
+        } catch (error) { 
+            console.log(error?.response?.data)
         }
     }
 

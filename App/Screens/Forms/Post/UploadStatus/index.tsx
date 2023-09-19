@@ -1,10 +1,11 @@
 import * as Library from 'expo-media-library'
 import Animated, { SlideInDown, SlideInLeft, SlideOutLeft, SlideOutUp } from 'react-native-reanimated'
-import { View, Text, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
 import useThemeColors from '../../../../Hooks/useThemeColors'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { useRef, useState, useEffect } from 'react'
 import { SpanText } from '../../../../Components/Texts'
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 
 const { height, width } = Dimensions.get('window')
 
@@ -25,8 +26,6 @@ export default function UploadStatusFrom() {
 
     const gesture = Gesture.Pan()
 
-
-
     return (
         <Animated.View
             entering={SlideInDown}
@@ -34,7 +33,9 @@ export default function UploadStatusFrom() {
             style={[styles.constainer, {}]}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10, padding: 10, alignItems: 'flex-start' }}>
                 <View style={{ backgroundColor: 'red', width: 40, aspectRatio: 1, borderRadius: 50 }}>
-
+                    <TouchableOpacity onPress={null} style={[]}   >
+                        <MaterialCommunityIcons style={[styles.postTypeButtonIcon, { backgroundColor: themeColors.text }]} name='upload-multiple' />
+                    </TouchableOpacity>
                 </View>
 
             </View>
@@ -71,6 +72,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexGrow: 1,
         maxHeight: height / 3
+    },
+    postTypeButtonIcon: {
+        backgroundColor: 'green',
+        borderRadius: 50,
+        fontSize: 30,
+        aspectRatio: 1,
+        textAlign: 'center',
+        verticalAlign: 'middle',
+        padding: 6,
     },
     textEditor: {
 

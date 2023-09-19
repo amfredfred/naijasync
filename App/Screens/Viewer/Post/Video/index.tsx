@@ -50,7 +50,7 @@ export default function PlayVideo() {
     }))
     //setting media
     useEffect(() => { mediaContext?.connect({ ...post, presenting: true }) }, [])
-    useEffect(() => { wait(5).then(R => postForm.methods.postView({ 'views': 1, puid: post?.puid })) }, [])
+    useEffect(() => { wait(5).then(R => postForm.methods.postView(post?.puid)) }, [])
     const contenGetsture = Gesture.Pan()
         .onUpdate(e => {
             contConH.value = Math.max(0, Math.min(e.translationY / 1, height - VIDEO_HEIGHT));
@@ -126,10 +126,7 @@ export default function PlayVideo() {
     //sharing rewards from ads
     useEffect(() => {
         if (rewardedInterstitialAd?.reward?.amount) {
-            postForm?.methods?.postReward({
-                rewards: rewardedInterstitialAd?.reward?.amount / 100,
-                puid: mediaContext?.puid
-            })
+            postForm?.methods?.postReward(rewardedInterstitialAd?.reward?.amount, mediaContext?.puid)
         }
     }, [rewardedInterstitialAd?.isClosed])
 

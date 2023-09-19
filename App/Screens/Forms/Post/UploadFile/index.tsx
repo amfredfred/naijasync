@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Image, Dimensions, View, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Text } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 
 import UploadIcon from '../../../../../assets/upload-icon.png'
 import UploadBackground from '../../../../../assets/autumn-leaves-background.jpg'
 import MusicalLandscape from '../../../../../assets/muusical-landscape.jpg'
 
-import Animated, { SlideInDown, SlideOutUp, SlideOutDown } from 'react-native-reanimated'
+import Animated, { SlideInDown, SlideOutUp, SlideOutDown, FadeIn, FadeOut } from 'react-native-reanimated'
 import { HeadLine, SpanText } from "../../../../Components/Texts";
 import { IPostContext } from "../../../../Interfaces/IPostContext";
 import * as FilePicker from 'expo-document-picker'
@@ -52,19 +52,19 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     }, [sessionValues?.file?.uri])
 
     useEffect(() => {
-        if (post) {
-            setSessionValues({
-                ...post as any,
-                file: {
-                    uri: `${REQUESTS_API}${post?.fileUrl}`
-                },
-                thumbnail: `${REQUESTS_API}${post?.thumbnailUrl}`,
-                description: post?.description,
-                title: post?.title,
-                tags: post?.tags,
-                postType: post?.postType
-            })
-        }
+        // if (post) {
+        //     setSessionValues({
+        //         ...post as any,
+        //         file: {
+        //             uri: `${REQUESTS_API}${post?.fileUrl}`
+        //         },
+        //         thumbnail: `${REQUESTS_API}${post?.thumbnailUrl}`,
+        //         description: post?.description,
+        //         title: post?.title,
+        //         tags: post?.tags,
+        //         postType: post?.postType
+        //     })
+        // }
     }, [])
 
     const playPauseMedia = async () => {
@@ -165,20 +165,19 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     }
 
     const postCaption = (
-        <View style={[styles.textInputContainer, { height: isKeyboardShown ? 'auto' : 'auto' }]}>
+        <View style={[styles.textInputContainer]}>
             <HeadLine
                 style={{ padding: 10, opacity: .7 }}
                 hidden={!isKeyboardShown}
                 children={'📢 Attention You! 📢'} />
             <SpanText
                 style={{ fontSize: 12, padding: 10, opacity: .5 }}
-                hidden={!isKeyboardShown}
-            >
+                hidden={!isKeyboardShown}    >
                 Adding captions to your posts can make a world of difference! It's more than just text
                 - it's a chance to share your story, your thoughts, and your personality.{'\n'}{'\n'}
                 Captions help your audience understand what your post is all about. Whether it's a breathtaking photo, a funny moment, or an inspiring quote, a caption gives context and meaning to your content.
             </SpanText>
-            <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-end', }]}>
+            <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-end', height: (isKeyboardShown) ? 'auto' : sessionValues?.description ? 100 : undefined, }]}>
                 <TextInput
                     onFocus={() => setIsCaptionInputFocused(true)}
                     onBlur={() => setIsCaptionInputFocused(false)}
@@ -193,21 +192,35 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                     returnKeyType="default"
                 />
             </View>
-            {
-                !isKeyboardShown && (
-                    <TouchableOpacity
-                        onPress={handleCreatePost}
-                        style={[styles.spaceBetween, { gap: 3, borderRadius: 5, height: 50, marginTop: 10, backgroundColor: themeColors.success, justifyContent: 'center' }]}
-                    >
-                        <SpanText> {post?.formMode}  </SpanText>
-                        <Ionicons
-                            size={20}
-                            name='chevron-forward'
-                            color={themeColors.text}
-                        />
-                    </TouchableOpacity>
-                )
-            }
+
+        </View>
+    )
+
+
+    const PostingTabs = (
+        <View style={[styles.spaceBetween, styles.postingTabcContainer]}>
+            <View style={[styles.spaceBetween, { gap: 20, }]}>
+                <TouchableOpacity>
+                    <Ionicons
+                        size={26}
+                        onPress={handlePickDocument}
+                        name='ios-images'
+                        color={themeColors.text}
+                    />
+                </TouchableOpacity>
+                <MaterialCommunityIcons
+                    size={26}
+                    onPress={handlePickThumbnail}
+                    name='image-album'
+                    color={themeColors.text}
+                />
+            </View>
+
+            <TouchableOpacity
+                onPress={handleCreatePost}
+                style={[styles.spaceBetween, { backgroundColor: themeColors.success, borderRadius: 50 }]}  >
+                <SpanText style={{ textTransform: 'capitalize' }}> {post?.formMode}  </SpanText>
+            </TouchableOpacity>
         </View>
     )
 
@@ -215,10 +228,10 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
         switch (fileType) {
             case 'video':
                 return (
-                    <View style={{ width: '100%', flex: 1 }}>
+                    <View style={{ width: '100%', flexGrow: 1 }}>
                         <Video
                             resizeMode={ResizeMode.CONTAIN}
-                            style={{ flex: 1, width: '100%' }}
+                            style={{ flexGrow: 1, width: '100%' }}
                             ref={videoMediaRef}
                             source={{ uri: sessionValues?.file?.uri }}
                             onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
@@ -227,10 +240,10 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                 )
             case 'image':
                 return (
-                    <View style={{ width: '100%', flex: 1, position: 'relative' }}>
+                    <View style={{ width: '100%', flexGrow: 1, position: 'relative' }}>
                         <Image
                             source={{ uri: sessionValues?.file?.uri }}
-                            style={{ flex: 1, width: '100%' }}
+                            style={{ flexGrow: 1, width: '100%' }}
                             resizeMethod='resize'
                             resizeMode='contain'
                         />
@@ -241,7 +254,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                     <ImageBackground
                         source={MusicalLandscape}
                         blurRadius={10}
-                        style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red' }}>
+                        style={{ width: '100%', flexGrow: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red' }}>
                         <Ionicons
                             name='musical-note'
                             color={themeColors.text}
@@ -324,56 +337,46 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     )
 
     const previewUploadedFile = (
-        <View style={[styles.uploadedFilePreviewContainer, { padding: isKeyboardShown ? 0 : 10 }]}>
+        <View style={[styles.uploadedFilePreviewContainer]}>
             {
                 isKeyboardShown || (
                     <View style={[styles.spaceBetween, styles.uploadedFileContainer]}>
-                        <View style={{ borderRadius: 10, overflow: 'hidden', flex: 1 }}>
-                            <ImageBackground
-                                blurRadius={100}
-                                source={{ uri: sessionValues?.file?.uri }}
-                                style={[styles.uploadedFilePreviewInnerContainer]}>
-                                {displayType()}
-                                {mediaState?.playState !== 'playing' && thumbPreviewer}
-                            </ImageBackground>
-                        </View>
-                        <View style={[{ zIndex: 5, right: 0, height: '100%', padding: 6, justifyContent: 'space-between', backgroundColor: themeColors.background }]}>
-                            <View style={[{ gap: 10 }]}>
-                                <MaterialIcons
-                                    onPress={() => setSessionValues(state => ({ ...state, file: null }))}
-                                    style={[styles.iconsStyle, { height: 40 }]}
-                                    size={30}
-                                    color={themeColors.text}
-                                    name="delete" />
-                                <MaterialIcons
-                                    onPress={handlePickDocument}
-                                    style={[styles.iconsStyle, { height: 40 }]}
-                                    size={30}
-                                    color={themeColors.text}
-                                    name="find-replace" />
-                            </View>
+                        <ImageBackground
+                            blurRadius={100}
+                            source={{ uri: sessionValues?.file?.uri }}
+                            style={[styles.uploadedFilePreviewInnerContainer]}>
+                            <Ionicons
+                                style={[styles.iconsStyle, { height: 40, position: 'absolute', right: 20, top: 20 }]}
+                                onPress={() => setSessionValues(state => ({ ...state, file: null }))}
+                                color={themeColors.text}
+                                size={30}
+                                name={'remove'} />
+                            {displayType()}
+                            {['video', 'audio'].includes(fileType) ? mediaState?.playState !== 'playing' && thumbPreviewer : null}
                             {['video', 'audio'].includes(fileType) &&
                                 <Ionicons
-                                    style={[styles.iconsStyle, { height: 40 }]}
+                                    style={[styles.iconsStyle, { height: 40,position:'absolute', right:20, bottom:20 }]}
                                     onPress={playPauseMedia}
                                     color={themeColors.text}
                                     size={30}
                                     name={mediaState.playState === 'paused' ? 'play' : mediaState.playState === 'playing' ? 'pause' : 'play'} />
                             }
-                        </View>
+                        </ImageBackground>
                     </View>
                 )
             }
-            {postCaption}
         </View>
     )
 
     return (
         <Animated.View
-            entering={SlideInDown}
-            exiting={SlideOutUp}
+            entering={FadeIn}
+            exiting={FadeOut}
             style={[styles.container, {}]}>
-            {sessionValues?.file ? previewUploadedFile : fileExplorer}
+            {postCaption}
+            {/* {sessionValues?.file ? previewUploadedFile : fileExplorer} */}
+            {previewUploadedFile}
+            {PostingTabs}
         </Animated.View>
     )
 }
@@ -384,11 +387,13 @@ const styles = StyleSheet.create({
     container: {
         height: '100%',
     },
+    postingTabcContainer: {
+        width: '100%',
+    },
     textInputContainer: {
         width: '100%',
         paddingVertical: 10,
         justifyContent: 'flex-end',
-        marginTop: 30,
         overflow: 'hidden',
     },
     textEditorContainer: {
@@ -435,21 +440,21 @@ const styles = StyleSheet.create({
     },
     uploadedFilePreviewContainer: {
         width: '100%',
-        height: '100%',
-        padding: 10,
+        flexGrow: 1,
         justifyContent: 'flex-end',
+        padding: 10
     },
     uploadedFilePreviewInnerContainer: {
-        borderRadius: 20,
         overflow: 'hidden',
-        flex: 1,
+        flexGrow: 1,
         width: '100%',
         justifyContent: 'flex-end',
+        borderRadius: 10
     },
     uploadedFileContainer: {
-        flex: 1,
         position: 'relative',
         padding: 0,
+        flex: 1
     },
     contentDescriptionContainerBar: {
         width: 60,

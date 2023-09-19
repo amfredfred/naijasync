@@ -52,7 +52,7 @@ export type IPostFormMethods = {
     updatePost(payload: IPostContext): void
     deletePost(payload: IPostItem): void
     // 
-    postView(payload: IPostItem): void
-    postReward(payload: IPostItem): void
-    postReact(payload: IPostItem): void
+    postView(payload: IPostItem['puid']): void
+    postReward(rewardsAmount: number, poatUID: IPostItem['puid']): void
+    postReact(reacted: IPostItem['liked'], puid: IPostItem['puid']): void
 }

@@ -208,8 +208,9 @@ export const getTags = (inputString: string): string[] => {
     }
 }
 
-export const   getRandomBoolean = () =>  {
-    return Math.random() <= 0.51;  
+export const getRandomBoolean = () => {
+    const probability = Math.random()
+    return probability <= 0.51;  
 }
 
 
