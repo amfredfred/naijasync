@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Image, Dimensions, View, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Text } from "react-native";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 
 import UploadIcon from '../../../../../assets/upload-icon.png'
@@ -29,12 +29,13 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     const [fileType, setFileType] = useState<IMediaType>(null)
     const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({})
     const [isCaptionInputFocused, setIsCaptionInputFocused] = useState(false)
+    const [isTitleFocused, setIsTitleFocused] = useState(false)
     const [isKeyboardShown, setIsKeyboardShown] = useState(false)
     const themeColors = useThemeColors()
 
     const { methods: { createPost, updatePost } } = usePostForm()
 
-    const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD', type:'UPLOAD' })
+    const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD', type: 'UPLOAD' })
 
     useKeyboardEvent({
         onShow: () => setIsKeyboardShown(true),
@@ -163,10 +164,10 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     const handleOnTitleTextChange = (text: string) => {
         setSessionValues(state => ({ ...state, title: text }))
     }
-    
+
     const postCaption = (
         <View style={{ flexGrow: 1 }}>
-            <View style={[styles.textInputContainer,]}>
+            <View style={[styles.textInputContainer,{  flexGrow:1}]}>
                 <HeadLine
                     style={{ padding: 10, opacity: .7 }}
                     hidden={!isKeyboardShown}
@@ -175,22 +176,22 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                     style={{ fontSize: 12, padding: 10, opacity: .5 }}
                     hidden={!isKeyboardShown}    >
                     Adding captions to your posts can make a world of difference! It's more than just text
-                    - it's a chance to share your story, your thoughts, and your personality.{'\n'}{'\n'}
-                    Captions help your audience understand what your post is all about. Whether it's a breathtaking photo, a funny moment, or an inspiring quote, a caption gives context and meaning to your content.
+                    - it's a chance to share your story, your thoughts, and your personality.
                 </SpanText>
-                <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-end', height: (isKeyboardShown) ? 'auto' : sessionValues?.description ? 100 : undefined, flexGrow: 1 }]}>
+                <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-start', flexGrow:1, height: (isKeyboardShown) ? 'auto' : sessionValues?.description ? 'auto' : undefined }]}>
                     <TextInput
                         onFocus={() => setIsCaptionInputFocused(true)}
                         onBlur={() => setIsCaptionInputFocused(false)}
                         style={[styles.textInput, { color: themeColors.text, flexGrow: 1 }]}
-                        placeholder={isKeyboardShown ? "Type your caption here..." : "What's up? caption 🖋️"}
+                        placeholder={['video', 'audio'].includes(fileType) ? `Caption your ${fileType} (recommended)` : isKeyboardShown ? "Type your caption here..." : "What's up?🖋️"}
                         value={sessionValues?.description}
                         onChangeText={handleOnCaptionTextChange}
                         multiline
                         textBreakStrategy="highQuality"
                         // autoFocus
-                        placeholderTextColor={themeColors.text}
+                        placeholderTextColor={'darkgrey'}
                         returnKeyType="default"
+                        maxLength={255}
                     />
                 </View>
 
@@ -199,12 +200,12 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     )
 
     const Title = (
-        <View style={[styles.spaceBetween, { marginHorizontal: 10, borderRadius: 10, overflow: 'hidden', height:45,backgroundColor:themeColors.background2  }]}>
+        <View style={[styles.spaceBetween, { marginHorizontal: 10, borderRadius: 10, overflow: 'hidden', height: 45, backgroundColor: themeColors.background2 }]}>
             <TextInput
                 placeholder={`Enter ${fileType} title here (optional)`}
                 onFocus={() => setIsCaptionInputFocused(true)}
                 onBlur={() => setIsCaptionInputFocused(false)}
-                style={[styles.textInput, { color: themeColors.text, flex:1 }]}
+                style={[styles.textInput, { color: themeColors.text, flex: 1 }]}
                 value={sessionValues?.title}
                 onChangeText={handleOnTitleTextChange}
                 // autoFocus
@@ -219,24 +220,24 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
         <View style={[styles.spaceBetween, styles.postingTabcContainer]}>
             <View style={[styles.spaceBetween, { gap: 20, }]}>
                 <TouchableOpacity>
-                    <Ionicons
-                        size={26}
+                    <FontAwesome5
+                        size={25}
                         onPress={handlePickDocument}
-                        name='ios-images'
+                        name='photo-video'
                         color={themeColors.text}
                     />
                 </TouchableOpacity>
-                <MaterialCommunityIcons
-                    size={26}
+                {['video', 'audio'].includes(fileType) && <MaterialCommunityIcons
+                    size={25}
                     onPress={handlePickThumbnail}
                     name='image-album'
                     color={themeColors.text}
-                />
+                />}
             </View>
 
             <TouchableOpacity
                 onPress={handleCreatePost}
-                style={[styles.spaceBetween, { backgroundColor: themeColors.success, borderRadius: 50 }]}  >
+                style={[styles.spaceBetween, { backgroundColor: themeColors.background2, borderRadius: 50 }]}  >
                 <SpanText style={{ textTransform: 'capitalize' }}> {post?.formMode}  </SpanText>
             </TouchableOpacity>
         </View>
@@ -321,13 +322,13 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                                     onPress={() => setSessionValues(state => ({ ...state, thumbnail: null }))}
                                     style={[styles.iconsStyle]}
                                     size={20}
-                                    color={themeColors.text}
+                                    color='white'
                                     name="delete" />
                                 <MaterialIcons
                                     onPress={handlePickThumbnail}
                                     style={[styles.iconsStyle]}
                                     size={20}
-                                    color={themeColors.text}
+                                    color='white'
                                     name="image" />
                             </View>
                         </View>
@@ -351,14 +352,14 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                             <Ionicons
                                 style={[styles.iconsStyle, { height: 40, position: 'absolute', right: 20, top: 20 }]}
                                 onPress={() => setSessionValues(state => ({ ...state, file: null }))}
-                                color={themeColors.text}
+                                color={'white'}
                                 size={30}
                                 name={'remove'} />
                             {['video', 'audio'].includes(fileType) &&
                                 <Ionicons
                                     style={[styles.iconsStyle, { height: 40, position: 'absolute', right: 20, bottom: 20 }]}
                                     onPress={playPauseMedia}
-                                    color={themeColors.text}
+                                    color={'white'}
                                     size={30}
                                     name={mediaState.playState === 'paused' ? 'play' : mediaState.playState === 'playing' ? 'pause' : 'play'} />
                             }
@@ -374,10 +375,10 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
             entering={FadeIn}
             exiting={FadeOut}
             style={[styles.container, {}]}>
-            {postCaption}
-            {!sessionValues?.file?.uri || previewUploadedFile}
+            {isTitleFocused || postCaption}
             {!['audio', 'video'].includes(fileType) || Title}
-            {PostingTabs}
+            {!sessionValues?.file?.uri || previewUploadedFile}
+            {isKeyboardShown || PostingTabs}
         </Animated.View>
     )
 }
@@ -390,6 +391,8 @@ const styles = StyleSheet.create({
     },
     postingTabcContainer: {
         width: '100%',
+        paddingHorizontal: 15,
+        paddingLeft: 10
     },
     textInputContainer: {
         width: '100%',
@@ -417,7 +420,9 @@ const styles = StyleSheet.create({
     textInput: {
         paddingHorizontal: 10,
         fontWeight: '300',
-        fontSize: 17,
+        fontSize: 16,
+        lineHeight: 23,
+        opacity: .7
     },
     spaceBetween: {
         flexDirection: 'row',
@@ -432,7 +437,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     thumbPreviewBackgroundImage: {
-        height: 110,
+        height: 80,
         position: 'absolute',
         left: 10,
         bottom: 10,

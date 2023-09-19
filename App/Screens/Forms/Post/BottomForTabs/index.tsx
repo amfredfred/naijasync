@@ -28,17 +28,17 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
             entering={SlideInDown}>
             <ScrollView
                 horizontal
-                contentContainerStyle={[styles.spaceBetween, { backgroundColor: themeColors.background2, paddingHorizontal: 20, width: '100%', gap: 10 }]}
-                style={[styles.postTypeList]}>
+                contentContainerStyle={[styles.spaceBetween, {   paddingHorizontal: 10, width: '100%', gap: 10 }]}
+                style={[styles.postTypeList, {backgroundColor:themeColors.background2, borderRadius:10 }]}>
                 <TouchableOpacity
                     onPress={() => handleOnButtonTabPress("IMPORT")}
                     style={[styles.postTypeButton]}   >
                     <MaterialCommunityIcons
                         style={[styles.postTypeButtonIcon, { backgroundColor: activeTab === 'IMPORT' ? 'transparent' : themeColors.background2, color: themeColors.text }]}
-                        name='database-import-outline' />
-                    <Text style={[{ color: themeColors.text }]}>
-                        Import
-                    </Text>
+                        name='link' />
+                    {/* <Text style={[{ color: themeColors.text }]}>
+                        link
+                    </Text> */}
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => handleOnButtonTabPress("ARTICLE")}
@@ -46,9 +46,9 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
                     <MaterialIcons
                         style={[styles.postTypeButtonIcon, { backgroundColor: activeTab === 'ARTICLE' ? 'transparent' : themeColors.background2, color: themeColors.text }]}
                         name='article' />
-                    <Text style={[{ color: themeColors.text }]}>
+                    {/* <Text style={[{ color: themeColors.text }]}>
                         Article
-                    </Text>
+                    </Text> */}
                 </TouchableOpacity>
                 {/* <TouchableOpacity
                     onPress={() => handleOnButtonTabPress("STATUS")}
@@ -66,9 +66,9 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
                     <MaterialIcons
                         style={[styles.postTypeButtonIcon, { backgroundColor: activeTab === 'GIF' ? 'transparent' : themeColors.background2, color: themeColors.text }]}
                         name='gif' />
-                    <Text style={[{ color: themeColors.text }]}>
+                    {/* <Text style={[{ color: themeColors.text }]}>
                         GIF
-                    </Text>
+                    </Text> */}
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -77,9 +77,9 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
                     <MaterialCommunityIcons
                         style={[styles.postTypeButtonIcon, { backgroundColor: activeTab === 'UPLOAD' ? 'transparent' : themeColors.background2, color: themeColors.text }]}
                         name='upload-multiple' />
-                    <Text style={[{ color: themeColors.text }]}>
+                    {/* <Text style={[{ color: themeColors.text }]}>
                         Upload
-                    </Text>
+                    </Text> */}
                 </TouchableOpacity>
             </ScrollView>
         </Animated.View>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         'justifyContent': 'space-between',
         padding: 6,
         gap: 10,
-        position: 'relative'
+        position: 'relative',
     },
     postTypeList: {
         backgroundColor: 'red',
@@ -112,11 +112,9 @@ const styles = StyleSheet.create({
         verticalAlign: 'middle',
         padding: 6,
     },
-    postTypeListContainer: {
-        elevation: 50,
-        shadowColor: 'red',
+    postTypeListContainer: { 
         zIndex: 4,
-        borderTopColor: 'gren',
-        borderTopWidth: StyleSheet.hairlineWidth
+        paddingHorizontal: 10,
+        paddingBottom: 10,
     }
 })

@@ -78,13 +78,13 @@ const AccountRoutes = () => (
 
 const PublicRoutes = (
     <Stack.Navigator
-        initialRouteName='PostComposer'
+        initialRouteName='Home'
         screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
-        <Stack.Screen name='PostComposer' component={PostComposer} />
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Downloads' component={Downloads} />
         <Stack.Screen name="Explorer" component={Explorer} initialParams={{ screen: 'videos' }} />
         <Stack.Screen name="Search" component={Search} />
+        <Stack.Screen name='PostComposer' component={PostComposer} />
         <Stack.Screen name="Account" component={AccountRoutes} />
         <Stack.Screen name='PlayVideo' component={PlayVideo} />
     </Stack.Navigator>
