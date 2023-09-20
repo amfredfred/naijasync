@@ -22,29 +22,16 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
     }
 
     const createPostMutation = useMutation((info) => {
-        return axios.post(`${REQUESTS_API}posts`,
-            info, {
-            headers: AHeaders
-        })
+        return axios.post(`${REQUESTS_API}posts`, info, { headers: AHeaders })
     })
 
     const updatePostMutation = useMutation((info) => {
-        return axios.post(`${REQUESTS_API}posts/${(info as any)?.postId}?_method=PUT`,
-            (info as any)?.data, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${authContext?.user?.accessToken}`
-            }
-        })
+        return axios.post(`${REQUESTS_API}posts/${(info as any)?.postId}?_method=PUT`, (info as any)?.data, { headers: AHeaders })
     })
 
     const deletePostMutation = useMutation((info) => {
-        return axios.delete(`${REQUESTS_API}posts/${(info as any)?.postId}`, {
-            headers: { 'Authorization': `Bearer ${authContext?.user?.accessToken}` },
-        })
+        return axios.delete(`${REQUESTS_API}posts/${(info as any)?.postId}`, { headers: AHeaders, })
     })
-
-
 
     const { toast } = useToast()
 
@@ -76,21 +63,22 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         if (navigation?.canGoBack()) {
             navigation?.goBack()
         }
-
         try {
             const post = await createPostMutation?.mutateAsync(formData as any)
-            console.log(post?.status, 'States')
             if (post?.status == 201 || post?.status == 200) {
-                toast({ message: 'Nice !!', severity: 'success' })
+                if (Platform.OS === 'android') {
+                    ToastAndroid.SHORT
+                    ToastAndroid.show(post?.data?.message, 2000)
+                }
                 createPostMutation.reset()
-            } else {
-                console.log(post?.data, " : DATA FROM CREATE")
-            }
+            } else { }
             return post?.data
         } catch (error) {
-            console.log(error?.response?.data?.message)
             if (error?.response?.status === 401) {
-                toast({ message: error?.response?.data?.message, severity: 'warning' })
+                if (Platform.OS === 'android') {
+                    ToastAndroid.SHORT
+                    ToastAndroid.show(error?.response?.data?.message, 2000)
+                }
                 return authContext?.logout()
             }
         } finally {
@@ -104,40 +92,54 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
             return
         }
         if (payload?.puid) {
-            const formData = new FormData()
-            await Promise.all(Object.keys(payload)?.map(d => {
-                formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
-            }))
-            if (payload?.file)
-                formData.append('upload', {
-                    type: payload.file.type,
-                    name: payload.file.name,
-                    uri: payload.file.uri
-                } as any);
-            if (payload?.thumbnail)
-                formData.append('thumbnail', {
-                    type: 'image/*',
-                    name: 'thumbnail.jpg',
-                    uri: payload?.thumbnail
-                } as any)
-            formData.append('_method', 'PATCH')
-            // if (navigation?.canGoBack()) {
-            //     navigation?.goBack()
-            // }
+
+            console.log( payload?.thumbnail != null && !payload?.thumbnail?.endsWith('null'), !payload?.thumbnail?.split(payload?.puid)?.[1])
+
             try {
-                const post = await updatePostMutation?.mutateAsync({ data: formData, postId: payload?.puid } as any)
-                console.log(post?.status, 'States')
-                if (post?.status == 201 || post?.status == 200) {
-                    toast({ message: 'Nice !!', severity: 'success' })
-                    updatePostMutation.reset()
-                } else {
-                    console.log(post?.data, " : DATA FROM CREATE")
+                const formData = new FormData()
+                await Promise.all(Object.keys(payload)?.map(d => {
+                    if (!(d === 'file' || d === 'thumbnail'))
+                        if (payload?.[d])
+                            formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
+                }))
+
+                if (payload?.thumbnail != null && !payload?.thumbnail?.endsWith('null'))
+                    if (!payload?.thumbnail?.split(payload?.puid)?.[1])
+                        formData.append('thumbnail', {
+                            type: 'image/*',
+                            name: 'thumbnail.jpg',
+                            uri: payload?.thumbnail
+                        } as any)
+
+                if (payload?.file !== null && payload?.file?.type !== null)
+                    if (!payload?.file?.uri?.split(payload?.puid)?.[1])
+                        formData.append('upload', {
+                            type: payload.file.type,
+                            name: payload.file.name,
+                            uri: payload.file.uri
+                        } as any);
+
+                formData.append('_method', 'PATCH')
+
+                if (navigation?.canGoBack()) {
+                    navigation?.goBack()
                 }
+
+                const post = await updatePostMutation?.mutateAsync({ data: formData, postId: payload?.puid } as any)
+                if (post?.status == 201 || post?.status == 200) {
+                    if (Platform.OS === 'android') {
+                        ToastAndroid.SHORT
+                        ToastAndroid.show(post?.data?.message, 2000)
+                    }
+                    updatePostMutation.reset()
+                } else { }
                 return post?.data
             } catch (error) {
-                console.log(JSON.stringify(error), ' ERROR REPOSNE')
                 if (error?.response?.status === 401) {
-                    toast({ message: error?.response?.data?.message, severity: 'warning' })
+                    if (Platform.OS === 'android') {
+                        ToastAndroid.SHORT
+                        ToastAndroid.show(error?.response?.data?.message, 2000)
+                    }
                     return authContext?.logout()
                 }
             }
@@ -149,6 +151,12 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
 
     const deletePost: IPostFormMethods['deletePost'] = async (payload) => {
         const deleted = await deletePostMutation?.mutateAsync({ postId: payload?.puid } as any)
+        if (deleted?.status == 200) {
+            if (authContext?.user?.person === 'isAuthenticated') {
+                ToastAndroid.BOTTOM
+                ToastAndroid.show(`Post deleted`, 2000)
+            }
+        }
     }
 
     const postView: IPostFormMethods['postView'] = async (puid) => {
@@ -160,18 +168,15 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
     const postReward: IPostFormMethods['postReward'] = async (rewards, puid) => {
         try {
             const rewarded = await axios.post(`${REQUESTS_API}post-reward`, { rewards, puid }, { headers: AHeaders })
-            console.log(rewarded?.data, AHeaders)
             if (rewarded?.status === 200) {
                 if (authContext?.user?.person === 'isAuthenticated') {
                     ToastAndroid.BOTTOM
                     ToastAndroid.show(`You earned points`, 10000)
                 }
             }
-        } catch (error) { 
-            console.log(error?.response)
-        }
+        } catch (error) { }
     }
-   
+
     const postReact: IPostFormMethods['postReact'] = async (reacted, puid) => {
         try {
             const reaction = await axios.post(`${REQUESTS_API}post-react`, { reacted, puid }, { headers: AHeaders })
@@ -180,9 +185,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
                     ToastAndroid.BOTTOM
                     ToastAndroid.show(`${reacted ? 'Liked' : 'Unlike'}`, 1000)
                 }
-        } catch (error) { 
-            console.log(error?.response?.data)
-        }
+        } catch (error) { }
     }
 
     const formContextValue = {

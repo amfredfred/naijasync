@@ -37,6 +37,7 @@ import UpdateBiometricSettings from '../Screens/User/Account/Settings/Security/S
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 import PlayVideo from '../Screens/Viewer/Post/Video';
 import { ProgressBar } from '../Components/Inputs';
+import MarketPlaceHome from '../Screens/MarketPlace';
 
 const Stack = createNativeStackNavigator();
 const Buttom = createBottomTabNavigator()
@@ -86,6 +87,8 @@ const PublicRoutes = (
         <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name='PostComposer' component={PostComposer} />
         <Stack.Screen name="Account" component={AccountRoutes} />
+        <Stack.Screen name="Market" component={MarketPlaceHome} />
+
         <Stack.Screen name='PlayVideo' component={PlayVideo} />
     </Stack.Navigator>
 )

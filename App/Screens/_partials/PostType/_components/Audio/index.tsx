@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { SpanText } from "../../../../../Components/Texts"
 import { useState } from "react"
 import PresentMedia from "../../../../Viewer/Post/PresentMedia"
+import { REQUESTS_API } from "@env"
 
 export default function PostAudioItemList(post: IPostItem) {
     const mP = useMediaPlaybackContext()
@@ -31,7 +32,7 @@ export default function PostAudioItemList(post: IPostItem) {
                 <View style={[styles.spaceBetween, { padding: 0, flex: 1 }]}>
                     <Image
                         style={{ width: 140, aspectRatio: '16/9', borderRadius: 10 }}
-                        source={{ uri: post?.thumbnailUrl }} />
+                        source={{ uri: `${REQUESTS_API}${post?.thumbnailUrl }`}} />
                     <SpanText >{mP?.fileUrl === post?.fileUrl ? Number(mP?.states?.progress > 0 ? mP?.states?.progress : 0) : 0}% / {post?.duration}</SpanText>
                 </View>
                 <TouchableOpacity style={[styles.playButton]} onPress={PlayPause}>

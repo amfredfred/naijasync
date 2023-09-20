@@ -41,7 +41,6 @@ export default function PostVideoItemList(post: IPostItem) {
     )
 }
 
-
 const styles = StyleSheet.create({
     playPauseiconContainer: {
         width: '100%',
@@ -62,7 +61,7 @@ const styles = StyleSheet.create({
     spaceBetween: {
         flexDirection: 'row',
         alignItems: 'center',
-        'justifyContent': 'space-between',
+        justifyContent: 'space-between',
         padding: 6,
         gap: 10
     },

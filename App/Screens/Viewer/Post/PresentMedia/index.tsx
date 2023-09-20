@@ -13,7 +13,7 @@ import React from 'react';
 import { BannerAd, BannerAdSize, TestIds, useRewardedAd } from 'react-native-google-mobile-ads';
 import VideoPresent from "./Video";
 import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
-import { TextExpandable } from "../../../../Components/Texts";
+import { HeadLine, TextExpandable } from "../../../../Components/Texts";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRewardedInterstitialAd } from "react-native-google-mobile-ads";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
@@ -144,11 +144,16 @@ export default function PresentMedia(post: PresentMedia) {
 
     const postFooting = (
         <LinearGradient
-            colors={['transparent', 'transparent', 'black']}
-            style={[styles.posFooting]}>
+            colors={['transparent', 'transparent', 'rgba(0,0,0,0.2)']}
+            style={[styles.posFooting, { backgroundColor: themeColors.background }]}>
+            <HeadLine
+                hidden={!post?.title}
+                children={post?.title}
+                style={{  paddingHorizontal:10  }}
+            />
             <TextExpandable
                 hidden={!post?.description}
-                style={{ padding: 10, paddingBottom: 5 }}
+                style={{ paddingHorizontal: 10, paddingBottom: 5 }}
                 children={post?.description} />
             {isBannerAdVisible && <View style={[styles.bannerAdContainer, { overflow: 'hidden' }]}>
                 <BannerAd
@@ -209,6 +214,8 @@ const styles = StyleSheet.create({
         width: '100%',
         bottom: 0,
         borderTopLeftRadius: 20,
-        borderTopRightRadius: 20
+        borderTopRightRadius: 20,
+        position: 'absolute',
+        paddingTop:10
     }
 })

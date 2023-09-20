@@ -121,9 +121,10 @@ const UploadPostListItem = (post: IPostItem) => {
     )
 
     return (
-        <TouchableOpacity
-            activeOpacity={.9}
-            onPress={() => (navigate as any)?.("ViewPost", { post })} style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background}}>
+        <View
+            // activeOpacity={.9}
+            // onPress={() => (navigate as any)?.("ViewPost", { post })}
+            style={{ paddingTop: 10, flexGrow: 1, flex: 1, backgroundColor: themeColors?.background }}>
             <View style={[styles.postWrapper]}>
                 <View style={{ height: '100%', paddingLeft: 10, justifyContent: 'flex-start' }}>
                     <ProfileAvatar  {...post?.owner} avatarOnly />
@@ -135,7 +136,7 @@ const UploadPostListItem = (post: IPostItem) => {
 
             {/* POSTS MENU */}
             <PostItemMenu {...post} visible={isMenuModalVisile} onRequestClose={() => setisMenuModalVisile(false)} />
-        </TouchableOpacity>
+        </View>
     )
 }
 

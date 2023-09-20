@@ -303,7 +303,7 @@ export default function PlayVideo() {
                 blurRadius={170}
                 style={{ paddingTop: StatusBar.currentHeight }}
                 source={{ uri: `${REQUESTS_API}${mediaContext?.thumbnailUrl}` }}>
-                <Animated.View style={[styles.videoContainer, { backgroundColor: colors.background }]}>
+                <Animated.View style={[styles.videoContainer, { backgroundColor: 'black' }]}>
                     <Video
                         style={[styles.video]}
                         resizeMode={ResizeMode.CONTAIN}

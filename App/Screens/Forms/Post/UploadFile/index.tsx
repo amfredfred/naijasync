@@ -53,19 +53,22 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     }, [sessionValues?.file?.uri])
 
     useEffect(() => {
-        // if (post) {
-        //     setSessionValues({
-        //         ...post as any,
-        //         file: {
-        //             uri: `${REQUESTS_API}${post?.fileUrl}`
-        //         },
-        //         thumbnail: `${REQUESTS_API}${post?.thumbnailUrl}`,
-        //         description: post?.description,
-        //         title: post?.title,
-        //         tags: post?.tags,
-        //         postType: post?.postType
-        //     })
-        // }
+        if (post?.puid) {
+            setSessionValues({
+                ...post as any,
+                file: {
+                    uri: `${REQUESTS_API}${post?.fileUrl}`,
+                    type: post?.fileType,
+                    name: post?.puid
+                },
+                thumbnail: `${REQUESTS_API}${post?.thumbnailUrl}`,
+                description: post?.description,
+                title: post?.title,
+                tags: post?.tags,
+                postType: post?.postType,
+                type: post?.postType
+            })
+        }
     }, [])
 
     const playPauseMedia = async () => {
@@ -167,7 +170,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
 
     const postCaption = (
         <View style={{ flexGrow: 1 }}>
-            <View style={[styles.textInputContainer,{  flexGrow:1}]}>
+            <View style={[styles.textInputContainer, { flexGrow: 1 }]}>
                 <HeadLine
                     style={{ padding: 10, opacity: .7 }}
                     hidden={!isKeyboardShown}
@@ -178,7 +181,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                     Adding captions to your posts can make a world of difference! It's more than just text
                     - it's a chance to share your story, your thoughts, and your personality.
                 </SpanText>
-                <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-start', flexGrow:1, height: (isKeyboardShown) ? 'auto' : sessionValues?.description ? 'auto' : undefined }]}>
+                <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-start', flexGrow: 1, height: (isKeyboardShown) ? 'auto' : sessionValues?.description ? 'auto' : undefined }]}>
                     <TextInput
                         onFocus={() => setIsCaptionInputFocused(true)}
                         onBlur={() => setIsCaptionInputFocused(false)}
@@ -200,7 +203,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     )
 
     const Title = (
-        <View style={[styles.spaceBetween, { marginHorizontal: 10, borderRadius: 10, overflow: 'hidden', height: 45, backgroundColor: themeColors.background2 }]}>
+        <View style={[styles.spaceBetween, { marginHorizontal: 10, marginTop: 20, borderRadius: 10, overflow: 'hidden', height: 45, backgroundColor: themeColors.background2 }]}>
             <TextInput
                 placeholder={`Enter ${fileType} title here (optional)`}
                 onFocus={() => setIsCaptionInputFocused(true)}
@@ -375,8 +378,8 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
             entering={FadeIn}
             exiting={FadeOut}
             style={[styles.container, {}]}>
-            {isTitleFocused || postCaption}
             {!['audio', 'video'].includes(fileType) || Title}
+            {isTitleFocused || postCaption}
             {!sessionValues?.file?.uri || previewUploadedFile}
             {isKeyboardShown || PostingTabs}
         </Animated.View>

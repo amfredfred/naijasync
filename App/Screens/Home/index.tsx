@@ -14,19 +14,23 @@ import PostItem from '../_partials/PostItem';
 import { FlatList, View } from 'react-native'
 import { Empty } from '../_partials/PostsList';
 import * as Animatable from 'react-native-animatable';
+import { SpanText } from '../../Components/Texts';
+import { StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { IconButton } from '../../Components/Buttons';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Home() {
     const themeColors = useThemeColors()
     const authContext = useAuthContext()
     const navigation = useNavigation()
+    const { navigate} = useNavigation()
 
     const [isRereshing, setIsRereshing] = useState(false)
     const [$Posts, set$Posts] = useState<IPostItem[]>([])
     const isRouteReady = navigation.isFocused();
 
     const fetch = async ({ pageParam = 1 }) => {
-        const url = `${REQUESTS_API}posts?page=${pageParam}`
-        console.log(url, '  url')
+        const url = `${REQUESTS_API}posts?page=${pageParam}` 
         return await axios<IPostItem[]>({
             url,
             method: 'GET',
@@ -124,9 +128,27 @@ export default function Home() {
     )
 
     const ListHeading = (
-        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}>
-
-        </View>
+        <ScrollView
+            horizontal
+            style={[{ width: '100%', backgroundColor: themeColors.background }]}
+            contentContainerStyle={[styles.spaceBetween,]}>
+            <TouchableOpacity style={[styles.spaceBetween, { borderRadius: 50, overflow: 'hidden', gap: 5, backgroundColor: themeColors.background2, paddingHorizontal: 20 }]} >
+                <SpanText children="Stories" />
+            </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => (navigate as any)?.('')}
+                style={[styles.spaceBetween, { borderRadius: 50, overflow: 'hidden', gap: 5, backgroundColor: themeColors.background2, paddingHorizontal: 20 }]} >
+                <SpanText style={{ color: themeColors.secondary }} children="#247" />
+            </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => (navigate as any)?.('Market')}
+                style={[styles.spaceBetween, { borderRadius: 50, overflow: 'hidden', gap: 5, backgroundColor: themeColors.background2, paddingHorizontal: 20, paddingLeft: 15 }]} >
+                <SpanText children="Market Place" />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.spaceBetween, { borderRadius: 50, overflow: 'hidden', gap: 5, backgroundColor: themeColors.background2, paddingHorizontal: 20 }]} >
+                <SpanText children="All" />
+            </TouchableOpacity>
+        </ScrollView >
     )
 
     return useMemo(() => (
@@ -136,7 +158,7 @@ export default function Home() {
                 ListHeaderComponent={ListHeading}
                 stickyHeaderIndices={$Posts ? [0] : undefined}
                 ItemSeparatorComponent={() => <View style={{ backgroundColor: themeColors.background2, height: 5 }} />}
-                style={{ flex: 1, backgroundColor: themeColors.background2 }}
+                style={{ flex: 1 }}
                 data={$Posts}
                 renderItem={({ item, index }) => (<PostItem {...item} />)}
                 ListEmptyComponent={() => (Array.from({ length: 5 }, (_, index) => <Empty key={index} />))}
@@ -150,4 +172,14 @@ export default function Home() {
         </UserLayout>
     ), [$Posts])
 
-}  
+}
+
+const styles = StyleSheet.create({
+    spaceBetween: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        'justifyContent': 'space-between',
+        padding: 6,
+        gap: 10
+    },
+})
