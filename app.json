@@ -62,5 +62,6 @@
   },
   "react-native-google-mobile-ads": {
     "android_app_id": "ca-app-pub-9643693190346556~9706940060"
-  }
+  },
+  "googleServicesFile": "./google-services.json"
 }

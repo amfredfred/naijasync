@@ -38,6 +38,7 @@ import { useEffect, useLayoutEffect, useMemo } from 'react';
 import PlayVideo from '../Screens/Viewer/Post/Video';
 import { ProgressBar } from '../Components/Inputs';
 import MarketPlaceHome from '../Screens/MarketPlace';
+import StoriesHome from '../Screens/Stories';
 
 const Stack = createNativeStackNavigator();
 const Buttom = createBottomTabNavigator()
@@ -88,6 +89,7 @@ const PublicRoutes = (
         <Stack.Screen name='PostComposer' component={PostComposer} />
         <Stack.Screen name="Account" component={AccountRoutes} />
         <Stack.Screen name="Market" component={MarketPlaceHome} />
+        <Stack.Screen name="Stories" component={StoriesHome} />
 
         <Stack.Screen name='PlayVideo' component={PlayVideo} />
     </Stack.Navigator>

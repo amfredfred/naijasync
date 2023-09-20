@@ -13,6 +13,7 @@ import useMediaLibrary from "../../../Hooks/useMediaLibrary";
 import { REQUESTS_API } from "@env";
 import usePostForm from "../../../Hooks/usePostForms";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
 
 
 
@@ -81,7 +82,7 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
 
     const postPublicMenuItem = [
         {
-            title: `Copy Link`,
+            title: `Copy Link (coming soon)`,
             hideIconRight: true,
             onPress: () => null,
             icon: <Ionicons size={30} name='copy' color={themeColors?.text} />,
@@ -93,14 +94,15 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
             icon: <Octicons size={30} name='report' color={themeColors?.text} />,
             description: 'You can report this post if you find it inappropriate.'
         },
-        {
+        ['video', 'audio','image'].includes(fileType) ? {
             title: `Download ${fileType} (coming soon)`,
             hideIconRight: true,
-            onPress: handleDownloadItem,
+            // onPress: handleDownloadItem,
             icon: <MaterialCommunityIcons size={30} name='download' color={themeColors?.text} />,
             description: `Donwload ${fileType} for access offline.`
-        }
+        } : {}
     ];
+
 
     const postWhenNotownerMenuItem = [
         {

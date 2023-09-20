@@ -132,11 +132,12 @@ export default function Home() {
             horizontal
             style={[{ width: '100%', backgroundColor: themeColors.background }]}
             contentContainerStyle={[styles.spaceBetween,]}>
-            <TouchableOpacity style={[styles.spaceBetween, { borderRadius: 50, overflow: 'hidden', gap: 5, backgroundColor: themeColors.background2, paddingHorizontal: 20 }]} >
+            <TouchableOpacity
+                onPress={() => (navigate as any)?.('Stories')}
+                style={[styles.spaceBetween, { borderRadius: 50, overflow: 'hidden', gap: 5, backgroundColor: themeColors.background2, paddingHorizontal: 20 }]} >
                 <SpanText children="Stories" />
             </TouchableOpacity>
             <TouchableOpacity
-                onPress={() => (navigate as any)?.('')}
                 style={[styles.spaceBetween, { borderRadius: 50, overflow: 'hidden', gap: 5, backgroundColor: themeColors.background2, paddingHorizontal: 20 }]} >
                 <SpanText style={{ color: themeColors.secondary }} children="#247" />
             </TouchableOpacity>
