@@ -44,7 +44,7 @@ const Stack = createNativeStackNavigator();
 const Buttom = createBottomTabNavigator()
 
 const AccountSettingsRoutes = () => (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }} >
         <Stack.Screen name='Personalization & Security' component={SettingsHome} />
         <Stack.Screen name='Personal Info' key={'Public Profile Update'} component={UpdateProfile} />
         <Stack.Screen name='Notificaions Preference' component={UpdateNotification} />
@@ -56,13 +56,13 @@ const AccountSettingsRoutes = () => (
 )
 
 const AccountDashboardRoutes = () => (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }} >
         <Stack.Screen name='Account overview 🌟' component={DashboardHome} />
     </Stack.Navigator>
 )
 
 const AccountFundingRoutes = () => (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }} >
         <Stack.Screen name='Payments & Transfers' component={FinanceHome} />
     </Stack.Navigator>
 )
@@ -81,7 +81,7 @@ const AccountRoutes = () => (
 const PublicRoutes = (
     <Stack.Navigator
         initialRouteName='Home'
-        screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: "slide_from_right" }} >
+        screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }} >
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Downloads' component={Downloads} />
         <Stack.Screen name="Explorer" component={Explorer} initialParams={{ screen: 'videos' }} />
@@ -90,7 +90,6 @@ const PublicRoutes = (
         <Stack.Screen name="Account" component={AccountRoutes} />
         <Stack.Screen name="Market" component={MarketPlaceHome} />
         <Stack.Screen name="Stories" component={StoriesHome} />
-
         <Stack.Screen name='PlayVideo' component={PlayVideo} />
     </Stack.Navigator>
 )
@@ -109,8 +108,6 @@ function Routes() {
         const route = url.replace(/.*?:\/\//g, '');
         console.log(route, " FROM LINKING")
     });
-
-
 
     const GuestRoutes = (
         <GuestLayout>

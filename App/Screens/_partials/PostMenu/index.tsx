@@ -61,7 +61,7 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
             title: `Edit`,
             onPress: () => {
                 props?.onRequestClose?.(null);
-                (navigation?.navigate as any)?.("PostComposer", { post: props, formMode: "edit" })
+                (navigation?.navigate as any)?.("PostComposer", { post: props, formMode: "Update" })
             },
             icon: <AntDesign size={30} name='edit' color={themeColors?.text} />,
             description: ''
@@ -94,15 +94,19 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
             icon: <Octicons size={30} name='report' color={themeColors?.text} />,
             description: 'You can report this post if you find it inappropriate.'
         },
-        ['video', 'audio','image'].includes(fileType) ? {
-            title: `Download ${fileType} (coming soon)`,
-            hideIconRight: true,
-            // onPress: handleDownloadItem,
-            icon: <MaterialCommunityIcons size={30} name='download' color={themeColors?.text} />,
-            description: `Donwload ${fileType} for access offline.`
-        } : {}
+        ...(['video', 'audio', 'image'].includes(fileType)
+            ? [
+                {
+                    title: `Download ${fileType} (coming soon)`,
+                    hideIconRight: true,
+                    // onPress: handleDownloadItem,
+                    icon: <MaterialCommunityIcons size={30} name='download' color={themeColors?.text} />,
+                    description: `Download ${fileType} for offline access.`
+                }
+            ]
+            : []
+        )
     ];
-
 
     const postWhenNotownerMenuItem = [
         {

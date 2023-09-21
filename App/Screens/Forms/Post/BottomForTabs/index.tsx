@@ -1,9 +1,10 @@
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
 import { StyleSheet, ScrollView, TouchableOpacity, Text, useColorScheme } from 'react-native'
-import { MaterialCommunityIcons, MaterialIcons, Zocial } from '@expo/vector-icons'
+import { FontAwesome5, MaterialCommunityIcons, MaterialIcons, Zocial } from '@expo/vector-icons'
 import useThemeColors from '../../../../Hooks/useThemeColors'
 import { IPostType } from '../../../../Interfaces/IPostContext'
 import { IThemedComponent } from '../../../../Interfaces'
+import * as Animatable from 'react-native-animatable'
 
 export interface IFormBottomTabs extends IThemedComponent {
     handleOnButtonTabPress(props: IPostType['types']): void,
@@ -50,26 +51,21 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
                         Article
                     </Text> */}
                 </TouchableOpacity>
-                {/* <TouchableOpacity
-                    onPress={() => handleOnButtonTabPress("STATUS")}
-                    style={[styles.postTypeButton]}   >
-                    <Zocial
-                        style={[styles.postTypeButtonIcon, { backgroundColor: activeTab === 'STATUS' ? 'transparent' : themeColors.background2, color: themeColors.text }]}
-                        name='statusnet' />
-                    <Text style={[{ color: themeColors.text }]}>
+             
+                <Animatable.View
+                
+                >
+                    <TouchableOpacity
+                        onPress={() => handleOnButtonTabPress("STATUS")}
+                        style={[styles.postTypeButton]}   >
+                        <FontAwesome5
+                            style={[styles.postTypeButtonIcon, { backgroundColor: activeTab === 'STATUS' ? 'transparent' : themeColors.background2, color: themeColors.text }]}
+                            name='hotjar' />
+                        {/* <Text style={[{ color: themeColors.text }]}>
                         Status
-                    </Text>
-                </TouchableOpacity> */}
-                <TouchableOpacity
-                    onPress={() => handleOnButtonTabPress("GIF")}
-                    style={[styles.postTypeButton]}   >
-                    <MaterialIcons
-                        style={[styles.postTypeButtonIcon, { backgroundColor: activeTab === 'GIF' ? 'transparent' : themeColors.background2, color: themeColors.text }]}
-                        name='gif' />
-                    {/* <Text style={[{ color: themeColors.text }]}>
-                        GIF
                     </Text> */}
-                </TouchableOpacity>
+                    </TouchableOpacity>
+                </Animatable.View>
 
                 <TouchableOpacity
                     onPress={() => handleOnButtonTabPress('UPLOAD')}

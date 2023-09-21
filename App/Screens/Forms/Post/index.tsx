@@ -15,7 +15,7 @@ const { width, height } = Dimensions.get('window');
 
 export default function PostComposer() {
     const [activeTab, setactiveTab] = useState<IPostType['types']>('UPLOAD');
-    const [formMode, setformMode] = useState<'create' | 'edit'>('create')
+    const [formMode, setformMode] = useState<'Post' | 'Update'>('Post')
     const [isShowingKeyboard, setisShowingKeyboard] = useState(false);
     const themeColors = useThemeColors();
     useKeyboardEvent({
@@ -28,44 +28,48 @@ export default function PostComposer() {
 
     // check if to update post
     const { params } = useRoute()
-    const { post, formMode: formModePassed } = (params ?? { post: {}, formMode: 'create' }) as {
+    const { post, formMode: formModePassed } = (params ?? { post: {}, formMode: 'Post' }) as {
         post: IPostItem,
-        formMode: 'create' | 'edit'
+        formMode: typeof formMode
     }
     useEffect(() => {
         setformMode(formModePassed)
     }, [])
 
+    const FormHeading = (
+        <View style={[styles.spaceBetween, { backgroundColor: themeColors.background2 }]}>
+            <View style={[styles.spaceBetween, { padding: 0, flexGrow: 1, justifyContent: 'flex-start' }]}>
+                <Ionicons
+                    onPress={() => { }}
+                    name="arrow-back"
+                    color={themeColors.text}
+                    size={30}
+                />
+                <SpanText style={[{ color: themeColors.text, fontSize: 20, textTransform: 'capitalize', paddingRight: 10 }]}>
+                    {activeTab}
+                </SpanText>
+            </View>
+            <TouchableOpacity
+                onPress={() => { }}
+                style={[styles.spaceBetween, styles.roundedButton, { backgroundColor: themeColors.background2 }]}>
+                <SpanText style={[{ color: themeColors.text, opacity: .6, fontSize: 16 }]}>  POST  </SpanText>
+            </TouchableOpacity>
+        </View>
+    )
+
 
     return useMemo(() => (
         <KeyboardAvoidingView
             behavior={Platform.OS == 'android' ? 'height' : 'padding'}
-            style={[styles.container, { backgroundColor: themeColors.background }]}>
+            style={[styles.container, { backgroundColor: themeColors.background, borderTopLeftRadius: 10, borderTopRightRadius: 10 }]}>
             <View style={[styles.containerInner]}>
-                <View style={[styles.spaceBetween, { backgroundColor: themeColors.background2 }]}>
-                    <View style={[styles.spaceBetween, { padding: 0, flexGrow: 1, justifyContent: 'flex-start' }]}>
-                        <Ionicons
-                            onPress={() => { }}
-                            name="arrow-back"
-                            color={themeColors.text}
-                            size={30}
-                        />
-                        <SpanText style={[{ color: themeColors.text, fontSize: 20, textTransform: 'capitalize', paddingRight: 10 }]}>
-                            {activeTab}
-                        </SpanText>
-                    </View>
-                    <TouchableOpacity
-                        onPress={() => { }}
-                        style={[styles.spaceBetween, styles.roundedButton, { backgroundColor: themeColors.background2 }]}>
-                        <SpanText style={[{ color: themeColors.text, opacity: .6, fontSize: 16 }]}>  POST  </SpanText>
-                    </TouchableOpacity>
-                </View>
+
                 {/*  */}
                 <View style={[styles.innerContainer]}>
-                    {activeTab === 'STATUS' && <UploadStatusFrom />}
+                    {activeTab === 'STATUS' && <UploadStatusFrom {...post} formMode={formMode} />}
                     {activeTab === 'UPLOAD' && <UploadFileForm {...post} formMode={formMode} />}
                 </View>
-                <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard || formMode === 'edit' }} />
+                <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard || formMode === 'Update' }} />
             </View>
         </KeyboardAvoidingView>
     ), [activeTab, isShowingKeyboard, themeColors]);

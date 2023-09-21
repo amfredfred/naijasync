@@ -78,13 +78,11 @@ export function MediaViewerProvider({ children }) {
     };
 
     const handleLoad = (data) => {
-        console.log("LOADED")
         setMediaState((prevState) => ({ ...prevState, duration: data.durationMillis }));
     };
 
     const play = async () => {
         try {
-            console.log('FROM ', Date.now())
             if (mediaType === 'audio') {
                 if (mediaState?.playState === 'ended')
                     await audioObjectRef?.current?.sound?.replayAsync();
@@ -97,9 +95,7 @@ export function MediaViewerProvider({ children }) {
                     await mediaRef?.current?.playAsync();
             }
             setMediaState((prevState) => ({ ...prevState, playState: 'playing' }));
-            console.log('PLAYED ', Date.now())
         } catch (error) {
-            console.log("ERROR: play-> ", error)
             setMediaState((prevState) => ({ ...prevState, playState: 'errored' }));
         }
     };
@@ -113,7 +109,6 @@ export function MediaViewerProvider({ children }) {
             }
             setMediaState((prevState) => ({ ...prevState, playState: 'paused' }));
         } catch (error) {
-            console.log("ERROR: pause-> ", error)
             setMediaState((prevState) => ({ ...prevState, playState: 'errored' }));
         }
     };
@@ -122,11 +117,10 @@ export function MediaViewerProvider({ children }) {
     const loadMediaPlayable = async (shouldPlay?: boolean) => {
         try {
             setMediaState(S => ({ ...S, playState: 'loading' }))
-            console.log("CALLED++++++++++++++++++++++++++++++++++++++++++++++++++=========================")
-
+            const uri = data?.fileUrl?.split('file:/')?.[1] ? data?.fileUrl : `${REQUESTS_API}${data?.fileUrl}`
             if (mediaType === 'audio') {
                 const playbackObject = await Audio.Sound.createAsync?.(
-                    { uri: `${REQUESTS_API}${data?.fileUrl}` },
+                    { uri },
                     { shouldPlay: shouldPlay },
                     handlePlaybackStatusUpdate as any
                 );
@@ -138,15 +132,12 @@ export function MediaViewerProvider({ children }) {
                 });
                 audioObjectRef.current = playbackObject;
             } else if (mediaType === 'video') {
-                console.log('LOADING VIDEO')
-                await mediaRef?.current?.loadAsync?.({ uri: `${REQUESTS_API}${data?.fileUrl}` }, {}, false);
-                console.log("LAODED VIDEO")
+                await mediaRef?.current?.loadAsync?.({ uri }, {}, false);
             }
             setMediaState(S => ({ ...S, isReady: true, playState: 'canPlay' }))
             play()
             mediaRef?.current?.setOnPlaybackStatusUpdate(states => handlePlaybackStatusUpdate(states as any))
         } catch (error) {
-            console.log("ERROR: loadMediaPlayable-> ", error)
             toast({
                 message: "error occured while loading media !!",
                 timeout: 5000,
@@ -186,18 +177,16 @@ export function MediaViewerProvider({ children }) {
         dispatch({ 'key': 'presenting', payload: props?.presenting })
         try {
             setMedia(props)
-        } catch (error) {
-            console.log("ERROR: connect-> ", error)
+        } catch (error) { 
         }
     }
 
-    const handleLoadStart = () => {
-        console.log("VIDEO LOAD START")
+    const handleLoadStart = () => { 
         // Handle onLoadStart logic here
     };
 
     const handleError = (e) => {
-        console.log("VIDEO ERROR", e)
+        
         // Handle onError logic here
     };
 

@@ -3,9 +3,9 @@ import { Image, Dimensions, View, TextInput, TouchableOpacity, ImageBackground, 
 import { FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 
-import UploadIcon from '../../../../../assets/upload-icon.png'
-import UploadBackground from '../../../../../assets/autumn-leaves-background.jpg'
 import MusicalLandscape from '../../../../../assets/muusical-landscape.jpg'
+
+import * as Animatable from 'react-native-animatable'
 
 import Animated, { SlideInDown, SlideOutUp, SlideOutDown, FadeIn, FadeOut } from 'react-native-reanimated'
 import { HeadLine, SpanText } from "../../../../Components/Texts";
@@ -19,22 +19,19 @@ import { IMediaPlayable } from '../../../Statics/Interface';
 import usePostForm from "../../../../Hooks/usePostForms";
 import { useDataContext } from "../../../../Contexts/DataContext";
 import { REQUESTS_API } from "@env";
+import { FancyButton } from "../../../../Components/Buttons";
+import { useMediaPlaybackContext } from "../../../../Contexts/MediaPlaybackContext";
 
 const { height, width } = Dimensions.get('window')
 
-export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' }) => {
+export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' }) => {
 
-    const videoMediaRef = useRef<Video>(null)
-    const [audioMediaRef, setAudioMediaRef] = useState<Audio.SoundObject>(null)
     const [fileType, setFileType] = useState<IMediaType>(null)
-    const [mediaState, setMediaState] = useState<IMediaPlayable['states']>({})
-    const [isCaptionInputFocused, setIsCaptionInputFocused] = useState(false)
-    const [isTitleFocused, setIsTitleFocused] = useState(false)
     const [isKeyboardShown, setIsKeyboardShown] = useState(false)
+    const [isPostingGif, setisPostingGif] = useState(false)
     const themeColors = useThemeColors()
-
+    const mediaContext = useMediaPlaybackContext()
     const { methods: { createPost, updatePost } } = usePostForm()
-
     const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD', type: 'UPLOAD' })
 
     useKeyboardEvent({
@@ -43,12 +40,11 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     })
 
     useEffect(() => {
-        const fileType = getMediaType(sessionValues?.file?.uri)
-        setFileType(fileType)
+
+        setFileType(getMediaType(sessionValues?.file?.uri))
 
         return () => {
             setFileType(null)
-            setMediaState(state => ({ ...state, playState: 'paused' }))
         }
     }, [sessionValues?.file?.uri])
 
@@ -72,43 +68,24 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     }, [])
 
     const playPauseMedia = async () => {
-        try {
-            if (fileType === 'audio') {
-                if (!audioMediaRef)
-                    setAudioMediaRef(await Audio.Sound.createAsync({
-                        uri: sessionValues?.file?.uri,
-                    }, {}, handlePlaybackStatusUpdate))
-                if (mediaState.playState !== 'playing') {
-                    setMediaState(state => ({ ...state, playState: 'playing' }))
-                    await audioMediaRef?.sound?.playAsync()
-                } else {
-                    setMediaState(state => ({ ...state, playState: 'paused' }))
-                    await audioMediaRef?.sound?.pauseAsync()
-                }
-            } else if (fileType === 'video') {
-                if (videoMediaRef?.current) {
-                    if (mediaState.playState !== 'playing') {
-                        setMediaState(state => ({ ...state, playState: 'playing' }))
-                        await videoMediaRef?.current?.playAsync()
-                    } else {
-                        setMediaState(state => ({ ...state, playState: 'paused' }))
-                        await videoMediaRef?.current?.pauseAsync()
-                    }
-                }
-            }
-        } catch (error) {
-            console.log("ERROR-> ", error)
+        if (mediaContext?.states?.playState == 'playing')
+            mediaContext?.pause()
+        else {
+            console.log('should be playing', mediaContext?.fileType)
+            mediaContext?.play()
         }
+
     }
 
     const handleCreatePost = async () => {
-        if (post?.formMode == 'create')
+        if (post?.formMode == 'Post')
             createPost({ ...sessionValues, 'postType': "UPLOAD" })
         else
             updatePost({ ...sessionValues })
     }
 
     const handlePickDocument = async () => {
+        setisPostingGif(false)
         const [type, multiple] = [['image/*', "video/*", "audio/*"], false]
         try {
             const pickedItems = await FilePicker.getDocumentAsync({
@@ -125,28 +102,17 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                         type: picked?.mimeType
                     }
                 }))
-                if (['video', 'image'].includes(picked?.mimeType))
-                    setSessionValues(state => ({ ...state, thumbnail: picked.uri }))
+                if (['video', 'audio'].includes(picked?.mimeType?.split('/')?.[0])) {
+                    mediaContext?.connect({ fileUrl: picked?.uri })
+                }
+                // if (['image', 'video'].includes(picked?.mimeType?.split('/')?.[0])) {
+                //     setSessionValues(state => ({ ...state, thumbnail: picked.uri }))
+                // }
             }
         } catch (error) {
-            console.log("ERROR handlePickDocument -> ", error)
+
         }
     }
-
-    const handlePlaybackStatusUpdate = (data) => {
-        if (data?.isLoaded && !data.isPlaying && data.didJustFinish) {
-            setMediaState(state => ({ playState: 'ended' }));
-            videoMediaRef?.current?.setPositionAsync(0)
-            audioMediaRef?.sound?.setPositionAsync(0)
-        }
-        const { positionMillis, playableDurationMillis, durationMillis } = data;
-        const calculatedProgress = (positionMillis / playableDurationMillis) * 100;
-        setMediaState(prevState => ({
-            ...prevState,
-            progress: Number((calculatedProgress ?? 0).toFixed(0)),
-            duration: durationMillis / 1000
-        }));
-    };
 
     const handlePickThumbnail = async () => {
         try {
@@ -183,8 +149,6 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                 </SpanText>
                 <View style={[styles.spaceBetween, { padding: 0, alignItems: 'flex-start', flexGrow: 1, height: (isKeyboardShown) ? 'auto' : sessionValues?.description ? 'auto' : undefined }]}>
                     <TextInput
-                        onFocus={() => setIsCaptionInputFocused(true)}
-                        onBlur={() => setIsCaptionInputFocused(false)}
                         style={[styles.textInput, { color: themeColors.text, flexGrow: 1 }]}
                         placeholder={['video', 'audio'].includes(fileType) ? `Caption your ${fileType} (recommended)` : isKeyboardShown ? "Type your caption here..." : "What's up?🖋️"}
                         value={sessionValues?.description}
@@ -206,8 +170,6 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
         <View style={[styles.spaceBetween, { marginHorizontal: 10, marginTop: 20, borderRadius: 10, overflow: 'hidden', height: 45, backgroundColor: themeColors.background2 }]}>
             <TextInput
                 placeholder={`Enter ${fileType} title here (optional)`}
-                onFocus={() => setIsCaptionInputFocused(true)}
-                onBlur={() => setIsCaptionInputFocused(false)}
                 style={[styles.textInput, { color: themeColors.text, flex: 1 }]}
                 value={sessionValues?.title}
                 onChangeText={handleOnTitleTextChange}
@@ -219,73 +181,124 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
     )
 
 
-    const PostingTabs = (
-        <View style={[styles.spaceBetween, styles.postingTabcContainer]}>
-            <View style={[styles.spaceBetween, { gap: 20, }]}>
-                <TouchableOpacity>
-                    <FontAwesome5
-                        size={25}
-                        onPress={handlePickDocument}
-                        name='photo-video'
-                        color={themeColors.text}
-                    />
-                </TouchableOpacity>
-                {['video', 'audio'].includes(fileType) && <MaterialCommunityIcons
-                    size={25}
-                    onPress={handlePickThumbnail}
-                    name='image-album'
-                    color={themeColors.text}
-                />}
+    const GifSearchTextInput = (
+        <View style={{ flexGrow: 1 }}>
+            <View style={[styles.spaceBetween, { marginHorizontal: 10, marginTop: 20, borderRadius: 10, overflow: 'hidden', height: 45, backgroundColor: themeColors.background2 }]}>
+                <TextInput
+                    editable={false}
+                    placeholder={`Seach Gif...`}
+                    style={[styles.textInput, { color: themeColors.text, flex: 1 }]}
+                    value={sessionValues?.title}
+                    onChangeText={handleOnTitleTextChange}
+                    // autoFocus
+                    placeholderTextColor={'darkgrey'}
+                    returnKeyType="default"
+                />
             </View>
 
-            <TouchableOpacity
-                onPress={handleCreatePost}
-                style={[styles.spaceBetween, { backgroundColor: themeColors.background2, borderRadius: 50 }]}  >
-                <SpanText style={{ textTransform: 'capitalize' }}> {post?.formMode}  </SpanText>
-            </TouchableOpacity>
+            <View style={{padding:30, flex:1, justifyContent:'center', alignItems:'center', opacity:.4}}>
+                <SpanText style={{fontSize:30}}>
+                   GIF IS COMING SOON
+                </SpanText>
+            </View>
         </View>
     )
 
-    const displayType = () => {
-        switch (fileType) {
-            case 'video':
-                return (
-                    <View style={{ width: '100%', flexGrow: 1 }}>
-                        <Video
-                            resizeMode={ResizeMode.CONTAIN}
-                            style={{ flexGrow: 1, width: '100%' }}
-                            ref={videoMediaRef}
-                            source={{ uri: sessionValues?.file?.uri }}
-                            onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-                        />
-                    </View>
-                )
-            case 'image':
-                return (
-                    <View style={{ width: '100%', flexGrow: 1, position: 'relative' }}>
-                        <Image
-                            source={{ uri: sessionValues?.file?.uri }}
-                            style={{ flexGrow: 1, width: '100%' }}
-                            resizeMethod='resize'
-                            resizeMode='contain'
-                        />
-                    </View>
-                )
-            case 'audio':
-                return (
-                    <ImageBackground
-                        source={MusicalLandscape}
-                        blurRadius={10}
-                        style={{ width: '100%', flexGrow: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red' }}>
+
+    const PostingTabs = (
+        <View style={[styles.spaceBetween, styles.postingTabcContainer]}>
+
+            {
+                isPostingGif ? (
+                    <View style={[styles.spaceBetween]}>
                         <Ionicons
-                            name='musical-note'
+                            size={25}
+                            onPress={() => {
+                                setSessionValues(s => ({ type: s.type, postType: s.postType }))
+                                setisPostingGif(false)
+                            }}
                             color={themeColors.text}
-                            size={100}
-                        />
-                    </ImageBackground>
+                            style={{ backgroundColor: themeColors.background2, borderRadius: 50, padding: 5, aspectRatio: 1 }}
+                            name="arrow-back" />
+                    </View>) : (
+                    <View style={[styles.spaceBetween, { padding: 0 }]}>
+                        <View style={[styles.spaceBetween, { gap: 20, }]}>
+                            <MaterialIcons
+                                size={25}
+                                onPress={handlePickDocument}
+                                name='attach-file'
+                                color={themeColors.text}
+                                style={{ backgroundColor: themeColors.background2, borderRadius: 50, padding: 5, aspectRatio: 1 }} />
+                            {['video', 'audio'].includes(fileType) && (
+                                <Animatable.View
+                                    animation={'zoomIn'}>
+                                    <MaterialCommunityIcons
+                                        size={25}
+                                        onPress={handlePickThumbnail}
+                                        name='image-album'
+                                        color={themeColors.text}
+                                        style={{ borderRadius: 50, padding: 5 }} />
+                                </Animatable.View>
+                            )}
+                        </View>
+
+                        <MaterialIcons
+                            onPress={() => {
+                                setSessionValues(s => ({ type: s.type, postType: s.postType }))
+                                setisPostingGif(true)
+                            }}
+                            style={{ backgroundColor: themeColors.background2, borderRadius: 50, padding: 5 }}
+                            size={25}
+                            color={themeColors.text}
+                            name='gif' />
+                    </View>
                 )
-        }
-    }
+            }
+
+            <FancyButton
+                containerStyle={{ paddingHorizontal: 20, borderRadius: 50, flex: 1 }}
+                onPress={handleCreatePost}
+                title={post?.formMode}
+            />
+        </View>
+    )
+
+
+    let FilePreviewComponent = null
+    if (fileType === 'video')
+        FilePreviewComponent = (
+            <View style={{ width: '100%', flexGrow: 1 }}>
+                <Video
+                    resizeMode={ResizeMode.CONTAIN}
+                    style={{ flexGrow: 1, width: '100%' }}
+                    ref={mediaContext?.mediaRef}
+                />
+            </View>
+        )
+    else if (fileType === 'image')
+        FilePreviewComponent = (
+            <View style={{ width: '100%', flexGrow: 1, position: 'relative' }}>
+                <Image
+                    source={{ uri: sessionValues?.file?.uri }}
+                    style={{ flexGrow: 1, width: '100%' }}
+                    resizeMethod='resize'
+                    resizeMode='contain'
+                />
+            </View>
+        )
+    else if (fileType === 'audio')
+        FilePreviewComponent = (
+            <ImageBackground
+                source={MusicalLandscape}
+                blurRadius={10}
+                style={{ width: '100%', flexGrow: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red' }}>
+                <Ionicons
+                    name='musical-note'
+                    color={themeColors.text}
+                    size={100}
+                />
+            </ImageBackground>)
+
 
     const thumbPreviewer = (
         <View style={[styles.thumbPreviewBackgroundImage]}>
@@ -350,8 +363,8 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                             blurRadius={180}
                             source={{ uri: sessionValues?.file?.uri }}
                             style={[styles.uploadedFilePreviewInnerContainer]}>
-                            {displayType()}
-                            {['video', 'audio'].includes(fileType) ? mediaState?.playState !== 'playing' && thumbPreviewer : null}
+                            {FilePreviewComponent}
+                            {['video', 'audio'].includes(fileType) ? mediaContext?.states?.playState !== 'playing' && thumbPreviewer : null}
                             <Ionicons
                                 style={[styles.iconsStyle, { height: 40, position: 'absolute', right: 20, top: 20 }]}
                                 onPress={() => setSessionValues(state => ({ ...state, file: null }))}
@@ -364,7 +377,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
                                     onPress={playPauseMedia}
                                     color={'white'}
                                     size={30}
-                                    name={mediaState.playState === 'paused' ? 'play' : mediaState.playState === 'playing' ? 'pause' : 'play'} />
+                                    name={mediaContext?.states?.playState === 'paused' ? 'play' : mediaContext?.states?.playState === 'playing' ? 'pause' : 'play'} />
                             }
                         </ImageBackground>
                     </View>
@@ -379,7 +392,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'create' | 'edit' 
             exiting={FadeOut}
             style={[styles.container, {}]}>
             {!['audio', 'video'].includes(fileType) || Title}
-            {isTitleFocused || postCaption}
+            {isPostingGif ? GifSearchTextInput : postCaption}
             {!sessionValues?.file?.uri || previewUploadedFile}
             {isKeyboardShown || PostingTabs}
         </Animated.View>

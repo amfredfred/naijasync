@@ -151,7 +151,7 @@ export async function openURi(uri: string, onCannotOpenUri?: () => void, onError
 
 export function getMediaType(link: string): IMediaType {
     if (!link) {
-        return undefined
+        return null
     }
     const mediaExtensions: { [key: string]: IMediaType } = {
         // Video Extensions

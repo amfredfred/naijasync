@@ -15,7 +15,6 @@ export default function VideoPresent(post: IPostItem) {
 
     const mediaContext = useMediaPlaybackContext()
     useEffect(() => { mediaContext?.connect({ ...post, presenting: true }) }, [post?.fileUrl])
-
     return (
         <View style={[styles.constainer]}>
             <View style={{ position: 'relative', flex: 1 }}>
@@ -31,7 +30,6 @@ export default function VideoPresent(post: IPostItem) {
                     resizeMode={ResizeMode?.CONTAIN}
                     ref={mediaContext?.mediaRef}
                     style={{ width: '100%', flexGrow: 1, flex: 1 }}
-                    onPlaybackStatusUpdate={mediaContext?.handlePlaybackStatusUpdate}
                 />
             </View>
             <View style={{ height: 35, flexDirection:'row', alignItems:'center', gap:10, paddingHorizontal:15 }}>

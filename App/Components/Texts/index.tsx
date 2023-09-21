@@ -70,7 +70,8 @@ export const TextExpandable = (props) => {
             onPress={handleOnPress}
             onLongPress={handleOnLongPress} // Handle long-press here
             style={[{
-                fontSize: 14, fontWeight: '200', lineHeight: 18, height: isExpanded ? undefined : 60
+                fontSize: 14, fontWeight: '200', lineHeight: 18,
+                marginVertical:6
             }, props?.style]}
         >
             {props.children}

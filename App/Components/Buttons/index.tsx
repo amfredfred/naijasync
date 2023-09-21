@@ -1,6 +1,6 @@
 import useThemeColors from "../../Hooks/useThemeColors";
 import { IApp, IThemedComponent } from "../../Interfaces";
-import { Image, TouchableOpacity, Vibration, Dimensions } from 'react-native'
+import { Image, TouchableOpacity, Vibration, Dimensions, View } from 'react-native'
 import { ContainerBlock, ContainerSpaceBetween, IContainer } from "../Containers";
 import { ISpanText, SpanText } from "../Texts";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -147,6 +147,40 @@ export const ButtonGradient = (props: IButtonGradient) => {
                     children={title} />
             </TouchableOpacity>
         </LinearGradient>
+    )
+
+}
+
+export const FancyButton = (props: IButton) => {
+    const themeColors = useThemeColors()
+    const { children, title, containerStyle, textStyle, style, ...otherProps } = props
+
+    const containerStyled: IContainer['style'] = {
+        overflow: 'hidden',
+        backgroundColor: themeColors.background2,
+        borderRadius: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 40,
+        elevation: .6,
+        shadowColor: themeColors.text,
+    }
+
+    const buttonStyled: IButton['style'] = {
+        padding: 7,
+        paddingHorizontal: 12, 
+    }
+
+    return (
+        <TouchableOpacity {...otherProps} style={[containerStyled, containerStyle]}>
+            <View  style={[buttonStyled, style]} >
+                <SpanText
+                    style={[{ textTransform: 'capitalize', fontSize: 18 }, textStyle]}
+                    hidden={!title}
+                    children={title} />
+            </View>
+        </TouchableOpacity>
     )
 
 }

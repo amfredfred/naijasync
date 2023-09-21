@@ -6,12 +6,34 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { useRef, useState, useEffect } from 'react'
 import { SpanText } from '../../../../Components/Texts'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
+import { IPostItem } from '../../../../Interfaces'
+import { Camera, CameraType } from 'expo-camera';
 
 const { height, width } = Dimensions.get('window')
 
-export default function UploadStatusFrom() {
+export default function UploadStatusFrom(post?: IPostItem & { formMode: 'Post' | 'Update' }) {
+
     const [libpermission, requestLibPermission] = Library.usePermissions()
     const [mediaFiles, setMediaFiles] = useState<Library.AssetInfo[]>([])
+
+    const [CamType, setCamType] = useState(CameraType.back);
+    const [CamPermision, requestCamPermision] = Camera.useCameraPermissions();
+
+    useEffect(() => {
+
+        const Permit = async () => {
+            if (!CamPermision) {
+                await requestCamPermision()
+            }
+            else if (!CamPermision?.granted) {
+                await requestCamPermision()
+            }
+        }
+
+        Permit()
+
+    }, [CamPermision])
+
 
     const richText = useRef()
     const themeColors = useThemeColors()
@@ -37,7 +59,6 @@ export default function UploadStatusFrom() {
                         <MaterialCommunityIcons style={[styles.postTypeButtonIcon, { backgroundColor: themeColors.text }]} name='upload-multiple' />
                     </TouchableOpacity>
                 </View>
-
             </View>
             <GestureDetector gesture={gesture}>
                 <Animated.View style={[styles.mediaExplorerContainer, { backgroundColor: themeColors.background2 }]}>
