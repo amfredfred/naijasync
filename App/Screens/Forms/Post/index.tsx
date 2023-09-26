@@ -14,7 +14,7 @@ import { IPostItem } from '../../../Interfaces';
 const { width, height } = Dimensions.get('window');
 
 export default function PostComposer() {
-    const [activeTab, setactiveTab] = useState<IPostType['types']>('UPLOAD');
+    const [activeTab, setactiveTab] = useState<IPostType['types']>('STATUS');
     const [formMode, setformMode] = useState<'Post' | 'Update'>('Post')
     const [isShowingKeyboard, setisShowingKeyboard] = useState(false);
     const themeColors = useThemeColors();
@@ -61,7 +61,7 @@ export default function PostComposer() {
     return useMemo(() => (
         <KeyboardAvoidingView
             behavior={Platform.OS == 'android' ? 'height' : 'padding'}
-            style={[styles.container, { backgroundColor: themeColors.background, borderTopLeftRadius: 10, borderTopRightRadius: 10 }]}>
+            style={[styles.container, { backgroundColor: themeColors.background }]}>
             <View style={[styles.containerInner]}>
 
                 {/*  */}
@@ -69,7 +69,10 @@ export default function PostComposer() {
                     {activeTab === 'STATUS' && <UploadStatusFrom {...post} formMode={formMode} />}
                     {activeTab === 'UPLOAD' && <UploadFileForm {...post} formMode={formMode} />}
                 </View>
-                <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard || formMode === 'Update' }} />
+                <FormBottomTabs
+                    hidden={activeTab === 'STATUS'}
+                    {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard || formMode === 'Update' }}
+                />
             </View>
         </KeyboardAvoidingView>
     ), [activeTab, isShowingKeyboard, themeColors]);
@@ -79,12 +82,11 @@ const styles = StyleSheet.create({
     container: {
         height,
         top: 0,
-        position: 'absolute',
         marginTop: StatusBar.currentHeight,
         width,
-        bottom: 0,
-        flexGrow: 1,
-        flex: 1
+        overflow: 'hidden',
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15
     },
     innerContainer: {
         flex: 1

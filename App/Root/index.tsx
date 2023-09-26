@@ -80,7 +80,7 @@ const AccountRoutes = () => (
 
 const PublicRoutes = (
     <Stack.Navigator
-        initialRouteName='Home'
+        initialRouteName='PostComposer'
         screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }} >
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Downloads' component={Downloads} />

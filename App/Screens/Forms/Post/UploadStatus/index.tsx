@@ -5,7 +5,7 @@ import useThemeColors from '../../../../Hooks/useThemeColors'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { useRef, useState, useEffect } from 'react'
 import { SpanText } from '../../../../Components/Texts'
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { IPostItem } from '../../../../Interfaces'
 import { Camera, CameraType } from 'expo-camera';
 
@@ -16,23 +16,23 @@ export default function UploadStatusFrom(post?: IPostItem & { formMode: 'Post' |
     const [libpermission, requestLibPermission] = Library.usePermissions()
     const [mediaFiles, setMediaFiles] = useState<Library.AssetInfo[]>([])
 
-    const [CamType, setCamType] = useState(CameraType.back);
-    const [CamPermision, requestCamPermision] = Camera.useCameraPermissions();
+    // const [CamType, setCamType] = useState(CameraType.back);
+    // const [CamPermision, requestCamPermision] = Camera.useCameraPermissions();
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        const Permit = async () => {
-            if (!CamPermision) {
-                await requestCamPermision()
-            }
-            else if (!CamPermision?.granted) {
-                await requestCamPermision()
-            }
-        }
+    //     const Permit = async () => {
+    //         if (!CamPermision) {
+    //             await requestCamPermision()
+    //         }
+    //         else if (!CamPermision?.granted) {
+    //             await requestCamPermision()
+    //         }
+    //     }
 
-        Permit()
+    //     Permit()
 
-    }, [CamPermision])
+    // }, [CamPermision])
 
 
     const richText = useRef()
@@ -48,18 +48,25 @@ export default function UploadStatusFrom(post?: IPostItem & { formMode: 'Post' |
 
     const gesture = Gesture.Pan()
 
+    const Heading = (
+        <View style={[styles.heading]}>
+            <View style={{ backgroundColor: 'red', width: 40, aspectRatio: 1, borderRadius: 50 }}>
+                <TouchableOpacity onPress={null} style={[]}   >
+                    <Ionicons
+                        style={[styles.postTypeButtonIcon]}
+                        name='arrow-back'
+                        color={'white'} />
+                </TouchableOpacity>
+            </View>
+        </View>
+    )
+
     return (
         <Animated.View
             entering={SlideInDown}
             exiting={SlideOutUp}
             style={[styles.constainer, {}]}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10, padding: 10, alignItems: 'flex-start' }}>
-                <View style={{ backgroundColor: 'red', width: 40, aspectRatio: 1, borderRadius: 50 }}>
-                    <TouchableOpacity onPress={null} style={[]}   >
-                        <MaterialCommunityIcons style={[styles.postTypeButtonIcon, { backgroundColor: themeColors.text }]} name='upload-multiple' />
-                    </TouchableOpacity>
-                </View>
-            </View>
+            {Heading}
             <GestureDetector gesture={gesture}>
                 <Animated.View style={[styles.mediaExplorerContainer, { backgroundColor: themeColors.background2 }]}>
                     <Animated.ScrollView>
@@ -77,8 +84,22 @@ const styles = StyleSheet.create({
     constainer: {
         flex: 1,
         position: 'relative',
-        flexGrow: 1
+        flexGrow: 1,
+        backgroundColor: 'green',
     },
+    heading: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 10,
+        padding: 10,
+        alignItems: 'center',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 2, backgroundColor: 'red'
+    },
+
     mediaExplorerContainer: {
         height: 80,
         width: '100%',
@@ -95,13 +116,10 @@ const styles = StyleSheet.create({
         maxHeight: height / 3
     },
     postTypeButtonIcon: {
-        backgroundColor: 'green',
-        borderRadius: 50,
-        fontSize: 30,
+        fontSize: 25,
         aspectRatio: 1,
         textAlign: 'center',
         verticalAlign: 'middle',
-        padding: 6,
     },
     textEditor: {
 
