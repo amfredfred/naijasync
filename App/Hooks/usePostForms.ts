@@ -8,13 +8,14 @@ import { useDataContext } from "../Contexts/DataContext";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Platform, ToastAndroid } from "react-native";
+import useEndpoints from "./useEndpoints";
 
 export default function usePostForm(): { states: IPostContext, methods: IPostFormMethods } {
+    
     const [states, setFormState] = useState({});
-
     const authContext = useAuthContext()
-    const dataContext = useDataContext()
     const navigation = useNavigation()
+    const endpoints = useEndpoints()
 
     const AHeaders = {
         'Content-Type': 'multipart/form-data',
@@ -32,8 +33,6 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
     const deletePostMutation = useMutation((info) => {
         return axios.delete(`${REQUESTS_API}posts/${(info as any)?.postId}`, { headers: AHeaders, })
     })
-
-    const { toast } = useToast()
 
     const setData: IPostFormMethods['setData'] = (key, payload) => {
         setFormState(prevState => ({
@@ -93,7 +92,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         }
         if (payload?.puid) {
 
-            console.log( payload?.thumbnail != null && !payload?.thumbnail?.endsWith('null'), !payload?.thumbnail?.split(payload?.puid)?.[1])
+            console.log(payload?.thumbnail != null && !payload?.thumbnail?.endsWith('null'), !payload?.thumbnail?.split(payload?.puid)?.[1])
 
             try {
                 const formData = new FormData()
@@ -160,14 +159,12 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
     }
 
     const postView: IPostFormMethods['postView'] = async (puid) => {
-        const [viewed] = await Promise.allSettled([axios.post(
-            `${REQUESTS_API}post-viewed`, { puid }, { headers: AHeaders }
-        )])
+        const [viewed] = await Promise.allSettled([axios.post(endpoints.postViewed, { puid }, { headers: AHeaders })])
     }
 
     const postReward: IPostFormMethods['postReward'] = async (rewards, puid) => {
         try {
-            const rewarded = await axios.post(`${REQUESTS_API}post-reward`, { rewards, puid }, { headers: AHeaders })
+            const rewarded = await axios.post(endpoints.rewardEarned, { rewards, puid }, { headers: AHeaders })
             if (rewarded?.status === 200) {
                 if (authContext?.user?.person === 'isAuthenticated') {
                     ToastAndroid.BOTTOM
@@ -179,7 +176,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
 
     const postReact: IPostFormMethods['postReact'] = async (reacted, puid) => {
         try {
-            const reaction = await axios.post(`${REQUESTS_API}post-react`, { reacted, puid }, { headers: AHeaders })
+            const reaction = await axios.post(endpoints.postReacted, { reacted, puid }, { headers: AHeaders })
             if (reaction?.status === 200)
                 if (Platform.OS === 'android') {
                     ToastAndroid.BOTTOM

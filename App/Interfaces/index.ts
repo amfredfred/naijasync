@@ -121,3 +121,26 @@ export interface IApp {
 // Type for the app's data context
 export type IAppDataContext = IStorageItems
 export type IAppDataContextMethods = IStorageMethods
+
+
+
+// interface EndPoints
+export type IEndPoints = {
+    /** @description the posts & or post endpoint is used to create/delete/update and view posts/post */
+    posts: string,
+    /** @description when a post is viewed, this endpoint is used to increment the view in database */
+    postViewed: string
+    /** @description when a post is liked/disliked, this endpoint is used to toggle this action */
+    postReacted: string
+    /** @description when a user/post earn reward by watching rewarded ads, this endpoint is used to update this action */
+    rewardEarned: string
+
+
+    // user
+    /** @description this endpoint is used to register new user */
+    register: string,
+    /** @description this endpoint is used to login a user using email/username/phone and they password */
+    login: string,
+    /** @description this endpoint is used to fetch user data using they API TOKEN, */
+    userdata: string,
+}

@@ -7,7 +7,6 @@ import { useRef, useState, useEffect } from 'react'
 import { SpanText } from '../../../../Components/Texts'
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { IPostItem } from '../../../../Interfaces'
-import { Camera, CameraType } from 'expo-camera';
 
 const { height, width } = Dimensions.get('window')
 

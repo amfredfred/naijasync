@@ -1,6 +1,5 @@
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import GuestLayout from "../Layouts/Guest"
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,7 +8,6 @@ import Landing from "../Screens/Guest/Landing";
 import Home from "../Screens/Home";
 import DataContextProvider from "../Contexts/DataContext";
 import Downloads from "../Screens/User/Downloads";
-import useAppStatus from "../Hooks/useAppStatus";
 import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
 import "expo-dev-client"
 import Explorer from "../Screens/Explorer";
@@ -34,9 +32,8 @@ import UpdatePassword from '../Screens/User/Account/Settings/Security/ChangePass
 import UpdateFundsRequestsSettings from '../Screens/User/Account/Settings/Payment/FundsRequest';
 import UpdateFundsTranferSettings from '../Screens/User/Account/Settings/Payment/FundsTransfer';
 import UpdateBiometricSettings from '../Screens/User/Account/Settings/Security/SetupBiometrics';
-import { useEffect, useLayoutEffect, useMemo } from 'react';
+import { useLayoutEffect } from 'react';
 import PlayVideo from '../Screens/Viewer/Post/Video';
-import { ProgressBar } from '../Components/Inputs';
 import MarketPlaceHome from '../Screens/MarketPlace';
 import StoriesHome from '../Screens/Stories';
 
