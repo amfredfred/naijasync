@@ -5,18 +5,15 @@ export default function useEndpoints(): IEndPoints {
 
     const base_api = REQUESTS_API
 
-    const endpoints: IEndPoints = {
-        posts: `${base_api}posts`,
+    return {
+        publication: `${base_api}posts`,
         rewardEarned: `${base_api}post-reward`,
-        postViewed: `${base_api}posts`,
+        postViewed: `${base_api}post-viewed`,
         postReacted: `${base_api}post-react`,
 
-        login: `${base_api}authenticate`,
+        login: `${base_api}login`,
         register: `${base_api}register`,
-        userdata: `${base_api}posts`,
-    }
-
-
-
-    return endpoints
+        accountInfo: `${base_api}account-info`,
+        accountPosts: `${base_api}account-posts`
+    } as IEndPoints
 }

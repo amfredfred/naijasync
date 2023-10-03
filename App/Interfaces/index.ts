@@ -126,8 +126,8 @@ export type IAppDataContextMethods = IStorageMethods
 
 // interface EndPoints
 export type IEndPoints = {
-    /** @description the posts & or post endpoint is used to create/delete/update and view posts/post */
-    posts: string,
+    /** @description the publication endpoint is used to create/delete/update and view posts/post */
+    publication: string,
     /** @description when a post is viewed, this endpoint is used to increment the view in database */
     postViewed: string
     /** @description when a post is liked/disliked, this endpoint is used to toggle this action */
@@ -142,5 +142,7 @@ export type IEndPoints = {
     /** @description this endpoint is used to login a user using email/username/phone and they password */
     login: string,
     /** @description this endpoint is used to fetch user data using they API TOKEN, */
-    userdata: string,
+    accountInfo: string,
+    /** @description intends to fetch the current user's posts using they API TOKEN, */
+    accountPosts:string
 }

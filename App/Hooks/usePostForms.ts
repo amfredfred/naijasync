@@ -64,6 +64,7 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         }
         try {
             const post = await createPostMutation?.mutateAsync(formData as any)
+            
             if (post?.status == 201 || post?.status == 200) {
                 if (Platform.OS === 'android') {
                     ToastAndroid.SHORT
