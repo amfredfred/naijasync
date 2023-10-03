@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     container: {
         height,
         top: 0,
-        marginTop: StatusBar.currentHeight,
+        // marginTop: StatusBar.currentHeight,
         width,
         overflow: 'hidden',
         borderTopLeftRadius: 15,

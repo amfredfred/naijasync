@@ -11,7 +11,7 @@ import { Platform, ToastAndroid } from "react-native";
 import useEndpoints from "./useEndpoints";
 
 export default function usePostForm(): { states: IPostContext, methods: IPostFormMethods } {
-    
+
     const [states, setFormState] = useState({});
     const authContext = useAuthContext()
     const navigation = useNavigation()
@@ -62,27 +62,26 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         if (navigation?.canGoBack()) {
             navigation?.goBack()
         }
-        try {
-            const post = await createPostMutation?.mutateAsync(formData as any)
-            
-            if (post?.status == 201 || post?.status == 200) {
-                if (Platform.OS === 'android') {
-                    ToastAndroid.SHORT
-                    ToastAndroid.show(post?.data?.message, 2000)
-                }
-                createPostMutation.reset()
-            } else { }
-            return post?.data
-        } catch (error) {
-            if (error?.response?.status === 401) {
-                if (Platform.OS === 'android') {
-                    ToastAndroid.SHORT
-                    ToastAndroid.show(error?.response?.data?.message, 2000)
-                }
-                return authContext?.logout()
+        console.log(endpoints?.publication, 'start')
+        const [publication] = await Promise.allSettled([axios.post(endpoints?.publication, formData, { headers: AHeaders })])
+        console.log(endpoints?.publication, 'done')
+        if (publication.status === 'fulfilled') {
+            if (Platform.OS === 'android') {
+                ToastAndroid.SHORT
+                ToastAndroid.show(publication?.value?.data?.message ?? 'Post published', 2000)
             }
-        } finally {
-            createPostMutation.reset()
+            return publication?.value?.data
+        } else if (publication?.status === 'rejected') {
+            if (publication?.reason?.statusCode === 401) {
+                authContext?.logout()
+            }
+            else {
+                if (Platform.OS === 'android') {
+                    console.log(JSON.stringify(publication?.reason))
+                    ToastAndroid.SHORT
+                    ToastAndroid.show(publication?.reason?.message ?? 'something went wrong!!', 2000)
+                }
+            }
         }
     }
 

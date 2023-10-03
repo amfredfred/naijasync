@@ -3,7 +3,7 @@ import { IEndPoints } from "../Interfaces";
 
 export default function useEndpoints(): IEndPoints {
 
-    const base_api = REQUESTS_API
+    const base_api = 'http://127.0.0.1:8000/api/v1/' //REQUESTS_API
 
     return {
         publication: `${base_api}posts`,
