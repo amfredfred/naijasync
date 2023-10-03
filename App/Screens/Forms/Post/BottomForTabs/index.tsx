@@ -30,7 +30,7 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
             <ScrollView
                 horizontal
                 contentContainerStyle={[styles.spaceBetween, {   paddingHorizontal: 10, width: '100%', gap: 10 }]}
-                style={[styles.postTypeList, {backgroundColor:themeColors.background2, borderRadius:10 }]}>
+                style={[styles.postTypeList, {backgroundColor:themeColors.background2  }]}>
                 <TouchableOpacity
                     onPress={() => handleOnButtonTabPress("IMPORT")}
                     style={[styles.postTypeButton]}   >
@@ -84,17 +84,15 @@ export default function FormBottomTabs(props: IFormBottomTabs) {
 
 
 const styles = StyleSheet.create({
-
     spaceBetween: {
         flexDirection: 'row',
         alignItems: 'center',
         'justifyContent': 'space-between',
-        padding: 6,
         gap: 10,
         position: 'relative',
     },
     postTypeList: {
-        backgroundColor: 'red',
+        
     },
     postTypeButton: {
         alignItems: 'center'
@@ -110,7 +108,10 @@ const styles = StyleSheet.create({
     },
     postTypeListContainer: { 
         zIndex: 4,
-        paddingHorizontal: 10,
-        paddingBottom: 10,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius:20,
+        overflow:'hidden'
+        // paddingHorizontal: 10,
+        // paddingBottom: 10,
     }
 })

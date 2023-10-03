@@ -17,7 +17,7 @@ import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
 import { IMediaType, IPostItem } from '../../../../Interfaces';
 import { IMediaPlayable } from '../../../Statics/Interface';
 import usePostForm from "../../../../Hooks/usePostForms";
-import { useDataContext } from "../../../../Contexts/DataContext";
+import { useDataContext } from "../../../../Contexts/SysContext";
 import { REQUESTS_API } from "@env";
 import { FancyButton } from "../../../../Components/Buttons";
 import { useMediaPlaybackContext } from "../../../../Contexts/MediaPlaybackContext";
@@ -196,9 +196,9 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' 
                 />
             </View>
 
-            <View style={{padding:30, flex:1, justifyContent:'center', alignItems:'center', opacity:.4}}>
-                <SpanText style={{fontSize:30}}>
-                   GIF IS COMING SOON
+            <View style={{ padding: 30, flex: 1, justifyContent: 'center', alignItems: 'center', opacity: .4 }}>
+                <SpanText style={{ fontSize: 30 }}>
+                    GIF IS COMING SOON
                 </SpanText>
             </View>
         </View>
@@ -387,15 +387,12 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' 
     )
 
     return (
-        <Animated.View
-            entering={FadeIn}
-            exiting={FadeOut}
-            style={[styles.container, {}]}>
+        <View style={[styles.container, {}]}>
             {!['audio', 'video'].includes(fileType) || Title}
             {isPostingGif ? GifSearchTextInput : postCaption}
             {!sessionValues?.file?.uri || previewUploadedFile}
             {isKeyboardShown || PostingTabs}
-        </Animated.View>
+        </View>
     )
 }
 

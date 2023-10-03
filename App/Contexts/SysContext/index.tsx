@@ -1,7 +1,9 @@
-import React, { useReducer, createContext, useContext, useEffect } from 'react'
+import React, { useReducer, createContext, useContext, useEffect, useMemo } from 'react'
 import { IAppDataContext, IAppDataContextMethods } from '../../Interfaces'
-import useStorage from '../../Hooks/useStorage' 
-import AuthContextProvider from '../AuthContext' 
+import useStorage from '../../Hooks/useStorage'
+import AuthContextProvider from '../AuthContext'
+import useEndpoints from '../../Hooks/useEndpoints'
+import axios from 'axios'
 
 const initialState: IAppDataContext = {
 }
@@ -16,6 +18,7 @@ export const useDataContext = () => useContext(DataContext)
 
 export default function DataContextProvider({ children }) {
     const { method } = useStorage("@NaijaSync")
+    const endpoints = useEndpoints()
 
     const dataReducer = (state, { key, item, payload }: { key: string, item?: any, payload: any }): IAppDataContext => {
         let data = null;
@@ -38,11 +41,26 @@ export default function DataContextProvider({ children }) {
         method?.setObjectItem?.(key, payload)
     }
 
-    return (
+    useEffect(() => {
+
+        const GsysConfigs = async () => {
+            const [sysConfigs] = await Promise.allSettled([
+               endpoints.useGetMethod(endpoints.sysConfigs)
+            ])
+        }
+
+        GsysConfigs()
+
+        return () => {
+
+        }
+    }, [])
+
+    return useMemo(() => (
         <DataContext.Provider value={{ states, setData, setObjectItem }}>
             <AuthContextProvider>
                 {children}
             </AuthContextProvider>
         </DataContext.Provider>
-    )
+    ), [states])
 }

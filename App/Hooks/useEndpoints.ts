@@ -1,19 +1,35 @@
 import { REQUESTS_API } from "@env";
 import { IEndPoints } from "../Interfaces";
+import axios from "axios";
 
 export default function useEndpoints(): IEndPoints {
 
-    const base_api = 'http://127.0.0.1:8000/api/v1/' //REQUESTS_API
+    const base_api = 'http://192.168.185.66:8000/api/v1/' //REQUESTS_API
+    const requestUrl = (_path: string) => base_api.concat(_path ?? '')
+
+    const useGetMethod: IEndPoints['useGetMethod'] = (url, data, headers) => axios.get(url, { data, headers })
+    const usePostMethod: IEndPoints['usePostMethod'] = (url, data, headers) => axios.post(url, { data, headers })
+    const useDeleteMethod: IEndPoints['useDeleteMethod'] = (url, data, headers) => axios.delete(url, { data, headers })
+    const usePutMethod: IEndPoints['usePutMethod'] = (url, data, headers) => axios.post(url?.concat('?_method=PUT'), { data, headers })
 
     return {
-        publication: `${base_api}posts`,
-        rewardEarned: `${base_api}post-reward`,
-        postViewed: `${base_api}post-viewed`,
-        postReacted: `${base_api}post-react`,
-
-        login: `${base_api}login`,
-        register: `${base_api}register`,
-        accountInfo: `${base_api}account-info`,
-        accountPosts: `${base_api}account-posts`
-    } as IEndPoints
+        search: requestUrl('search'),
+        publication: requestUrl('posts'),
+        rewardEarned: requestUrl('post-reward'),
+        postViewed: requestUrl('post-viewed'),
+        postReacted: requestUrl('post-react'),
+        login: requestUrl('login'),
+        register: requestUrl('register'),
+        logout: requestUrl('logout'),
+        accountInfo: requestUrl('account-info'),
+        accountPosts: requestUrl('account-posts'),
+        accountUpdate: requestUrl('account-update'),
+        accountExists: requestUrl('account-exists'),
+        sysConfigs: requestUrl('system-configs'),
+        requestUrl,
+        useGetMethod,
+        usePostMethod,
+        useDeleteMethod,
+        usePutMethod,
+    } satisfies IEndPoints
 }

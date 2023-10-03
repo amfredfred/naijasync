@@ -4,7 +4,7 @@ import axios from "axios";
 import { IPostContext, IPostFormMethods } from "../Interfaces/IPostContext";
 import { useToast } from "../Contexts/ToastContext";
 import { useAuthContext } from "../Contexts/AuthContext";
-import { useDataContext } from "../Contexts/DataContext";
+import { useDataContext } from "../Contexts/SysContext";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Platform, ToastAndroid } from "react-native";

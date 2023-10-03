@@ -1,3 +1,4 @@
+import { Axios, AxiosHeaderValue, AxiosHeaders, AxiosPromise } from 'axios'
 import { IPostType } from './IPostContext'
 import { IAuthContextData } from './iAuthContext'
 import { IStorageItems, IStorageMethods } from './iUseStorage'
@@ -125,7 +126,8 @@ export type IAppDataContextMethods = IStorageMethods
 
 
 // interface EndPoints
-export type IEndPoints = {
+export interface IEndPoints {
+    search: string
     /** @description the publication endpoint is used to create/delete/update and view posts/post */
     publication: string,
     /** @description when a post is viewed, this endpoint is used to increment the view in database */
@@ -134,15 +136,30 @@ export type IEndPoints = {
     postReacted: string
     /** @description when a user/post earn reward by watching rewarded ads, this endpoint is used to update this action */
     rewardEarned: string
-
-
-    // user
     /** @description this endpoint is used to register new user */
-    register: string,
-    /** @description this endpoint is used to login a user using email/username/phone and they password */
-    login: string,
-    /** @description this endpoint is used to fetch user data using they API TOKEN, */
-    accountInfo: string,
-    /** @description intends to fetch the current user's posts using they API TOKEN, */
-    accountPosts:string
+    register: string
+    /** @description this endpoint is used to login a user using email/username/phone and his/her password */
+    login: string
+    /** @description this endpoint is used to fetch user data using his/her API TOKEN, */
+    accountInfo: string
+    /** @description intends to fetch the current user's posts using his/her API TOKEN, */
+    accountPosts: string
+    /** @description intends to update the current user's accountwith a POST method and data passed, see ./iAuthContext->IAuthContextData['user']['account'] */
+    accountUpdate: string
+    /** 
+     * @description intends to find a user based on email/username/phone passed using a GET method
+     * @returns ['exists' => true | false, 'account'=> /iAuthContext->IAuthContextData['user']['account'] | null ]
+    */
+    accountExists: string
+    // 
+    logout: string
+    /** @description intends to fetch the current system configurations managed by super admin*/
+    sysConfigs: string
+    // 
+    requestUrl(_path?: string): string
+    // 
+    usePutMethod(url: string, data?: { [key: string]: string | number | Object }, headers?:  AxiosHeaders): AxiosPromise
+    useGetMethod: this['usePutMethod']
+    usePostMethod: this['usePutMethod']
+    useDeleteMethod: this['usePutMethod']
 }

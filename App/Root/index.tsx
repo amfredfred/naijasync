@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import Landing from "../Screens/Guest/Landing";
 import Home from "../Screens/Home";
-import DataContextProvider from "../Contexts/DataContext";
+import DataContextProvider from "../Contexts/SysContext";
 import Downloads from "../Screens/User/Downloads";
 import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
 import "expo-dev-client"

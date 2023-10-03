@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import useThemeColors from "../../Hooks/useThemeColors";
-import { useDataContext } from "../../Contexts/DataContext";
+import { useDataContext } from "../../Contexts/SysContext";
 import React from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
@@ -23,14 +23,14 @@ export default function Home() {
     const themeColors = useThemeColors()
     const authContext = useAuthContext()
     const navigation = useNavigation()
-    const { navigate} = useNavigation()
+    const { navigate } = useNavigation()
 
     const [isRereshing, setIsRereshing] = useState(false)
     const [$Posts, set$Posts] = useState<IPostItem[]>([])
     const isRouteReady = navigation.isFocused();
 
     const fetch = async ({ pageParam = 1 }) => {
-        const url = `${REQUESTS_API}posts?page=${pageParam}` 
+        const url = `${REQUESTS_API}posts?page=${pageParam}`
         return await axios<IPostItem[]>({
             url,
             method: 'GET',

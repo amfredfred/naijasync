@@ -62,34 +62,31 @@ export default function PostComposer() {
         <KeyboardAvoidingView
             behavior={Platform.OS == 'android' ? 'height' : 'padding'}
             style={[styles.container, { backgroundColor: themeColors.background }]}>
-            <View style={[styles.containerInner]}>
+            <View style={[styles.containerInner, { backgroundColor: themeColors.background }]}>
 
                 {/*  */}
                 <View style={[styles.innerContainer]}>
                     {activeTab === 'STATUS' && <UploadStatusFrom {...post} formMode={formMode} />}
                     {activeTab === 'UPLOAD' && <UploadFileForm {...post} formMode={formMode} />}
                 </View>
-                <FormBottomTabs
-                    hidden={activeTab === 'STATUS'}
-                    {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard || formMode === 'Update' }}
-                />
+
             </View>
+            <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard || formMode === 'Update' }} />
         </KeyboardAvoidingView>
     ), [activeTab, isShowingKeyboard, themeColors]);
 }
-
+ 
 const styles = StyleSheet.create({
     container: {
-        height,
         top: 0,
-        // marginTop: StatusBar.currentHeight,
+        paddingTop: StatusBar.currentHeight,
         width,
         overflow: 'hidden',
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15
+        flex: 1,
     },
     innerContainer: {
-        flex: 1
+        flex: 1,
+        overflow: 'hidden'
     },
     roundedButton: {
         height: 30,
@@ -99,6 +96,8 @@ const styles = StyleSheet.create({
     },
     containerInner: {
         flex: 1,
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15,
     },
     spaceBetween: {
         flexDirection: 'row',
