@@ -163,7 +163,6 @@ export const FancyButton = (props: IButton) => {
         alignItems: 'center',
         justifyContent: 'center',
         height: 40,
-        elevation: .6,
         shadowColor: themeColors.text,
     }
 

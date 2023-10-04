@@ -10,6 +10,8 @@ interface IMenuItem {
     description?: string,
     icon?: React.ReactNode,
     hideIconRight?: React.ReactNode
+    transparent?: boolean
+    mini?: boolean
 }
 
 export default function MenuItem(item: IMenuItem) {
@@ -18,7 +20,10 @@ export default function MenuItem(item: IMenuItem) {
     const themeColors = useThemeColors()
 
     return (
-        <View key={item?.title?.trim() + item?.description?.trim()} style={[styles.menuItemContainer, { backgroundColor: themeColors.background2 }]}>
+        <View key={item?.title?.trim() + item?.description?.trim()} style={[styles.menuItemContainer, {
+            width: item?.mini ? '25%' : undefined,
+            backgroundColor: item?.transparent ? 'transparent' : themeColors.background2
+        }]}>
             <TouchableOpacity key={item.title.trim()} onPress={item.onPress}>
                 <View style={[styles.spaceBetween]}>
                     <View style={{ flexDirection: 'row', gap: 13, paddingLeft: 0, backgroundColor: 'transparent' }}>
@@ -27,7 +32,7 @@ export default function MenuItem(item: IMenuItem) {
                             <SpanText
                                 children={item.title}
                                 style={{ fontSize: 17, opacity: .6 }} />
-                            {item?.description && (<SpanText
+                            {(item?.description && !item.mini) && (<SpanText
                                 children={item?.description}
                                 style={{ fontSize: 12, opacity: .4 }} />
                             )}
@@ -49,6 +54,7 @@ const styles = StyleSheet.create({
     menuItemContainer: {
         borderRadius: 5,
         marginVertical: 2,
+        flexGrow:1
     },
     menuItem: {
         height: 45,

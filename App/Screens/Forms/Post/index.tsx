@@ -5,8 +5,8 @@ import useThemeColors from "../../../Hooks/useThemeColors";
 import useKeyboardEvent from "../../../Hooks/useKeyboardEvent";
 import { IPostType } from "../../../Interfaces/IPostContext";
 import FormBottomTabs from "./BottomForTabs";
-import UploadStatusFrom from "./UploadStatus";
-import UploadFileForm from "./UploadFile";
+import UploadStatusFrom from "./FormStatusHome";
+import UploadFileForm from "./FormUploadHome";
 import { SpanText } from '../../../Components/Texts';
 import { useRoute } from '@react-navigation/native';
 import { IPostItem } from '../../../Interfaces';
@@ -24,7 +24,6 @@ export default function PostComposer() {
         dep: null
     });
     const handleOnButtonTabPress = (props: IPostType['types']) => setactiveTab(props);
-
 
     // check if to update post
     const { params } = useRoute()
@@ -57,7 +56,6 @@ export default function PostComposer() {
         </View>
     )
 
-
     return useMemo(() => (
         <KeyboardAvoidingView
             behavior={Platform.OS == 'android' ? 'height' : 'padding'}
@@ -79,7 +77,6 @@ export default function PostComposer() {
 const styles = StyleSheet.create({
     container: {
         top: 0,
-        paddingTop: StatusBar.currentHeight,
         width,
         overflow: 'hidden',
         flex: 1,

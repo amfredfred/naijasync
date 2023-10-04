@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
-import { Image, Dimensions, View, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Text } from "react-native";
+import { Image, Dimensions, View, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Text, KeyboardAvoidingView, Platform, StatusBar } from "react-native";
 import { FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 
@@ -21,14 +21,16 @@ import { useDataContext } from "../../../../Contexts/SysContext";
 import { REQUESTS_API } from "@env";
 import { FancyButton } from "../../../../Components/Buttons";
 import { useMediaPlaybackContext } from "../../../../Contexts/MediaPlaybackContext";
+import { useNavigation } from "@react-navigation/native";
 
 const { height, width } = Dimensions.get('window')
 
-export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' }) => {
+export const FormUploadHome = (post?: IPostItem & { formMode: 'Post' | 'Update' }) => {
 
     const [fileType, setFileType] = useState<IMediaType>(null)
     const [isKeyboardShown, setIsKeyboardShown] = useState(false)
     const [isPostingGif, setisPostingGif] = useState(false)
+    const { navigate, canGoBack, goBack } = useNavigation()
     const themeColors = useThemeColors()
     const mediaContext = useMediaPlaybackContext()
     const { methods: { createPost, updatePost } } = usePostForm()
@@ -256,9 +258,9 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' 
             }
 
             <FancyButton
-                containerStyle={{ paddingHorizontal: 20, borderRadius: 50, flex: 1 }}
+                containerStyle={{ paddingHorizontal: 25, borderRadius: 50, }}
                 onPress={handleCreatePost}
-                title={post?.formMode}
+                title={'Post'}
             />
         </View>
     )
@@ -299,7 +301,16 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' 
                 />
             </ImageBackground>)
 
-
+    const Heading = (
+        <View style={[styles.heading, { backgroundColor: themeColors.background2, paddingTop: StatusBar?.currentHeight }]}>
+            <View style={[styles.spaceBetween, {padding:0}]}>
+                <Ionicons onPress={() => canGoBack() ? goBack() : (navigate as any)?.('Home')} name='arrow-back' color={'white'} size={30} />
+                <SpanText>
+                    Create Post
+                </SpanText>
+           </View>
+        </View>
+    )
     const thumbPreviewer = (
         <View style={[styles.thumbPreviewBackgroundImage]}>
             <ImageBackground
@@ -355,6 +366,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' 
     )
 
     const previewUploadedFile = (
+
         <View style={[styles.uploadedFilePreviewContainer]}>
             {
                 isKeyboardShown || (
@@ -364,7 +376,7 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' 
                             source={{ uri: sessionValues?.file?.uri }}
                             style={[styles.uploadedFilePreviewInnerContainer]}>
                             {FilePreviewComponent}
-                            {['video', 'audio'].includes(fileType) ? mediaContext?.states?.playState !== 'playing' && thumbPreviewer : null}
+                            {['video', 'audio'].includes(fileType) ?   thumbPreviewer : null}
                             <Ionicons
                                 style={[styles.iconsStyle, { height: 40, position: 'absolute', right: 20, top: 20 }]}
                                 onPress={() => setSessionValues(state => ({ ...state, file: null }))}
@@ -387,20 +399,25 @@ export const UploadFileForm = (post?: IPostItem & { formMode: 'Post' | 'Update' 
     )
 
     return (
-        <View style={[styles.container, {}]}>
-            {!['audio', 'video'].includes(fileType) || Title}
-            {isPostingGif ? GifSearchTextInput : postCaption}
-            {!sessionValues?.file?.uri || previewUploadedFile}
-            {isKeyboardShown || PostingTabs}
-        </View>
+        <KeyboardAvoidingView
+            behavior={Platform.OS == 'android' ? 'height' : 'padding'}
+            style={[styles.container, { backgroundColor: themeColors.background }]}>
+            {Heading}
+            <View style={[styles.container, {}]}>
+                {!['audio', 'video'].includes(fileType) || Title}
+                {isPostingGif ? GifSearchTextInput : postCaption}
+                {(!sessionValues?.file?.uri || isKeyboardShown) || previewUploadedFile}
+                {isKeyboardShown || PostingTabs}
+            </View>
+        </KeyboardAvoidingView>
     )
 }
 
-export default UploadFileForm
+export default FormUploadHome
 
 const styles = StyleSheet.create({
     container: {
-        height: '100%',
+       flex:1
     },
     postingTabcContainer: {
         width: '100%',
@@ -421,14 +438,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexGrow: 1,
         maxHeight: 'auto',
-    },
-    fileExplorerContainer: {
-        height: height / 2.3,
-        width: '100%',
-        backgroundColor: 'red',
-        borderTopEndRadius: 20,
-        borderTopLeftRadius: 20,
-        bottom: 0,
     },
     textInput: {
         paddingHorizontal: 10,
@@ -460,9 +469,9 @@ const styles = StyleSheet.create({
     },
     uploadedFilePreviewContainer: {
         width: '100%',
-        flexGrow: 1,
+        flexGrow: 5,
         justifyContent: 'flex-end',
-        padding: 10
+        padding: 10,
     },
     uploadedFilePreviewInnerContainer: {
         overflow: 'hidden',
@@ -492,4 +501,13 @@ const styles = StyleSheet.create({
         textAlignVertical: 'center',
     },
     textEditor: {},
+    heading: {
+        flexDirection: 'row',
+        gap: 10,
+        padding: 10,
+        alignItems: 'center',
+        width: '100%',
+        zIndex: 2,
+        justifyContent:"space-between"
+    },
 });

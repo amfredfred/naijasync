@@ -1,6 +1,6 @@
 import * as Library from 'expo-media-library'
 import Animated from 'react-native-reanimated'
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, KeyboardAvoidingView, Platform, StatusBar } from 'react-native'
 import useThemeColors from '../../../../Hooks/useThemeColors'
 import { useRef, useState, useEffect } from 'react'
 import { Foundation, Ionicons, MaterialIcons } from '@expo/vector-icons'
@@ -8,14 +8,16 @@ import { IPostItem } from '../../../../Interfaces'
 import { Camera, useCameraDevice, useCameraPermission, CameraPosition, useMicrophonePermission } from 'react-native-vision-camera'
 import { SpanText } from '../../../../Components/Texts'
 import * as Animatable from 'react-native-animatable'
+import { useNavigation } from '@react-navigation/native'
 
 const { height, width } = Dimensions.get('window')
 
-export default function UploadStatusFrom(post?: IPostItem & { formMode: 'Post' | 'Update' }) {
+export default function FormStatusHome(post?: IPostItem & { formMode: 'Post' | 'Update' }) {
 
     const [CamType, setCamType] = useState<CameraPosition>('back');
     const [camMode, setCamMode] = useState<'video' | 'photo'>('photo')
     const camDevie = useCameraDevice(CamType)
+    const { navigate, canGoBack, goBack } = useNavigation()
     const { hasPermission: hasCamPermission, requestPermission: requestCamPermission } = useCameraPermission();
     const { hasPermission: hasMicPermission, requestPermission: requestMicPermission } = useMicrophonePermission();
 
@@ -44,7 +46,6 @@ export default function UploadStatusFrom(post?: IPostItem & { formMode: 'Post' |
 
     const Controls = (
         <View style={[styles.mediaExplorerContainer]}>
-       
             <View style={{ alignItems: 'center', flex: 1 }}>
                 <TouchableOpacity
                     style={{ backgroundColor: themeColors.background2, borderRadius: 50, padding: 5, paddingHorizontal: 20 }}
@@ -89,28 +90,36 @@ export default function UploadStatusFrom(post?: IPostItem & { formMode: 'Post' |
         </View >
     )
 
-    return (
-        <View
-            style={[styles.container, {}]}>
-            {/* {Heading} */}
-            <Animatable.View
-                style={[styles.camContainer, { backgroundColor: themeColors.background2 }]}>
-                <Animatable.View
-                    style={[styles.camContainer]}
-                    animation={'fadeIn'}
-                    duration={1500}
-                    delay={0}
-                    iterationCount={0}
-                    iterationDelay={0}
-                    ref={flipCam}   >
-                    <View style={{position:'absolute', left:0, height:'100%',width:'100%',zIndex:10, justifyContent:'center', alignItems:'center'}}>
-                        <Text style={{color:'white', fontSize:40, opacity:.2}}>COING SOON</Text>
-                    </View>
-                    <Camera style={[styles.camStyles, StyleSheet.absoluteFill]} device={camDevie} isActive={camDevie != undefined} />
-                </Animatable.View>
-            </Animatable.View>
-            {Controls}
+    const Heading = (
+        <View style={[styles.heading]}>
+            <Ionicons onPress={() => canGoBack() ? goBack() : (navigate as any)?.('Home')} name='arrow-back' color={'white'} size={30} />
         </View>
+    )
+
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS == 'android' ? 'height' : 'padding'}
+            style={[styles.container, { backgroundColor: themeColors.background, paddingTop: StatusBar?.currentHeight }]}>
+            <View
+                style={[styles.container, {}]}>
+                {Heading}
+                <Animatable.View
+                    style={[styles.camContainer, { backgroundColor: themeColors.background2 }]}>
+                    <Animatable.View
+                        style={[styles.camContainer]}
+                        animation={'fadeIn'}
+                        duration={1500}
+                        ref={flipCam}   >
+                        <View style={{ position: 'absolute', left: 0, height: '100%', width: '100%', zIndex: 10, justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ color: 'white', fontSize: 40, opacity: .2 }}>COING SOON</Text>
+                        </View>
+                        <Camera style={[styles.camStyles, StyleSheet.absoluteFill]} device={camDevie} isActive={camDevie != undefined} />
+                    </Animatable.View>
+                </Animatable.View>
+                {Controls}
+            </View>
+            {/* <FormBottomTabs {...{ handleOnButtonTabPress, activeTab, hidden: isShowingKeyboard || formMode === 'Update' }} /> */}
+        </KeyboardAvoidingView>
     )
 }
 
@@ -125,7 +134,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         gap: 10,
         padding: 10,
-        paddingHorizontal: 5,
         alignItems: 'center',
         position: 'absolute',
         top: 0,

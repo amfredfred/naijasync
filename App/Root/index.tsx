@@ -21,8 +21,7 @@ import RegisterScreen from '../Screens/Guest/Auth/Register/index,';
 import LoginScreen from '../Screens/Guest/Auth/Login';
 import AccountLayout from '../Layouts/Account';
 import Account from '../Screens/User/Account';
-import AccountTabBar from '../Layouts/Account/AccountTabBar';
-import PostComposer from '../Screens/Forms/Post';
+import AccountTabBar from '../Layouts/Account/AccountTabBar'; 
 import FinanceHome from '../Screens/User/Account/Finance';
 import SettingsHome from '../Screens/User/Account/Settings';
 import DashboardHome from '../Screens/User/Account/Dashboard';
@@ -32,10 +31,13 @@ import UpdatePassword from '../Screens/User/Account/Settings/Security/ChangePass
 import UpdateFundsRequestsSettings from '../Screens/User/Account/Settings/Payment/FundsRequest';
 import UpdateFundsTranferSettings from '../Screens/User/Account/Settings/Payment/FundsTransfer';
 import UpdateBiometricSettings from '../Screens/User/Account/Settings/Security/SetupBiometrics';
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import PlayVideo from '../Screens/Viewer/Post/Video';
 import MarketPlaceHome from '../Screens/MarketPlace';
 import StoriesHome from '../Screens/Stories';
+import FormsHome from '../Screens/Forms';
+import FormStatusHome from '../Screens/Forms/Post/FormStatusHome';
+import FormUploadHome from '../Screens/Forms/Post/FormUploadHome';
 
 const Stack = createNativeStackNavigator();
 const Buttom = createBottomTabNavigator()
@@ -77,17 +79,20 @@ const AccountRoutes = () => (
 
 const PublicRoutes = (
     <Stack.Navigator
-        initialRouteName='PostComposer'
+        initialRouteName='Home'
         screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }} >
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Downloads' component={Downloads} />
         <Stack.Screen name="Explorer" component={Explorer} initialParams={{ screen: 'videos' }} />
         <Stack.Screen name="Search" component={Search} />
-        <Stack.Screen name='PostComposer' component={PostComposer} />
         <Stack.Screen name="Account" component={AccountRoutes} />
         <Stack.Screen name="Market" component={MarketPlaceHome} />
         <Stack.Screen name="Stories" component={StoriesHome} />
         <Stack.Screen name='PlayVideo' component={PlayVideo} />
+
+        <Stack.Screen name='FormsHome' component={FormsHome} />
+        <Stack.Screen name='FormStatusHome' component={FormStatusHome} />
+        <Stack.Screen name='FormUploadHome' component={FormUploadHome} />
     </Stack.Navigator>
 )
 

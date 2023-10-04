@@ -3,11 +3,12 @@ import useThemeColors from "../../Hooks/useThemeColors";
 
 export type IThemedmodal = Modal['props'] & {
     hideBar?: boolean
+    containerBg?: string
 }
 const { height, width } = Dimensions.get('window')
 
 export default function ThemedModal(modalprops: IThemedmodal) {
-    const { children, hideBar = false, ...otherModalProps } = modalprops
+    const { children, hideBar = false, containerBg, ...otherModalProps } = modalprops
 
     const themeColors = useThemeColors()
 
@@ -16,13 +17,13 @@ export default function ThemedModal(modalprops: IThemedmodal) {
             statusBarTranslucent
             transparent
             {...otherModalProps}>
-            <View style={[styles.mainContainer]}>
+            <View style={[styles.mainContainer, { backgroundColor: containerBg ?? styles.mainContainer.backgroundColor }]}>
                 <View style={[styles.absoluteContainer, { backgroundColor: themeColors.background, borderTopLeftRadius: hideBar ? 0 : 20, borderTopRightRadius: hideBar ? 0 : 20 }]}>
                     {hideBar || <View style={[styles.spaceBetween, { height: 20, justifyContent: 'center', backgroundColor: themeColors.background2, width: '100%' }]}>
                         <View style={[styles.contentDescriptionContainerBar, { backgroundColor: themeColors.text }]} />
                     </View>}
                     <View
-                        style={{ flexGrow: 1, width: '100%'}}>
+                        style={{ flexGrow: 1, width: '100%' }}>
                         {children}
                     </View>
                 </View>

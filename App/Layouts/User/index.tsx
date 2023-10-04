@@ -17,23 +17,19 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import useKeyboardEvent from "../../Hooks/useKeyboardEvent";
 
 import PlayIcon from '../../../assets/icons/play-icon.png'
+import ThemedModal from "../../Components/Modals";
+import FormsHome from "../../Screens/Forms";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
 
-    const [keyBoardShown, setkeyBoardShown] = useState(false)
     const authContext = useAuthContext()
-
     const { background, background2, text } = useThemeColors()
     const { states: { states, user, storage }, setData } = useDataContext()
     const { navigate, goBack, canGoBack } = useNavigation()
     const [open, setOpen] = useState(false);
     const themeColors = useThemeColors()
 
-    useKeyboardEvent({
-        onHide: () => setkeyBoardShown(s => false),
-        onShow: () => setkeyBoardShown(s => true),
-    })
-
+    const [isFormsHomeShown, setisFormsHomeShown] = useState(false)
 
     const Header = (
         <ContainerBlock
@@ -56,7 +52,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                     />
 
                     <IconButton
-                        onPress={() => (navigate as any)?.("PostComposer")}
+                        onPress={() => (navigate as any)?.('FormsHome')}
                         hidden={states?.isInSearchMode}
                         icon={<Ionicons color={themeColors.text} size={25} name="add" />}
                     />
@@ -186,6 +182,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
             >
                 {Header}
                 {children}
+                
             </Drawer >
         </ContainerFlex >
     )
