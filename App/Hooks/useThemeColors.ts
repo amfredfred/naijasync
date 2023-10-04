@@ -7,7 +7,7 @@ export default function useThemeColors(): IApp['themeColors']['dark' | 'light'] 
 
     const schemes: IApp['themeColors'] = {
         dark: {
-            background: '#050807',
+            background: '#242424',//#050807
             headerBackground: '#bf0202',
             text: '#EAEAEA',
             primary: 'turquoise',
@@ -16,7 +16,7 @@ export default function useThemeColors(): IApp['themeColors']['dark' | 'light'] 
             success: '#81C784',
             error: '#E57373',
             warning: '#FFD54F',
-            background2: '#1e1e20', //#1f1e1e
+            background2: '#303030', //#1f1e1e //#1e1e20
             headline: ''
         },
         light: {

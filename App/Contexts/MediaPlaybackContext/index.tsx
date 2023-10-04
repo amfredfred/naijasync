@@ -6,8 +6,8 @@ import { useToast } from "../ToastContext";
 import { IMediaPlayable, IMediaPlaybackUpdate, IMediaViewer, IMediaViewerProvider } from "../../Screens/Statics/Interface";
 import { Audio, Video } from "expo-av";
 import { IMediaType } from "../../Interfaces";
-import { getMediaType } from "../../Helpers";
-import { REQUESTS_API } from "@env";
+import { getMediaType } from "../../Helpers"; 
+import useEndpoints from '../../Hooks/useEndpoints';
 
 const initialState: IMediaViewer = {
     presenting: false
@@ -18,7 +18,7 @@ export const useMediaPlaybackContext = () => useContext(MediaPlaybackContext)
 
 export function MediaViewerProvider({ children }) {
 
-
+    const endpoints = useEndpoints()
     const mediaReducer = (state, { key, payload }: { key?: any, payload }) => (key) ? { ...state, [key]: payload } : payload;
 
     const [data, dispatch] = useReducer(mediaReducer, initialState)
@@ -117,7 +117,7 @@ export function MediaViewerProvider({ children }) {
     const loadMediaPlayable = async (shouldPlay?: boolean) => {
         try {
             setMediaState(S => ({ ...S, playState: 'loading' }))
-            const uri = data?.fileUrl?.split('file:/')?.[1] ? data?.fileUrl : `${REQUESTS_API}${data?.fileUrl}`
+            const uri = data?.fileUrl?.split('file:/')?.[1] ? data?.fileUrl : endpoints.requestUrl(data?.fileUrl)
             if (mediaType === 'audio') {
                 const playbackObject = await Audio.Sound.createAsync?.(
                     { uri },

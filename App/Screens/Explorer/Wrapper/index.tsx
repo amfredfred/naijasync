@@ -2,18 +2,20 @@ import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { HeadLine, SpanText, TextExpandable } from "../../../Components/Texts";
 import {  MaterialIcons } from "@expo/vector-icons";
 import useThemeColors from "../../../Hooks/useThemeColors";
-import { IPostItem } from "../../../Interfaces";
-import { REQUESTS_API } from "@env"; 
+import { IPostItem } from "../../../Interfaces"; 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import PostExplorerFooting from "./Footing";
 import PostItemMenu from "../../_partials/PostMenu";
 import { useState } from "react";
+import useEndpoints from "../../../Hooks/useEndpoints";
 dayjs.extend(relativeTime)
 
 export default function ExplorerPostItemWrapper({ post, children }: { post: IPostItem, children: React.ReactNode }) {
     const [isMenuModalVisile, setisMenuModalVisile] = useState(false)
     const themeColors = useThemeColors()
+    const { requestUrl } = useEndpoints()
+
 
     return (
         <View style={[styles.blockContainer, { backgroundColor: themeColors.background2 }]}>
@@ -23,7 +25,7 @@ export default function ExplorerPostItemWrapper({ post, children }: { post: IPos
                         resizeMethod="resize"
                         resizeMode="contain"
                         style={{ width: 40, aspectRatio: 1, borderRadius: 50, }}
-                        source={{ uri: `${REQUESTS_API}${post.thumbnailUrl}` }}
+                        source={{ uri: requestUrl(post.thumbnailUrl)  }}
                     />
                     <View style={[styles.spaceBetween, { flexGrow: 1, height: 40, padding: 0 }]}>
                         <View style={[{ flexGrow: 1, padding: 0 }]}>

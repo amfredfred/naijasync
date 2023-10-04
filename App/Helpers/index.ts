@@ -1,6 +1,5 @@
 import { Linking } from 'react-native'
 import { IMediaType } from '../Interfaces';
-import { Notifications } from 'react-native-notifications';
 
 export const wait = /*@devfred*/ async (seconds?: number) => new Promise((resolved) => setTimeout(() => resolved('continue'), Number(seconds) * 1000 || 1000))
 
@@ -197,10 +196,9 @@ export function getMediaType(link: string): IMediaType {
 
 
 export const getTags = (inputString: string): string[] => {
+    if (!inputString) return undefined
     const hashtagRegex = /#(\w+)/g;
-
     const matches = inputString.match(hashtagRegex);
-
     if (matches) {
         return [...new Set(matches.map(match => match.slice(1)))];
     } else {
@@ -210,7 +208,7 @@ export const getTags = (inputString: string): string[] => {
 
 export const getRandomBoolean = () => {
     const probability = Math.random()
-    return probability <= 0.51;  
+    return probability <= 0.51;
 }
 
 
@@ -219,9 +217,9 @@ export const extractUrl = (text: string) => {
     const urls = text.match(urlRegex);
 
     if (urls) {
-         
+
     } else {
-        
+
     }
 
 }

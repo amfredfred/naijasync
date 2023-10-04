@@ -6,8 +6,7 @@ import ProfileAvatar from "../../../../Components/ProfileAvatar";
 import { Ionicons } from "@expo/vector-icons";
 import { IconButton } from "../../../../Components/Buttons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
-import ImagePresent from "./Image";
-import { REQUESTS_API } from "@env";
+import ImagePresent from "./Image"; 
 import usePostForm from "../../../../Hooks/usePostForms";
 import React from 'react';
 import { BannerAd, BannerAdSize, TestIds, useRewardedAd } from 'react-native-google-mobile-ads';
@@ -18,6 +17,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRewardedInterstitialAd } from "react-native-google-mobile-ads";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
 import { getRandomBoolean } from "../../../../Helpers";
+import useEndpoints from "../../../../Hooks/useEndpoints";
 
 
 
@@ -47,6 +47,8 @@ export default function PresentMedia(post: PresentMedia) {
     const authContext = useAuthContext()
     const [isPostFocused, setIsPostFocused] = useState(false)
     const [isBannerAdVisible, setisBannerAdVisible] = useState(true)
+    const { requestUrl } = useEndpoints()
+
 
     useEffect(() => {
         if (!rewardedInterstitialAd.isLoaded)
@@ -101,7 +103,7 @@ export default function PresentMedia(post: PresentMedia) {
             case 'UPLOAD': {
                 switch (post?.fileType) {
                     case 'image':
-                        return <ImagePresent source={`${REQUESTS_API}${post?.fileUrl}`} />
+                        return <ImagePresent source={requestUrl(post?.fileUrl)} />
                     case 'video':
                         return <VideoPresent {...post} />
                     default:

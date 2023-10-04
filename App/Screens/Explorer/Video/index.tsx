@@ -10,43 +10,39 @@ import useThemeColors from "../../../Hooks/useThemeColors"
 import { useEffect, useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import { REQUESTS_API } from "@env"
 import { useAuthContext } from "../../../Contexts/AuthContext"
 import { IPostItem } from "../../../Interfaces"
 import { useMediaPlaybackContext } from "../../../Contexts/MediaPlaybackContext"
-import { ResizeMode, Video } from "expo-av" 
+import { ResizeMode, Video } from "expo-av"
 import ExplorerPostItemWrapper from "../Wrapper"
 import PresentMedia from "../../Viewer/Post/PresentMedia"
+import useEndpoints from "../../../Hooks/useEndpoints"
 
 export default function VideoExplorer() {
 
     const { params } = useRoute()
-    const { exploring, genre, screen } = params as any 
+    const { exploring, genre, screen } = params as any
     const authContext = useAuthContext()
-
+    const { requestUrl, useGetMethod } = useEndpoints()
     const [Videos, setVideos] = useState<IPostItem[]>()
-
     const { background, background2, text } = useThemeColors()
-    const { navigate } = useNavigation()
+    const { navigate, isFocused } = useNavigation()
 
     const $videos = useQuery(
         ['videos'],
-        async () => await axios.get<IPostItem[]>(`${REQUESTS_API}posts?type=video&username=${authContext?.user?.account?.username}`,),
-        { getNextPageParam: () => { } }
+        async () => await useGetMethod<IPostItem>(requestUrl(`posts?type=video&username=${authContext?.user?.account?.username}`)),
+        { getNextPageParam: () => { }, enabled: isFocused() }
     )
 
     useEffect(() => {
-        if ($videos?.status === 'success') { 
-            setVideos(($videos?.data?.data as any)?.data)
-        } else if ($videos?.status === 'error') {
-            console.log("ERERO ", ($videos?.failureReason as any)?.response?.data)
-        }
+        if (isFocused())
+            if ($videos?.status === 'success') {
+                setVideos(($videos?.data?.data as any)?.data)
+            } else if ($videos?.status === 'error') {
+                console.log("ERERO ", ($videos?.failureReason as any)?.response?.data)
+            }
     }, [$videos.status])
 
-
-    const handleBackPress = () => {
-        return false
-    }
 
     const handleGoBack = () => {
         (navigate as any)?.("Home")
@@ -55,14 +51,6 @@ export default function VideoExplorer() {
     const onRefresh = () => {
         $videos?.refetch()
     }
-
-    //Effects
-    useEffect(() => {
-        const BHND = BackHandler.addEventListener('hardwareBackPress', handleBackPress)
-        return () => {
-            BHND.remove()
-        }
-    }, [])
 
     const Heading = (
         <ContainerSpaceBetween style={{ padding: 0, height: 45, backgroundColor: background }}>
@@ -91,14 +79,14 @@ export default function VideoExplorer() {
                         resizeMethod="resize"
                         resizeMode="cover"
                         style={[styles.videoThumbImage]}
-                        source={{ uri: `${REQUESTS_API}${post?.thumbnailUrl ?? post?.fileUrl}` }} />
+                        source={{ uri: requestUrl(post?.thumbnailUrl ?? post?.fileUrl) }} />
                     {
                         !post?.thumbnailUrl && (
                             <Video
                                 resizeMode={ResizeMode.CONTAIN}
                                 style={[styles.videoComponent, { backgroundColor: background }]}
                                 ref={mediaPlayer?.mediaRef}
-                                source={{ 'uri': `${REQUESTS_API}${post?.fileUrl}` }} />
+                                source={{ 'uri': requestUrl(post?.fileUrl) }} />
                         )
                     }
                 </TouchableOpacity>
@@ -107,7 +95,8 @@ export default function VideoExplorer() {
         )
     }
 
-    return useMemo(() => (
+
+    return (
         <FlatList
             stickyHeaderHiddenOnScroll
             stickyHeaderIndices={[0]}
@@ -116,7 +105,7 @@ export default function VideoExplorer() {
             refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
             renderItem={({ index, item }) => <VideoComponent {...item} />}
         />
-    ), [$videos.data?.data])
+    )
 }
 
 const styles = StyleSheet.create({

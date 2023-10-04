@@ -1,16 +1,23 @@
 import { REQUESTS_API } from "@env";
 import { IEndPoints } from "../Interfaces";
 import axios from "axios";
+import { useAuthContext } from "../Contexts/AuthContext";
+import { useDataContext } from "../Contexts/SysContext";
+import useStorage from "./useStorage";
 
 export default function useEndpoints(): IEndPoints {
 
     const base_api = 'http://192.168.185.66:8000/api/v1/' //REQUESTS_API
     const requestUrl = (_path: string) => base_api.concat(_path ?? '')
 
-    const useGetMethod: IEndPoints['useGetMethod'] = (url, data, headers) => axios.get(url, { data, headers })
-    const usePostMethod: IEndPoints['usePostMethod'] = (url, data, headers) => axios.post(url, { data, headers })
-    const useDeleteMethod: IEndPoints['useDeleteMethod'] = (url, data, headers) => axios.delete(url, { data, headers })
-    const usePutMethod: IEndPoints['usePutMethod'] = (url, data, headers) => axios.post(url?.concat('?_method=PUT'), { data, headers })
+    const defauld_heads = {
+        'Content-Type': 'multipart/form-data',
+    }
+
+    const useGetMethod: IEndPoints['useGetMethod'] = (url, data, headers) => axios.get(url, data)
+    const usePostMethod: IEndPoints['usePostMethod'] = (url, data, headers) => axios.post(url, data, { headers: { ...defauld_heads, ...headers } })
+    const useDeleteMethod: IEndPoints['useDeleteMethod'] = (url, data, headers) => axios.delete(url, { headers: { ...defauld_heads, ...headers } })
+    const usePutMethod: IEndPoints['usePutMethod'] = (url, data, headers) => axios.post(url?.concat('?_method=PUT'), data, { headers: { ...defauld_heads, ...headers } })
 
     return {
         search: requestUrl('search'),

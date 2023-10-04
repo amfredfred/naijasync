@@ -45,8 +45,10 @@ export default function DataContextProvider({ children }) {
 
         const GsysConfigs = async () => {
             const [sysConfigs] = await Promise.allSettled([
-               endpoints.useGetMethod(endpoints.sysConfigs)
+               endpoints.usePostMethod(endpoints.sysConfigs, {}, )
             ])
+
+            console.log('System: ', sysConfigs)
         }
 
         GsysConfigs()

@@ -3,10 +3,8 @@ import useStorage from '../../Hooks/useStorage'
 import { IAuthContextData, IAuthContextMethods } from '../../Interfaces/iAuthContext'
 import * as Cellular from 'expo-cellular'
 import { IStorageMethods } from '../../Interfaces/iUseStorage'
-import { useMutation } from '@tanstack/react-query'
-import axios from 'axios'
-import { REQUESTS_API } from '@env'
 import { useToast } from '../ToastContext'
+import useEndpoints from '../../Hooks/useEndpoints'
 
 const initialState: IAuthContextData = {
     user: {
@@ -29,6 +27,7 @@ interface IDispatch {
 
 export default function AuthContextProvider({ children }: { children: React.ReactNode }) {
     const { method, NaijaSync, isFetching } = useStorage("@NaijaSync")
+    const endpoints = useEndpoints()
 
     const dataReducer = (state: any, { type, key, item, payload }: IDispatch): IAuthContextData => {
         const data = { ...state, [key as string]: { ...state?.[key], ...(payload || {}) } }
@@ -45,111 +44,79 @@ export default function AuthContextProvider({ children }: { children: React.Reac
 
     const { toast } = useToast()
 
-    const mutation = useMutation((info) => {
-        console.log(NaijaSync?.user?.accessToken, ";access token")
-        return axios({
-            url: `${REQUESTS_API}${(info as any)?.path}`,
-            method: 'POST',
-            data: info,
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${states?.user?.accessToken}`
-            }
-        })
-    })
-
-
     const register: IAuthContextMethods['register'] = async (userData) => {
-        const formData = new FormData()
-        formData['path'] = 'register'
-        formData.append('email', userData?.email)
-        formData.append('password', userData?.password)
-        formData.append('password_confirmation', userData?.confirmPassword)
-        formData.append('name', userData?.fullName)
+        const { email, password, confirmPassword: password_confirmation, fullName: name } = userData
         setisBusy(true)
-        let user;
-        try {
-            const auth = await mutation?.mutateAsync(formData as any)
-            user = (auth?.data as any)?.profile as IAuthContextData['user']
-            if (auth?.status == 201 || auth?.status == 200) {
-                user['accessToken'] = (auth?.data as any)?.accessToken
-                user['person'] = 'isAuthenticated'
-                user['isAuthenticated'] = true
-                setObjectItem('user', user)
-            }
-        } catch (error) {
-            setObjectItem('user', { person: 'isNew' })
+        const [auth] = await Promise.allSettled([endpoints.usePostMethod(endpoints.register, { email, password, password_confirmation, name },)])
+        if (auth.status === 'rejected') {
             toast({
-                message: `${error?.response?.data?.message}`,
-                severity: 'error',
+                message: auth.reason?.response?.data?.message ?? auth?.reason?.message ?? 'something went wrong!!',
+                severity: 'warning',
             })
-        } finally {
-            setisBusy(false)
-            mutation?.reset()
+        } else if (auth.status === 'fulfilled') {
+            const user = (auth?.value?.data as any)?.profile as IAuthContextData['user']
+            user['accessToken'] = (auth?.value?.data as any)?.accessToken
+            user['person'] = 'isAuthenticated'
+            user['isAuthenticated'] = true
+            setObjectItem('user', user)
         }
+        setisBusy(false)
     }
 
     const login: IAuthContextMethods['login'] = async (userData) => {
-        try {
-            const formData = new FormData()
-            formData['path'] = 'login'
-            formData.append('email', userData?.email)
-            formData.append('password', userData?.password)
-            setisBusy(true)
-            const auth = await mutation?.mutateAsync(formData as any)
-            const user = (auth?.data as any)?.profile as IAuthContextData['user']
-            if (auth?.status == 201 || auth?.status == 200) {
-                user['accessToken'] = (auth?.data as any)?.accessToken
-                user['person'] = 'isAuthenticated'
-                user['isAuthenticated'] = true
-                setObjectItem('user', user)
-            }
-        } catch (error) {
+        const { email, password } = userData
+        setisBusy(true)
+        const [auth] = await Promise.allSettled([endpoints.usePostMethod(endpoints.login, { email, password },)])
+        if (auth.status === 'rejected') {
             toast({
-                message: `${error?.response?.data?.message}`,
+                message: auth.reason?.response?.data?.message ?? auth?.reason?.message ?? 'something went wrong!!',
                 severity: 'warning',
             })
-        } finally {
-            setisBusy(false)
-            mutation?.reset()
+        } else if (auth.status === 'fulfilled') {
+            const user = (auth?.value?.data as any)?.profile as IAuthContextData['user']
+            user['accessToken'] = (auth?.value?.data as any)?.accessToken
+            user['person'] = 'isAuthenticated'
+            user['isAuthenticated'] = true
+            setObjectItem('user', user)
         }
+        setisBusy(false)
     }
 
     const updateAccount: IAuthContextMethods['updateAccount'] = async (newAccountInfo) => {
-        try {
-            const formData = new FormData()
-            formData['path'] = 'account-update'
-            if (!states?.user?.isAuthenticated) {
-                logout()
-                return
-            }
-            setisBusy(true)
-            await Promise.all(Object.keys(newAccountInfo)?.map(d => {
-                formData.append(d, typeof newAccountInfo?.[d] === 'object' ? JSON.stringify(newAccountInfo?.[d]) : newAccountInfo?.[d])
-            }))
-            if (newAccountInfo?.profileCoverPics)
-                formData.append('profile-image', newAccountInfo?.profileCoverPics as any);
-            if (newAccountInfo?.profilePics)
-                formData.append('cover-image', newAccountInfo?.profilePics as any)
-            const auth = await mutation?.mutateAsync(formData as any)
-            const user = (auth?.data as any)?.profile as IAuthContextData['user']
-            if (auth?.status == 201 || auth?.status == 200) {
-                user['accessToken'] = (auth?.data as any)?.accessToken
-                user['person'] = 'isAuthenticated'
-                user['isAuthenticated'] = true
-                setObjectItem('user', user)
-            }
-            return user
-        } catch (error) {
-            toast({
-                message: ` ${error?.response?.data?.message}`,
-                severity: 'error',
-            })
-        }
-        finally {
-            setisBusy(false)
-            mutation.reset()
-        }
+        // try {
+        //     const formData = new FormData()
+        //     formData['path'] = 'account-update'
+        //     if (!states?.user?.isAuthenticated) {
+        //         logout()
+        //         return
+        //     }
+        //     setisBusy(true)
+        //     await Promise.all(Object.keys(newAccountInfo)?.map(d => {
+        //         formData.append(d, typeof newAccountInfo?.[d] === 'object' ? JSON.stringify(newAccountInfo?.[d]) : newAccountInfo?.[d])
+        //     }))
+        //     if (newAccountInfo?.profileCoverPics)
+        //         formData.append('profile-image', newAccountInfo?.profileCoverPics as any);
+        //     if (newAccountInfo?.profilePics)
+        //         formData.append('cover-image', newAccountInfo?.profilePics as any)
+        //     const auth = await mutation?.mutateAsync(formData as any)
+        //     const user = (auth?.data as any)?.profile as IAuthContextData['user']
+        //     if (auth?.status == 201 || auth?.status == 200) {
+        //         user['accessToken'] = (auth?.data as any)?.accessToken
+        //         user['person'] = 'isAuthenticated'
+        //         user['isAuthenticated'] = true
+        //         setObjectItem('user', user)
+        //     }
+        //     return user
+        // } catch (error) {
+        //     toast({
+        //         message: ` ${error?.response?.data?.message}`,
+        //         severity: 'error',
+        //     })
+        // }
+        // finally {
+        //     setisBusy(false)
+        //     mutation.reset()
+        // }
     }
 
     const confirmNumber: IAuthContextMethods['confirmNumber'] = async () => {
@@ -162,7 +129,6 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     }
 
     const skipAuth: IAuthContextMethods['skipAuth'] = () => {
-        console.log('skip aut pressed')
         setObjectItem('user', { person: 'hasSkippedAuthentication' })
     }
 
@@ -210,9 +176,6 @@ export default function AuthContextProvider({ children }: { children: React.Reac
         isBusy,
         user: states.user,
     }
-
-    console.log('MIAN RELOADED')
-
 
     return (
         <AuthContext.Provider value={data}>

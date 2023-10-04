@@ -1,8 +1,7 @@
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { IPostItem } from '../../../Interfaces'
 import useThemeColors from '../../../Hooks/useThemeColors'
-import { HeadLine, SpanText, TextExpandable } from '../../../Components/Texts'
-import { REQUESTS_API } from '@env'
+import { HeadLine, SpanText, TextExpandable } from '../../../Components/Texts' 
 import { getMediaType } from '../../../Helpers'
 import { Ionicons, MaterialIcons, } from '@expo/vector-icons'
 import dayjs from 'dayjs'
@@ -103,17 +102,17 @@ const UploadPostListItem = (post: IPostItem) => {
                     <PostComments {...post} />
 
                     <TouchableOpacity
-                        style={{ opacity: .4 }}
-                        onPress={() => ShareContent({
-                            message: `${REQUESTS_API}posts/${post?.puid}`,
-                            url: `${REQUESTS_API}posts/${post?.puid}`,
-                            title: `Sharing `
-                        })}
-                        children={<Ionicons
-                            size={23}
-                            name='share-social'
-                            color={themeColors.text}
-                        />}
+                        // style={{ opacity: .4 }}
+                        // onPress={() => ShareContent({
+                        //     message: `${REQUESTS_API}posts/${post?.puid}`,
+                        //     url: `${REQUESTS_API}posts/${post?.puid}`,
+                        //     title: `Sharing `
+                        // })}
+                        // children={<Ionicons
+                        //     size={23}
+                        //     name='share-social'
+                        //     color={themeColors.text}
+                        // />}
                     />
                 </View>
             </View>
@@ -167,7 +166,7 @@ const styles = StyleSheet.create({
         minHeight: 'auto',
         paddingRight: 10,
         flex: 1,
-        flexGrow:1
+        flexGrow: 1
     },
     playPauseiconContainer: {
         width: '100%',

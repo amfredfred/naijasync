@@ -1,4 +1,4 @@
-import { Axios, AxiosHeaderValue, AxiosHeaders, AxiosPromise } from 'axios'
+import { Axios, AxiosHeaderValue, AxiosPromise,   AxiosRequestConfig } from 'axios'
 import { IPostType } from './IPostContext'
 import { IAuthContextData } from './iAuthContext'
 import { IStorageItems, IStorageMethods } from './iUseStorage'
@@ -124,6 +124,13 @@ export type IAppDataContext = IStorageItems
 export type IAppDataContextMethods = IStorageMethods
 
 
+interface CustomHeaders extends AxiosHeaders {
+    Authorization?: string; // Define Authorization property explicitly
+}
+
+type AxiosHeaders = Record<string, string>;
+
+
 
 // interface EndPoints
 export interface IEndPoints {
@@ -158,7 +165,7 @@ export interface IEndPoints {
     // 
     requestUrl(_path?: string): string
     // 
-    usePutMethod(url: string, data?: { [key: string]: string | number | Object }, headers?:  AxiosHeaders): AxiosPromise
+    usePutMethod<T extends unknown>(url: string, data?: AxiosRequestConfig['data'], headers?: AxiosRequestConfig['headers']): AxiosPromise<T>
     useGetMethod: this['usePutMethod']
     usePostMethod: this['usePutMethod']
     useDeleteMethod: this['usePutMethod']

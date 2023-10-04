@@ -16,21 +16,21 @@ import { Empty } from '../_partials/PostsList';
 import * as Animatable from 'react-native-animatable';
 import { SpanText } from '../../Components/Texts';
 import { StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
-import { IconButton } from '../../Components/Buttons';
-import { Ionicons } from '@expo/vector-icons';
+import useEndpoints from '../../Hooks/useEndpoints';
 
 export default function Home() {
     const themeColors = useThemeColors()
     const authContext = useAuthContext()
     const navigation = useNavigation()
     const { navigate } = useNavigation()
+    const endpoints = useEndpoints()
 
     const [isRereshing, setIsRereshing] = useState(false)
     const [$Posts, set$Posts] = useState<IPostItem[]>([])
     const isRouteReady = navigation.isFocused();
 
     const fetch = async ({ pageParam = 1 }) => {
-        const url = `${REQUESTS_API}posts?page=${pageParam}`
+        const url = `${endpoints.publication}?page=${pageParam}`
         return await axios<IPostItem[]>({
             url,
             method: 'GET',

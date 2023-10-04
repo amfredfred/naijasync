@@ -12,18 +12,17 @@ import { useRoute } from "@react-navigation/native";
 import { HeadLine, SpanText } from "../../../../Components/Texts";
 import usePostForm from "../../../../Hooks/usePostForms";
 import MediaProgressBar from "../../../_partials/MediaProgressBar";
-import { REQUESTS_API } from "@env";
 import { LinearGradient } from "expo-linear-gradient";
 import PostItemMenu from "../../../_partials/PostMenu";
 import { useQuery } from "@tanstack/react-query";
 import { IPostItem } from "../../../../Interfaces";
 import axios from "axios";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
-import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
 import MediaPlayDuration from "../../../_partials/MediaPlayDuration";
 import { TestIds, useInterstitialAd, useRewardedInterstitialAd } from "react-native-google-mobile-ads";
 import PlayButton from "../../../_partials/PlayButton";
 import { useMediaPlaybackContext } from "../../../../Contexts/MediaPlaybackContext";
+import useEndpoints from "../../../../Hooks/useEndpoints";
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
@@ -34,6 +33,8 @@ export default function PlayVideo() {
     const [isShwoingControls, setisShwoingControls] = useState(true)
     const [isMenuModalVisile, setisMenuModalVisile] = useState(false)
     const [playerMode, setPlayerMode] = useState<"fullscreen" | "default">('default')
+    const { requestUrl } = useEndpoints()
+
 
     const postForm = usePostForm()
     const { params } = useRoute()
@@ -82,7 +83,7 @@ export default function PlayVideo() {
     const [Videos, setVideos] = useState<IPostItem[]>([])
     const $videos = useQuery(
         ['videos'],
-        async () => await axios.get<IPostItem[]>(`${REQUESTS_API}posts?type=video&username=${authContext?.user?.account?.username}`,),
+        async () => await axios.get<IPostItem[]>(requestUrl(`posts?type=video&username=${authContext?.user?.account?.username}`)),
         { enabled: mediaContext?.states.isReady, getNextPageParam: () => { } }
     )
     const onRefresh = () => $videos?.refetch()
@@ -283,7 +284,7 @@ export default function PlayVideo() {
                         resizeMethod="resize"
                         resizeMode="cover"
                         style={{ width: '100%', height: '100%' }}
-                        source={{ uri: `${REQUESTS_API}${item?.thumbnailUrl}` }}
+                        source={{ uri: requestUrl(item?.thumbnailUrl) }}
                     />
                 </TouchableOpacity>
             )}
@@ -302,7 +303,7 @@ export default function PlayVideo() {
                 resizeMode='cover'
                 blurRadius={170}
                 style={{ paddingTop: StatusBar.currentHeight }}
-                source={{ uri: `${REQUESTS_API}${mediaContext?.thumbnailUrl}` }}>
+                source={{ uri: requestUrl(mediaContext?.thumbnailUrl) }}>
                 <Animated.View style={[styles.videoContainer, { backgroundColor: 'black' }]}>
                     <Video
                         style={[styles.video]}
@@ -310,13 +311,13 @@ export default function PlayVideo() {
                         ref={mediaContext?.mediaRef} />
                     <Overlay
                         hidden={!Boolean(mediaContext.states?.playState == 'loading')}
-                        imageSource={`${REQUESTS_API}${mediaContext?.thumbnailUrl}`} />
+                        imageSource={requestUrl(mediaContext?.thumbnailUrl)} />
 
                     {mediaContext?.states?.playState === 'ended' && (
                         <Animated.Image
                             entering={FadeIn}
                             exiting={FadeOut}
-                            source={{ uri: `${REQUESTS_API}${mediaContext?.thumbnailUrl}` }}
+                            source={{ uri: requestUrl(mediaContext?.thumbnailUrl) }}
                             style={{ width: '100%', height: '100%', position: 'absolute', left: 0, zIndex: 1, top: 0 }}
                         />
                     )}

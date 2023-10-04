@@ -2,15 +2,16 @@ import { View, TouchableOpacity, Image, StyleSheet } from "react-native"
 import { IPostItem } from "../../../../../Interfaces"
 import { useMediaPlaybackContext } from "../../../../../Contexts/MediaPlaybackContext"
 import { Ionicons } from "@expo/vector-icons"
-import { REQUESTS_API } from "@env"
 import { useState } from "react"
 import PresentMedia from "../../../../Viewer/Post/PresentMedia"
 import { useNavigation } from "@react-navigation/native"
+import useEndpoints from "../../../../../Hooks/useEndpoints"
 
 export default function PostVideoItemList(post: IPostItem) {
     const mediaContext = useMediaPlaybackContext()
     const [isPresentingMedia, setisPresentingMedia] = useState(false)
     const { navigate } = useNavigation()
+    const { requestUrl } = useEndpoints()
 
     return (
         <View style={[styles.mediaDisplayWrapper, {}]}>
@@ -20,7 +21,7 @@ export default function PostVideoItemList(post: IPostItem) {
                 style={{ position: 'relative', height: '100%', width: '100%' }}>
                 <Image
                     style={{ width: '100%', height: '100%', position: 'absolute', left: 0, top: 0 }}
-                    source={{ uri: `${REQUESTS_API}${post?.thumbnailUrl}` }}
+                    source={{ uri: requestUrl(post?.thumbnailUrl??post?.fileUrl) }}
                     resizeMethod='resize'
                     resizeMode='cover' />
             </TouchableOpacity>

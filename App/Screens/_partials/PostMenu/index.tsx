@@ -61,7 +61,7 @@ export default function PostItemMenu(props: IPostItem & IThemedmodal) {
             title: `Edit`,
             onPress: () => {
                 props?.onRequestClose?.(null);
-                (navigation?.navigate as any)?.("PostComposer", { post: props, formMode: "Update" })
+                (navigation?.navigate as any)?.("FormUploadHome", { post: props, formMode: "update_post" })
             },
             icon: <AntDesign size={30} name='edit' color={themeColors?.text} />,
             description: ''

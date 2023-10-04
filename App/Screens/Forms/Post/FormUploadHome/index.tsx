@@ -15,17 +15,15 @@ import { Audio, Video, ResizeMode } from "expo-av";
 import { getMediaType } from '../../../../Helpers';
 import useKeyboardEvent from "../../../../Hooks/useKeyboardEvent";
 import { IMediaType, IPostItem } from '../../../../Interfaces';
-import { IMediaPlayable } from '../../../Statics/Interface';
 import usePostForm from "../../../../Hooks/usePostForms";
-import { useDataContext } from "../../../../Contexts/SysContext";
-import { REQUESTS_API } from "@env";
 import { FancyButton } from "../../../../Components/Buttons";
 import { useMediaPlaybackContext } from "../../../../Contexts/MediaPlaybackContext";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import useEndpoints from "../../../../Hooks/useEndpoints";
 
 const { height, width } = Dimensions.get('window')
 
-export const FormUploadHome = (post?: IPostItem & { formMode: 'Post' | 'Update' }) => {
+export const FormUploadHome = () => {
 
     const [fileType, setFileType] = useState<IMediaType>(null)
     const [isKeyboardShown, setIsKeyboardShown] = useState(false)
@@ -35,6 +33,17 @@ export const FormUploadHome = (post?: IPostItem & { formMode: 'Post' | 'Update' 
     const mediaContext = useMediaPlaybackContext()
     const { methods: { createPost, updatePost } } = usePostForm()
     const [sessionValues, setSessionValues] = useState<IPostContext>({ postType: 'UPLOAD', type: 'UPLOAD' })
+    const { requestUrl } = useEndpoints()
+
+    const route = useRoute()
+    // check if to update post
+    const { params } = useRoute()
+    const { post: postToEdit, formMode: form_mode = 'new_post' } = (params ?? { post: {}, formMode: 'new_post' }) as {
+        post: IPostItem,
+        formMode: 'new_post' | 'update_post'
+    }
+
+    const [formMode, setformMode] = useState<'new_post' | 'update_post'>('new_post')
 
     useKeyboardEvent({
         onShow: () => setIsKeyboardShown(true),
@@ -42,29 +51,27 @@ export const FormUploadHome = (post?: IPostItem & { formMode: 'Post' | 'Update' 
     })
 
     useEffect(() => {
-
         setFileType(getMediaType(sessionValues?.file?.uri))
-
         return () => {
             setFileType(null)
         }
     }, [sessionValues?.file?.uri])
 
     useEffect(() => {
-        if (post?.puid) {
+        if (postToEdit?.puid) {
             setSessionValues({
-                ...post as any,
+                ...postToEdit as any,
                 file: {
-                    uri: `${REQUESTS_API}${post?.fileUrl}`,
-                    type: post?.fileType,
-                    name: post?.puid
+                    uri: requestUrl(postToEdit?.fileUrl),
+                    type: postToEdit?.fileType,
+                    name: postToEdit?.puid
                 },
-                thumbnail: `${REQUESTS_API}${post?.thumbnailUrl}`,
-                description: post?.description,
-                title: post?.title,
-                tags: post?.tags,
-                postType: post?.postType,
-                type: post?.postType
+                thumbnail: requestUrl(postToEdit?.thumbnailUrl),
+                description: postToEdit?.description,
+                title: postToEdit?.title,
+                tags: postToEdit?.tags,
+                postType: postToEdit?.postType,
+                type: postToEdit?.postType
             })
         }
     }, [])
@@ -80,7 +87,7 @@ export const FormUploadHome = (post?: IPostItem & { formMode: 'Post' | 'Update' 
     }
 
     const handleCreatePost = async () => {
-        if (post?.formMode == 'Post')
+        if (formMode == 'new_post')
             createPost({ ...sessionValues, 'postType': "UPLOAD" })
         else
             updatePost({ ...sessionValues })
@@ -303,12 +310,12 @@ export const FormUploadHome = (post?: IPostItem & { formMode: 'Post' | 'Update' 
 
     const Heading = (
         <View style={[styles.heading, { backgroundColor: themeColors.background2, paddingTop: StatusBar?.currentHeight }]}>
-            <View style={[styles.spaceBetween, {padding:0}]}>
+            <View style={[styles.spaceBetween, { padding: 0 }]}>
                 <Ionicons onPress={() => canGoBack() ? goBack() : (navigate as any)?.('Home')} name='arrow-back' color={'white'} size={30} />
                 <SpanText>
                     Create Post
                 </SpanText>
-           </View>
+            </View>
         </View>
     )
     const thumbPreviewer = (
@@ -376,7 +383,7 @@ export const FormUploadHome = (post?: IPostItem & { formMode: 'Post' | 'Update' 
                             source={{ uri: sessionValues?.file?.uri }}
                             style={[styles.uploadedFilePreviewInnerContainer]}>
                             {FilePreviewComponent}
-                            {['video', 'audio'].includes(fileType) ?   thumbPreviewer : null}
+                            {['video', 'audio'].includes(fileType) ? thumbPreviewer : null}
                             <Ionicons
                                 style={[styles.iconsStyle, { height: 40, position: 'absolute', right: 20, top: 20 }]}
                                 onPress={() => setSessionValues(state => ({ ...state, file: null }))}
@@ -417,7 +424,7 @@ export default FormUploadHome
 
 const styles = StyleSheet.create({
     container: {
-       flex:1
+        flex: 1
     },
     postingTabcContainer: {
         width: '100%',
@@ -508,6 +515,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         zIndex: 2,
-        justifyContent:"space-between"
+        justifyContent: "space-between"
     },
 });
