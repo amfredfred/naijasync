@@ -10,14 +10,16 @@ export default function PostShare(post: IPostItem) {
     const themeColors = useThemeColors()
 
     return (
-        <TouchableOpacity style={[styles.container, { backgroundColor: themeColors.background2 }]}>
+        <TouchableOpacity
+            disabled
+            style={[styles.container, { backgroundColor: themeColors.background2 }]}>
             <Ionicons
                 name='share-social'
                 size={17}
                 color={themeColors.text}
             />
             <SpanText
-                children={`${formatNumber(31245)} `}
+                children={`${formatNumber(0)} `}
                 style={{ flexGrow: 1, fontSize: 11, }} />
         </TouchableOpacity>
     )

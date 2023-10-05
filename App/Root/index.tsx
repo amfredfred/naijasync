@@ -37,6 +37,7 @@ import StoriesHome from '../Screens/Stories';
 import FormsHome from '../Screens/Forms';
 import FormStatusHome from '../Screens/Forms/Post/FormStatusHome';
 import FormUploadHome from '../Screens/Forms/Post/FormUploadHome';
+import MenuHome from '../Screens/Menu';
 
 const Stack = createNativeStackNavigator();
 const Buttom = createBottomTabNavigator()
@@ -84,6 +85,7 @@ const PublicRoutes = (
         <Stack.Screen name='Downloads' component={Downloads} />
         <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name="Account" component={AccountRoutes} />
+        <Stack.Screen name="MenuHome" component={MenuHome} />
         <Stack.Screen name="Market" component={MarketPlaceHome} />
         <Stack.Screen name="Stories" component={StoriesHome} />
         <Stack.Screen name='PlayVideo' component={PlayVideo} />

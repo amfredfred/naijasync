@@ -1,13 +1,10 @@
 import { REQUESTS_API } from "@env";
 import { IEndPoints } from "../Interfaces";
 import axios from "axios";
-import { useAuthContext } from "../Contexts/AuthContext";
-import { useDataContext } from "../Contexts/SysContext";
-import useStorage from "./useStorage";
 
 export default function useEndpoints(): IEndPoints {
 
-    const base_api = 'http://192.168.185.66:8000/api/v1/' //REQUESTS_API
+    const base_api = 'http://192.168.144.163:8000/api/v1/' //REQUESTS_API
     const requestUrl = (_path: string) => base_api.concat(_path ?? '')
 
     const defauld_heads = {

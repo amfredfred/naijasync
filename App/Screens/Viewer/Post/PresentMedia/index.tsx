@@ -83,7 +83,6 @@ export default function PresentMedia(post: PresentMedia) {
         pressTimeout = setTimeout(() => {
 
         }, 100); // Adjust the duration as needed
-        StatusBar.setHidden(!isPostFocused)
         setIsPostFocused(!isPostFocused);
     };
 
@@ -94,10 +93,14 @@ export default function PresentMedia(post: PresentMedia) {
     };
 
 
-    const onRequestClose = async () => showREwardedAd()
+    const onRequestClose = async () => {
+        showREwardedAd()
+        StatusBar.setHidden(false)
+    }
 
     useEffect(() => {
         postForm?.methods?.postView(post?.puid)
+        StatusBar.setHidden(true)
     }, [])
 
     const RenderPost = () => {
@@ -185,7 +188,9 @@ export default function PresentMedia(post: PresentMedia) {
         <ThemedModal
             hideBar
             animationType='fade'
+            transparent={false}
             onRequestClose={onRequestClose}
+            statusBarTranslucent={false}
             visible={Boolean(post?.puid)} >
             <View style={{ backgroundColor: themeColors.background, height }}>
                 {postContent}
@@ -222,16 +227,16 @@ const styles = StyleSheet.create({
     posFooting: {
         width: '100%',
         // position: 'absolute', 
-        position: 'relative', 
+        position: 'relative',
     },
     footingInner: {
         // position: 'absolute',
-        width:'100%',
+        width: '100%',
         // left: 0,
         // bottom: '100%',
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
         overflow: 'hidden',
-        paddingTop:10
+        paddingTop: 10
     }
 })
