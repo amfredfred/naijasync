@@ -2,14 +2,14 @@ import { Overlay } from "../../../../Components/Containers";
 import useThemeColors from "../../../../Hooks/useThemeColors";
 import { Video, ResizeMode } from "expo-av";
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { IconButton } from "../../../../Components/Buttons";
+import { FancyButton, IconButton } from "../../../../Components/Buttons";
 import { View, StyleSheet, Dimensions, StatusBar, Text, RefreshControl, TouchableOpacity, ScrollView, FlatList, Image, ImageBackground, BackHandler } from 'react-native'
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import Animated, { useSharedValue, useAnimatedStyle, SlideInDown, SlideOutDown, FadeInDown, withSpring, withDecay, FadeIn, FadeOut } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { getRandomBoolean, wait } from "../../../../Helpers";
 import { useRoute } from "@react-navigation/native";
-import { HeadLine, SpanText } from "../../../../Components/Texts";
+import { HeadLine, SpanText, TextExpandable } from "../../../../Components/Texts";
 import usePostForm from "../../../../Hooks/usePostForms";
 import MediaProgressBar from "../../../_partials/MediaProgressBar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,6 +23,8 @@ import { TestIds, useInterstitialAd, useRewardedInterstitialAd } from "react-nat
 import PlayButton from "../../../_partials/PlayButton";
 import { useMediaPlaybackContext } from "../../../../Contexts/MediaPlaybackContext";
 import useEndpoints from "../../../../Hooks/useEndpoints";
+import LikeButton from "../../../_partials/PostComponents/Like";
+import PostAnalytics from "../../../_partials/PostComponents/Analytics/inedx";
 const { width, height } = Dimensions.get('window')
 
 const VIDEO_HEIGHT = 230
@@ -136,7 +138,6 @@ export default function PlayVideo() {
             rewardedInterstitialAd?.show()
         return false
     }
-
 
     //Effects
     useEffect(() => {
@@ -264,33 +265,55 @@ export default function PlayVideo() {
             stickyHeaderIndices={[0]}
             ListHeaderComponent={MediaDefinition}
             data={[...Videos]}
-            numColumns={3}
+            // numColumns={4}
             maxToRenderPerBatch={10}
             ListEmptyComponent={() => Array.from({ length: 3 }, (_) => <View style={{ height: 170, borderRadius: 5, backgroundColor: colors.background2 }} />)}
-            columnWrapperStyle={{ gap: 5 }}
+            // columnWrapperStyle={{ gap: 5 }}
             contentContainerStyle={{ gap: 5, padding: 5 }}
             refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={$videos?.isRefetching} />}
             renderItem={({ item, index }: { item: IPostItem, index: number }) => (
                 <TouchableOpacity
-                    disabled={Boolean(mediaContext?.fileUrl == item.fileUrl)}
-                    onPress={() => {
-                        mediaContext?.connect(item)
-                        if (rewardedInterstitialAd?.isLoaded)
-                            if (getRandomBoolean())
-                                rewardedInterstitialAd?.show()
-                    }}
-                    style={{ flexGrow: 1, height: 170, overflow: 'hidden', borderRadius: 5, opacity: Boolean(mediaContext?.fileUrl == item.fileUrl) ? .4 : 1 }}   >
+                    style={[styles.spaceBetween, {
+                        flexGrow: 1,
+                        padding: 0,
+                        height: 140,
+                        overflow: 'hidden',
+                    }]}   >
                     <Image
                         resizeMethod="resize"
-                        resizeMode="cover"
-                        style={{ width: '100%', height: '100%' }}
+                        resizeMode='cover'
+                        style={{ width: 100, height: '100%', borderRadius: 5 }}
                         source={{ uri: requestUrl(item?.thumbnailUrl) }}
                     />
+                    <View style={{ height: '100%', paddingVertical: 10, flex: 1 }}>
+                        <HeadLine children={item.title} />
+                        <View style={{ width: '100%', flex: 1 }}>
+                            <SpanText style={{fontSize:13, fontWeight:'500'}} numberOfLines={3} children={item.description ?? item?.caption} />
+                        </View>
+                        <View style={[styles.spaceBetween, { padding: 0 }]}>
+                            <View style={[styles.spaceBetween, {padding:0}]}>
+                                <LikeButton post={item} onLikeToggle={null} />
+                                <PostAnalytics {...item}  />
+                            </View>
+                            <TouchableOpacity
+                                disabled={Boolean(mediaContext?.fileUrl == item.fileUrl)}
+                                onPress={() => {
+                                    mediaContext?.connect(item)
+                                    if (rewardedInterstitialAd?.isLoaded)
+                                        if (getRandomBoolean())
+                                            rewardedInterstitialAd?.show()
+                                }}
+                                style={{ backgroundColor: colors.background2, padding: 3, paddingHorizontal: 15, borderRadius: 50 }}>
+                                <SpanText style={{ fontSize: 12 }}>
+                                    {Boolean(mediaContext?.fileUrl == item.fileUrl) ? 'Watching...' : 'Play'}
+                                </SpanText>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </TouchableOpacity>
-            )}
-        />
+            )}  
+        /> 
     )
-
 
     return (
         <Animated.View

@@ -1,25 +1,27 @@
 import { useEffect, useState, } from "react";
 import ThemedModal from "../../../../Components/Modals";
 import { IPostItem } from "../../../../Interfaces";
-import { ScrollView, StyleSheet, View, useWindowDimensions, Animated as RNAnimated, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, View, useWindowDimensions, Animated as RNAnimated, TouchableOpacity, ImageBackground } from "react-native";
 import ProfileAvatar from "../../../../Components/ProfileAvatar";
 import { Ionicons } from "@expo/vector-icons";
 import { IconButton } from "../../../../Components/Buttons";
 import useThemeColors from "../../../../Hooks/useThemeColors";
-import ImagePresent from "./Image"; 
+import ImagePresent from "./Image";
 import usePostForm from "../../../../Hooks/usePostForms";
 import React from 'react';
 import { BannerAd, BannerAdSize, TestIds, useRewardedAd } from 'react-native-google-mobile-ads';
 import VideoPresent from "./Video";
-import PostExplorerFooting from "../../../Explorer/Wrapper/Footing";
 import { HeadLine, TextExpandable } from "../../../../Components/Texts";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRewardedInterstitialAd } from "react-native-google-mobile-ads";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
 import { getRandomBoolean } from "../../../../Helpers";
 import useEndpoints from "../../../../Hooks/useEndpoints";
-
-
+import { StatusBar } from 'react-native'
+import LikeButton from "../../../_partials/PostComponents/Like";
+import PostAnalytics from "../../../_partials/PostComponents/Analytics/inedx";
+import PostComments from "../../../_partials/PostComponents/Comments";
+import PostShare from "../../../_partials/PostComponents/Share";
 
 type PresentMedia = IPostItem & {
     onClose?(): void
@@ -81,7 +83,7 @@ export default function PresentMedia(post: PresentMedia) {
         pressTimeout = setTimeout(() => {
 
         }, 100); // Adjust the duration as needed
-
+        StatusBar.setHidden(!isPostFocused)
         setIsPostFocused(!isPostFocused);
     };
 
@@ -145,33 +147,38 @@ export default function PresentMedia(post: PresentMedia) {
 
 
     const postFooting = (
-        <LinearGradient
-            colors={['transparent', 'transparent', 'rgba(0,0,0,0.2)']}
-            style={[styles.posFooting, { backgroundColor: themeColors.background }]}>
-            <HeadLine
-                hidden={!post?.title}
-                children={post?.title}
-                style={{  paddingHorizontal:10  }}
-            />
-            <TextExpandable
-                hidden={!post?.description}
-                style={{ paddingHorizontal: 10, paddingBottom: 5 }}
-                children={post?.description} />
-            {isBannerAdVisible && <View style={[styles.bannerAdContainer, { overflow: 'hidden' }]}>
-                <BannerAd
-                    unitId={bannerAdId}
-                    size={BannerAdSize.BANNER}
-                    requestOptions={{
-                        requestNonPersonalizedAdsOnly: true,
-                    }}
+        <View style={[styles.posFooting, { backgroundColor: themeColors.background }]}  >
+            <View style={[styles.footingInner, { backgroundColor: 'rgba(0,0,0,0.5)' }]}>
+                <HeadLine
+                    hidden={!post?.title}
+                    children={post?.title}
+                    style={{ paddingHorizontal: 10 }}
                 />
-                <IconButton onPress={() => setisBannerAdVisible(false)} icon={<Ionicons name="close" />} />
-            </View>}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 9 }}>
-                <ProfileAvatar {...post?.owner} avatarOnly />
-                <PostExplorerFooting {...post} />
+                <TextExpandable
+                    hidden={!post?.description}
+                    style={{ paddingHorizontal: 10, paddingBottom: 5 }}
+                    children={post?.description} />
+                {isBannerAdVisible && <View style={[styles.bannerAdContainer, { overflow: 'hidden' }]}>
+                    <BannerAd
+                        unitId={bannerAdId}
+                        size={BannerAdSize.BANNER}
+                        requestOptions={{
+                            requestNonPersonalizedAdsOnly: true,
+                        }}
+                    />
+                    <IconButton onPress={() => setisBannerAdVisible(false)} icon={<Ionicons name="close" />} />
+                </View>}
             </View>
-        </LinearGradient>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 15, padding: 10 }}>
+                <ProfileAvatar {...post?.owner} avatarOnly />
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 15 }}>
+                    <LikeButton post={post} onLikeToggle={null} />
+                    <PostAnalytics {...post} />
+                    <PostComments {...post} />
+                    <PostShare  {...post} />
+                </View>
+            </View>
+        </View>
     )
 
     return (
@@ -214,10 +221,17 @@ const styles = StyleSheet.create({
     },
     posFooting: {
         width: '100%',
-        bottom: 0,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        position: 'absolute',
+        // position: 'absolute', 
+        position: 'relative', 
+    },
+    footingInner: {
+        // position: 'absolute',
+        width:'100%',
+        // left: 0,
+        // bottom: '100%',
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+        overflow: 'hidden',
         paddingTop:10
     }
 })

@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Platform, ToastAndroid } from "react-native";
 import useEndpoints from "./useEndpoints";
 import { getTags } from "../Helpers";
+import { AxiosRequestConfig } from "axios";
 
 export default function usePostForm(): { states: IPostContext, methods: IPostFormMethods } {
 
@@ -13,9 +14,9 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
     const navigation = useNavigation()
     const endpoints = useEndpoints()
 
-    const header = {
-        Authorization: `Bearer ${authContext.user.accessToken}`
-    }
+    const header = new Object() as AxiosRequestConfig['headers']
+    header['Authorization'] = `Bearer ${authContext.user.accessToken}`
+
 
     const setData: IPostFormMethods['setData'] = (key, payload) => {
         let tags = undefined
@@ -28,62 +29,77 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
         }))
     };
 
-    const _handlePublicationFiles = async (formData: FormData, _file: any, _fieldName: 'uplaod' | 'thumbnail', type: string, name: string) => (
-        formData.append(_fieldName, {
-            type: type,
-            name: name,
-            uri: _file
-        } as any)
-    )
+    const _handlePublicationFiles = async (formData: FormData, _file: any, _fieldName: 'upload' | 'thumbnail', type: string, name: string) => {
+        if (_fieldName && _file)
+            formData.append(_fieldName, {
+                type: type,
+                name: name,
+                uri: _file
+            } as any)
+    }
+
+    const _requireAuthenticated = async () => {
+
+    }
 
     const _handlePublicationStatus = async (publication) => {
         if (publication.status === 'fulfilled') {
             if (Platform.OS === 'android') {
                 ToastAndroid.SHORT
-                ToastAndroid.show(publication?.value?.data?.message ?? 'Post published', 2000)
+                ToastAndroid.show(publication?.value?.data?.message ?? 'success', 2000)
             }
             return publication?.value?.data
         }
         if (publication?.reason?.statusCode === 401) return authContext?.logout()
+        console.log(JSON.stringify(publication?.reason?.response?.data?.message))
         if (Platform.OS === 'android') {
             ToastAndroid.SHORT
-            ToastAndroid.show(publication?.reason?.message ?? 'something went wrong!!', 2000)
+            ToastAndroid.show(publication?.reason?.response?.data?.message ?? publication?.reason?.message ?? 'something went wrong!!', 2000)
         }
+    }
+
+    const _afterPublication = async () => {
+
     }
 
     const _handlePublicationFormData = (payload: IPostContext): FormData => {
         const formData = new FormData()
+        if (!payload?.file) formData.append('upload', '')
+        if (!payload?.thumbnail) formData.append('thumbnail', '')
         Object.keys(payload)?.map(d => {
-            formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
+            if (payload[d] !== null)
+                formData.append(d, typeof payload?.[d] === 'object' ? JSON.stringify(payload?.[d]) : payload?.[d])
         })
         return formData
     }
 
     const createPost: IPostFormMethods['createPost'] = async (payload: IPostContext) => {
+        _requireAuthenticated()
         const formData = _handlePublicationFormData(payload)
-        _handlePublicationFiles(formData, payload.file.uri, 'uplaod', payload.file.type, payload.file.name)
-        _handlePublicationFiles(formData, payload?.thumbnail, 'thumbnail', 'image/*', 'thumbnail.jpg')
-        if (navigation?.canGoBack()) navigation?.goBack()
+        !payload?.file || _handlePublicationFiles(formData, payload?.file?.uri, 'upload', payload?.file?.type, payload?.file?.name)
+        !payload?.thumbnail || _handlePublicationFiles(formData, payload?.thumbnail, 'thumbnail', 'image/*', 'thumbnail.jpg')
         const [publication] = await Promise.allSettled([endpoints.usePostMethod<any>(endpoints?.publication, formData, header)])
+        if (navigation?.canGoBack()) navigation?.goBack()
         _handlePublicationStatus(publication)
     }
 
     const updatePost: IPostFormMethods['updatePost'] = async (payload) => {
+        _requireAuthenticated()
         if (payload?.puid) {
             const formData = _handlePublicationFormData(payload)
-            if (payload?.thumbnail != null && !payload?.thumbnail?.endsWith('null'))
-                if (!payload?.thumbnail?.split(payload?.puid)?.[1])
-                    _handlePublicationFiles(formData, payload?.thumbnail, 'thumbnail', 'image/*', 'thumbnail.jpg')
-            if (payload?.file !== null && payload?.file?.type !== null)
-                if (!payload?.file?.uri?.split(payload?.puid)?.[1])
-                    _handlePublicationFiles(formData, payload.file.uri, 'uplaod', payload.file.type, payload.file.name)
-            if (navigation?.canGoBack()) navigation?.goBack()
-            const [publication] = await Promise.allSettled([endpoints.usePutMethod<any>(endpoints?.publication.concat(payload?.puid).concat('?_method = PUT'), formData, header)])
+            formData.append('_method', 'PATCH')
+            if (payload?.thumbnail && payload?.thumbnail?.startsWith('file'))
+                _handlePublicationFiles(formData, payload?.thumbnail, 'thumbnail', 'image/*', 'thumbnail.jpg')
+            if (payload?.file && payload?.file?.uri?.startsWith('file'))
+                _handlePublicationFiles(formData, payload.file.uri, 'upload', payload.file.type, payload.file.name)
+            // if (navigation?.canGoBack()) navigation?.goBack()
+            const [publication] = await Promise.allSettled([endpoints.usePostMethod<any>(endpoints?.publication.concat('/').concat(payload?.puid).concat('?_method=PUT'), formData, header)])
             _handlePublicationStatus(publication)
         }
     }
 
     const deletePost: IPostFormMethods['deletePost'] = async (payload) => {
+        _requireAuthenticated()
         const [deleted] = await Promise.allSettled([endpoints.useDeleteMethod(endpoints.publication, { postId: payload?.puid }, header)])
         if (deleted?.status == 'fulfilled')
             if (authContext?.user?.person === 'isAuthenticated') {
@@ -98,21 +114,12 @@ export default function usePostForm(): { states: IPostContext, methods: IPostFor
 
     const postReward: IPostFormMethods['postReward'] = async (rewards, puid) => {
         const [rewarded] = await Promise.allSettled([endpoints.usePostMethod(endpoints.rewardEarned, { rewards, puid }, header)])
-        if (rewarded?.status === 'fulfilled') {
-            if (authContext?.user?.person === 'isAuthenticated') {
-                ToastAndroid.BOTTOM
-                ToastAndroid.show(`You earned points`, 10000)
-            }
-        }
+        _handlePublicationStatus(rewarded)
     }
 
     const postReact: IPostFormMethods['postReact'] = async (reacted, puid) => {
         const [reaction] = await Promise.allSettled([endpoints.usePostMethod(endpoints.postReacted, { reacted, puid }, header)])
-        if (reaction?.status === 'fulfilled')
-            if (Platform.OS === 'android') {
-                ToastAndroid.BOTTOM
-                ToastAndroid.show(`${reacted ? 'Liked' : 'Unlike'}`, 1000)
-            }
+        _handlePublicationStatus(reaction)
     }
 
     return {

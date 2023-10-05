@@ -1,7 +1,8 @@
-import { Axios, AxiosHeaderValue, AxiosPromise,   AxiosRequestConfig } from 'axios'
+import { Axios, AxiosHeaderValue, AxiosPromise, AxiosRequestConfig } from 'axios'
 import { IPostType } from './IPostContext'
 import { IAuthContextData } from './iAuthContext'
 import { IStorageItems, IStorageMethods } from './iUseStorage'
+import { UseInfiniteQueryResult } from '@tanstack/react-query'
 
 // Interface for themed components
 export interface IThemedComponent {
@@ -123,16 +124,22 @@ export interface IApp {
 export type IAppDataContext = IStorageItems
 export type IAppDataContextMethods = IStorageMethods
 
-
-interface CustomHeaders extends AxiosHeaders {
-    Authorization?: string; // Define Authorization property explicitly
+export type IUseInfiniteQueryParams = {
+    results: unknown[],
+    error: UseInfiniteQueryResult['error'],
+    loadMoreItems(): void
+    onRefetch(): void,
+    hasNextPage: UseInfiniteQueryResult['hasNextPage']
+    isRefetching: boolean
 }
 
-type AxiosHeaders = Record<string, string>;
+export type IUseInfiniteQueryArgs = {
+    url: string,
+    querykey: string,
+    enabled: boolean
+    chainedQuery?: string
+}
 
-
-
-// interface EndPoints
 export interface IEndPoints {
     search: string
     /** @description the publication endpoint is used to create/delete/update and view posts/post */

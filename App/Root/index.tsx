@@ -10,7 +10,6 @@ import DataContextProvider from "../Contexts/SysContext";
 import Downloads from "../Screens/User/Downloads";
 import { AppOpenAd, TestIds, useAppOpenAd } from 'react-native-google-mobile-ads';
 import "expo-dev-client"
-import Explorer from "../Screens/Explorer";
 import Search from "../Screens/Search";
 import { Linking, View } from 'react-native';
 import { MediaViewerProvider } from "../Contexts/MediaPlaybackContext";
@@ -83,7 +82,6 @@ const PublicRoutes = (
         screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }} >
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Downloads' component={Downloads} />
-        <Stack.Screen name="Explorer" component={Explorer} initialParams={{ screen: 'videos' }} />
         <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name="Account" component={AccountRoutes} />
         <Stack.Screen name="Market" component={MarketPlaceHome} />

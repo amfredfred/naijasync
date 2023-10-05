@@ -59,6 +59,7 @@ export const FormUploadHome = () => {
 
     useEffect(() => {
         if (postToEdit?.puid) {
+            setformMode('update_post')
             setSessionValues({
                 ...postToEdit as any,
                 file: {
